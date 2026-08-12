@@ -18,8 +18,8 @@ accounts are distinguished by their category, and metric definitions apply the
 signs. This keeps the extract readable and keeps debit/credit sign errors out of
 the demonstration.
 
-This module has no dependency on any AI component. See
-`.claude/benacta/architecture-principles.md` — the trust boundary.
+This module has no dependency on any AI component — part of the trust
+boundary enforced by `tests/test_ai_independence.py`.
 """
 
 from __future__ import annotations

@@ -1,6 +1,6 @@
 # BENACTA — Demo Script
 
-> Three walkthroughs of the same running app (`DEMO_MODE=true streamlit run app.py`), scaled to how much time the audience has. Same story, same numbers, every time — see `docs/implementation-plan.md` §3 for the full reference scenario.
+> Three walkthroughs of the same running app (`DEMO_MODE=true streamlit run app.py`), scaled to how much time the audience has. Same story, same numbers, every time — see `docs/architecture.md` and the README's worked example for the full reference scenario.
 
 ## 30-second explanation
 

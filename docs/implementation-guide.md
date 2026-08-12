@@ -1,6 +1,6 @@
 # BENACTA — Implementation Guide
 
-> For readers who want to run, extend or adapt the reference implementation. Doctrine and scope are governed by `CLAUDE.md` and `.claude/benacta/*`; this guide is practical, not philosophical. Architecture and data contracts: `docs/architecture.md`.
+> For readers who want to run, extend or adapt the reference implementation. Practical, not philosophical. Architecture and data contracts: `docs/architecture.md`.
 
 ## Running it
 

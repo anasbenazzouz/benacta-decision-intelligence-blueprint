@@ -197,9 +197,6 @@ benacta-decision-intelligence-blueprint/
 ├── app.py                     Executive Decision Cockpit · Architecture · Audit Trail
 ├── requirements.txt / .env.example
 │
-├── .claude/benacta/           persistent doctrine (positioning, architecture, brand, vocabulary, anti-patterns)
-├── source/                    supplied brand charter and Architecture Note #001 (untouched)
-│
 ├── data/
 │   ├── actuals.csv · budget.csv · budget_lines.csv · transactions.csv · source_records.csv
 │   └── context/                management notes, milestones, forecast assumptions, travel & finance policy
@@ -278,4 +275,4 @@ Anas Benazzouz — BENACTA · AI Engineering · Finance & Operations
 
 ---
 
-*License: deferred to the release phase — an owner decision, to be made before the repository is made public if it becomes public; see `docs/acceptance-criteria.md` §11. All data in this repository is fictional.*
+*License: none selected yet — deliberately deferred, all rights reserved by default in the meantime. All data in this repository is fictional.*

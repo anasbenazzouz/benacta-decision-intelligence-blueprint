@@ -1,6 +1,6 @@
 # BENACTA Decision Intelligence Blueprint — V1 Architecture
 
-> Phase 2 deliverable. Doctrine: `.claude/benacta/architecture-principles.md`. Scope: `docs/implementation-plan.md`.
+> Technical architecture and data contracts for the reference implementation.
 
 ## 1. Business view
 

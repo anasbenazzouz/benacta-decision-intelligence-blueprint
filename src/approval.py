@@ -26,7 +26,7 @@ class ReviewState(str, Enum):
     REVISION_REQUESTED = "REVISION_REQUESTED"
 
 
-#: What an executive sees, per `.claude/benacta/vocabulary.md`.
+#: What an executive sees (BENACTA UI vocabulary).
 REVIEW_STATE_LABELS: dict[ReviewState, str] = {
     ReviewState.DRAFT: "AI DRAFT",
     ReviewState.AWAITING_REVIEW: "CONTROLLER REVIEW",

@@ -1,10 +1,9 @@
 """
 BENACTA — visual system for the Decision Cockpit.
 
-Tokens and components taken from the supplied graphical charter
-(`source/brand/Graphical_Design_Final.pdf`, "Master Définitif") and transcribed
-in `.claude/benacta/brand-system.md`. The charter's own governing rule applies:
-the system is locked — select from it, do not reinterpret it.
+Tokens and components taken from BENACTA's supplied graphical charter
+("Master Définitif"). The charter's own governing rule applies: the system
+is locked — select from it, do not reinterpret it.
 
 Three principles drive everything here:
 
