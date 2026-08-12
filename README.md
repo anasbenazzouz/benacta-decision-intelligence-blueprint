@@ -11,6 +11,8 @@
 
 A working reference implementation showing how governed enterprise data moves through business meaning, deterministic truth, contextual interpretation, human judgment and action. Finance — a Monthly Performance Review — is the first vertical slice; BENACTA is broader than Finance.
 
+**[▶ Open the live Decision Cockpit](https://benacta-di.streamlit.app/)** — no sign-up, no API key.
+
 `DEMO_MODE=true` · 155/155 tests passing · no API key required · Python + Streamlit + Pandas
 
 ---
@@ -39,7 +41,7 @@ The objective here is not *"chat with your ERP."* It is:
 
 ## Decision Cockpit
 
-![Executive Decision Cockpit — July 2026 performance, four governed metrics with actual, budget and variance](assets/generated/screenshots/01-executive-decision-cockpit.png)
+[![Executive Decision Cockpit — July 2026 performance, four governed metrics with actual, budget and variance](assets/generated/screenshots/01-executive-decision-cockpit.png)](https://benacta-di.streamlit.app/)
 
 *The executive entry point. Every figure on this screen was calculated by code from the committed ledger — the header says so (`calculated by code · not generated`), and the `TRACE TO SOURCE` control on each metric makes the claim checkable rather than decorative.*
 
@@ -198,6 +200,14 @@ tests/test_ai_independence.py::test_financial_truth_is_independent_from_llm
 ```
 
 This is the philosophically load-bearing test in the repository. AI augments interpretation. It does not own the truth.
+
+## Live demo
+
+**https://benacta-di.streamlit.app**
+
+The full loop, running: the cockpit, the ranked attention list, the evidence and interpretation blocks, controller approval, the decision log and the audit trail. No sign-up, no API key, nothing to install. It runs in Demo Mode on the same fictional dataset committed to this repository, so the figures you see are the ones the tests assert.
+
+The app sleeps when idle and takes a few seconds to wake on the first request.
 
 ## Quick start
 
