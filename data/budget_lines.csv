@@ -1,0 +1,17 @@
+budget_line_id,period,business_unit,project_id,project_name,customer,milestone_id,milestone_name,account,cost_center,currency,amount,budget_version,source_system,source_model
+BL-90001,2026-07,BU-PRJ,PRJ-SVW,Sundvik Wastewater Upgrade,Sundvik Municipal Utilities,MS-1187,Phase 1 customer acceptance,700100,CC-4100,EUR,680000.00,FY26 Approved Budget,EPM · Planning,RevenueBudgetLine
+BL-90002,2026-07,BU-PRJ,PRJ-KLR,Kallgren Refinery Retrofit,Kallgren Refining AS,MS-2078,Mechanical completion acceptance,700100,CC-4100,EUR,910000.00,FY26 Approved Budget,EPM · Planning,RevenueBudgetLine
+BL-90003,2026-07,BU-PRJ,PRJ-BRT,Bratten Terminal Expansion,Bratten Port Authority,MS-2140,Interim acceptance milestone,700100,CC-4100,EUR,425000.00,FY26 Approved Budget,EPM · Planning,RevenueBudgetLine
+BL-90004,2026-07,BU-PRJ,PRJ-OSF,Osby Filtration Plant,Osby Water Authority,MS-1996,Final acceptance,700100,CC-4100,EUR,240000.00,FY26 Approved Budget,EPM · Planning,RevenueBudgetLine
+BL-90005,2026-07,BU-PRJ,PRJ-NGW,Northgate Water Treatment,Nordic Water Utilities AB,MS-2214,Phase 2 customer acceptance,700100,CC-4100,EUR,195000.00,FY26 Approved Budget,EPM · Planning,RevenueBudgetLine
+BL-90006,2026-07,BU-PRJ,PRJ-HLT,Halden Terminal,Halden Port Authority,MS-2231,Commissioning acceptance,700100,CC-4100,EUR,150000.00,FY26 Approved Budget,EPM · Planning,RevenueBudgetLine
+BL-90007,2026-07,BU-PRJ,PRJ-NGW,Northgate Water Treatment,Nordic Water Utilities AB,,,700200,CC-4200,EUR,300000.00,FY26 Approved Budget,EPM · Planning,RevenueBudgetLine
+BL-90008,2026-07,BU-PRJ,PRJ-KLR,Kallgren Refinery Retrofit,Kallgren Refining AS,,,700200,CC-4200,EUR,270000.00,FY26 Approved Budget,EPM · Planning,RevenueBudgetLine
+BL-90009,2026-07,BU-PRJ,PRJ-BRT,Bratten Terminal Expansion,Bratten Port Authority,,,700200,CC-4200,EUR,230000.00,FY26 Approved Budget,EPM · Planning,RevenueBudgetLine
+BL-90010,2026-07,BU-SVC,PRJ-SVW,Sundvik Wastewater Upgrade,Sundvik Municipal Utilities,,,700300,CC-5100,EUR,405000.00,FY26 Approved Budget,EPM · Planning,RevenueBudgetLine
+BL-90011,2026-07,BU-SVC,PRJ-KLR,Kallgren Refinery Retrofit,Kallgren Refining AS,,,700300,CC-5100,EUR,375000.00,FY26 Approved Budget,EPM · Planning,RevenueBudgetLine
+BL-90012,2026-07,BU-SVC,PRJ-OSF,Osby Filtration Plant,Osby Water Authority,,,700300,CC-5100,EUR,260000.00,FY26 Approved Budget,EPM · Planning,RevenueBudgetLine
+BL-90013,2026-07,BU-SVC,PRJ-BRT,Bratten Terminal Expansion,Bratten Port Authority,,,700300,CC-5100,EUR,210000.00,FY26 Approved Budget,EPM · Planning,RevenueBudgetLine
+BL-90014,2026-07,BU-SVC,PRJ-NGW,Northgate Water Treatment,Nordic Water Utilities AB,,,700400,CC-5100,EUR,140000.00,FY26 Approved Budget,EPM · Planning,RevenueBudgetLine
+BL-90015,2026-07,BU-SVC,PRJ-KLR,Kallgren Refinery Retrofit,Kallgren Refining AS,,,700400,CC-5100,EUR,120000.00,FY26 Approved Budget,EPM · Planning,RevenueBudgetLine
+BL-90016,2026-07,BU-SVC,PRJ-BRT,Bratten Terminal Expansion,Bratten Port Authority,,,700400,CC-5100,EUR,90000.00,FY26 Approved Budget,EPM · Planning,RevenueBudgetLine

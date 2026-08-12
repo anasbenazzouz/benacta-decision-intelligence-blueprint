@@ -1,0 +1,23 @@
+# BENACTA — Decision Cockpit runtime configuration.
+#
+# The theme is pinned rather than inherited from the viewer's operating system:
+# the charter palette is the brand, and a viewer in dark mode must not be shown
+# a different one. Values are the exact charter colours.
+
+[theme]
+base = "light"
+backgroundColor = "#F1E9DA"          # Warm Porcelain — the light ground
+secondaryBackgroundColor = "#E7DFCC" # a porcelain step for inputs and code blocks
+textColor = "#122B20"                # Deep Heritage Green — ink
+primaryColor = "#BBA06B"             # Antique Champagne — decision and action only
+font = "sans-serif"
+
+[client]
+toolbarMode = "minimal"
+showErrorDetails = true
+
+[browser]
+gatherUsageStats = false
+
+[server]
+headless = true

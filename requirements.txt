@@ -1,0 +1,8 @@
+# BENACTA Decision Intelligence Blueprint — runtime dependencies
+# Deliberately small. The application runs fully in DEMO_MODE with no API key.
+pandas>=2.0
+streamlit>=1.30
+
+# Optional: only used when DEMO_MODE=false to enable real LLM commentary.
+# The application is fully functional without it.
+# anthropic>=0.40

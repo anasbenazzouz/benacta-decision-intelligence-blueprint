@@ -1,0 +1,15 @@
+transaction_id,posting_date,document_number,period,business_unit,project_id,project_name,customer,milestone_id,milestone_name,account,cost_center,currency,amount,source_system,source_model
+TX-90001,2026-07-08,MSA-2026-07-011,2026-07,BU-PRJ,PRJ-SVW,Sundvik Wastewater Upgrade,Sundvik Municipal Utilities,MS-1187,Phase 1 customer acceptance,700100,CC-4100,EUR,680000.00,ERP · Project Accounting,MilestoneAcceptance
+TX-90002,2026-07-15,MSA-2026-07-012,2026-07,BU-PRJ,PRJ-KLR,Kallgren Refinery Retrofit,Kallgren Refining AS,MS-2078,Mechanical completion acceptance,700100,CC-4100,EUR,910000.00,ERP · Project Accounting,MilestoneAcceptance
+TX-90003,2026-07-21,MSA-2026-07-013,2026-07,BU-PRJ,PRJ-BRT,Bratten Terminal Expansion,Bratten Port Authority,MS-2140,Interim acceptance milestone,700100,CC-4100,EUR,425000.00,ERP · Project Accounting,MilestoneAcceptance
+TX-90004,2026-07-29,MSA-2026-07-014,2026-07,BU-PRJ,PRJ-OSF,Osby Filtration Plant,Osby Water Authority,MS-1996,Final acceptance,700100,CC-4100,EUR,240000.00,ERP · Project Accounting,MilestoneAcceptance
+TX-90005,2026-07-10,SI-2026-07-041,2026-07,BU-PRJ,PRJ-NGW,Northgate Water Treatment,Nordic Water Utilities AB,,,700200,CC-4200,EUR,310000.00,ERP · Sales & Distribution,SalesInvoice
+TX-90006,2026-07-18,SI-2026-07-042,2026-07,BU-PRJ,PRJ-KLR,Kallgren Refinery Retrofit,Kallgren Refining AS,,,700200,CC-4200,EUR,285000.00,ERP · Sales & Distribution,SalesInvoice
+TX-90007,2026-07-25,SI-2026-07-043,2026-07,BU-PRJ,PRJ-BRT,Bratten Terminal Expansion,Bratten Port Authority,,,700200,CC-4200,EUR,240000.00,ERP · Sales & Distribution,SalesInvoice
+TX-90008,2026-07-01,SI-2026-07-051,2026-07,BU-SVC,PRJ-SVW,Sundvik Wastewater Upgrade,Sundvik Municipal Utilities,,,700300,CC-5100,EUR,410000.00,ERP · Sales & Distribution,SalesInvoice
+TX-90009,2026-07-01,SI-2026-07-052,2026-07,BU-SVC,PRJ-KLR,Kallgren Refinery Retrofit,Kallgren Refining AS,,,700300,CC-5100,EUR,380000.00,ERP · Sales & Distribution,SalesInvoice
+TX-90010,2026-07-01,SI-2026-07-053,2026-07,BU-SVC,PRJ-OSF,Osby Filtration Plant,Osby Water Authority,,,700300,CC-5100,EUR,265000.00,ERP · Sales & Distribution,SalesInvoice
+TX-90011,2026-07-01,SI-2026-07-054,2026-07,BU-SVC,PRJ-BRT,Bratten Terminal Expansion,Bratten Port Authority,,,700300,CC-5100,EUR,207000.00,ERP · Sales & Distribution,SalesInvoice
+TX-90012,2026-07-12,SI-2026-07-061,2026-07,BU-SVC,PRJ-NGW,Northgate Water Treatment,Nordic Water Utilities AB,,,700400,CC-5100,EUR,145000.00,ERP · Sales & Distribution,SalesInvoice
+TX-90013,2026-07-19,SI-2026-07-062,2026-07,BU-SVC,PRJ-KLR,Kallgren Refinery Retrofit,Kallgren Refining AS,,,700400,CC-5100,EUR,128000.00,ERP · Sales & Distribution,SalesInvoice
+TX-90014,2026-07-24,SI-2026-07-063,2026-07,BU-SVC,PRJ-BRT,Bratten Terminal Expansion,Bratten Port Authority,,,700400,CC-5100,EUR,95000.00,ERP · Sales & Distribution,SalesInvoice
