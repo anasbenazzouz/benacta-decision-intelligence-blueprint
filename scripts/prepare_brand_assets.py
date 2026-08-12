@@ -8,6 +8,11 @@ visible artboard edge. Nothing is recoloured, stretched or re-proportioned —
 the crop is the only transformation, per the charter's logo rules.
 
     python scripts/prepare_brand_assets.py
+
+The supplied logo packs are not redistributed with this repository; only the
+derived crops in `assets/generated/` are committed. This script is therefore a
+provenance record of how those crops were produced rather than something a
+cloner needs to run — the application never invokes it.
 """
 
 from __future__ import annotations

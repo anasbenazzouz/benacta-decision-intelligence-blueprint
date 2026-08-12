@@ -1,7 +1,7 @@
 # Vendored fonts
 
-The two type families of the BENACTA charter (`.claude/benacta/brand-system.md` §2),
-vendored locally so `docs/controlled-intelligence-blueprint.html` renders
+The two type families of the BENACTA charter, vendored locally so
+`docs/controlled-intelligence-blueprint.html` renders
 identically offline and the PDF can be regenerated without a network.
 
 Regenerate with `python scripts/vendor_fonts.py`.

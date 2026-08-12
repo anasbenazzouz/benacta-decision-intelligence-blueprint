@@ -37,7 +37,35 @@ The objective here is not *"chat with your ERP."* It is:
 8. The reviewed issue becomes an owned next step — insight without action is incomplete.
 9. Every step is logged, so any statement on screen can be traced back to its source.
 
-## One concrete example
+## Decision Cockpit
+
+![Executive Decision Cockpit — July 2026 performance, four governed metrics with actual, budget and variance](assets/generated/screenshots/01-executive-decision-cockpit.png)
+
+*The executive entry point. Every figure on this screen was calculated by code from the committed ledger — the header says so (`calculated by code · not generated`), and the `TRACE TO SOURCE` control on each metric makes the claim checkable rather than decorative.*
+
+## From signal to decision
+
+The cockpit is organised as a sequence, not a set of panels: what happened, what requires attention, why, and who decides. The same Revenue issue is followed through all three screens below.
+
+### Attention — what the controls surfaced
+
+![Ranked attention list — five control findings ordered by severity, Revenue selected at HIGH](assets/generated/screenshots/02-revenue-attention-detail.png)
+
+*Eight control findings, five above the materiality thresholds, ranked. Each row names the rule that fired — absolute or relative materiality — so attention is the output of a published policy rather than an editorial choice.*
+
+### Evidence and interpretation — why it happened
+
+![Revenue issue detail — AI interpretation beside the computed figures, root cause, and three quoted evidence sources](assets/generated/screenshots/03-evidence-interpretation.png)
+
+*The figures sit on the right, computed. The AI interpretation sits on the left, drafted from those figures and from the quoted source text below it — marked `AI-GENERATED INTERPRETATION`, and explicit that the association it draws "is indicative and requires controller confirmation." The evidence is quoted, not summarised.*
+
+### Human review and action — who decides
+
+![Controller review stage with Approve and Request revision controls, above the decision log](assets/generated/screenshots/04-human-review-action.png)
+
+*Nothing publishes itself. The interpretation moves `AI DRAFT → CONTROLLER REVIEW → APPROVED`, a named reviewer either approves it or sends it back with a comment, and the decision log carries each issue to an owner, a next step and a status.*
+
+## Reference scenario
 
 ### Why is Revenue below budget?
 
@@ -94,6 +122,10 @@ This reference implementation's **Business Semantic Layer** (`src/domain.py`) ma
 
 ## Code computes. AI explains. Humans decide.
 
+![Architecture view — the layer stack, with the trust boundary drawn between context retrieval and AI interpretation](assets/generated/screenshots/05-architecture-trust-boundary.png)
+
+*The architecture view inside the application, not a slide. The dashed line across the middle is the trust boundary: **computed facts only — facts above, interpretation below.** The deterministic core is boxed and closed; the AI layer beneath it "retrieves, explains, drafts — never owns the numbers"; the audit spine runs the full height.*
+
 The trust boundary is the architecture's central claim, and it is enforced, not just asserted.
 
 | Layer | Owns | Never |
@@ -105,6 +137,24 @@ The trust boundary is the architecture's central claim, and it is enforced, not 
 Retrieval sits on the deterministic side deliberately: it generates nothing, so the evidence a reader sees is quoted source text rather than something the model produced. `tests/test_ai_independence.py` treats `src/retrieval.py` as part of the truth layer and holds it to the same no-AI-imports rule.
 
 **The LLM is not the system of record.** It receives computed facts, control alerts and retrieved evidence — never the ledger — and returns a draft a human must approve. Disabling the AI layer entirely changes nothing about the figures, the controls or the materiality: `tests/test_ai_independence.py::test_financial_truth_is_independent_from_llm` proves it, structurally (no import path from the deterministic modules to any LLM SDK) and behaviorally (the full truth pipeline re-run with those imports actively blocked, producing byte-identical facts and alerts).
+
+### What the LLM is allowed to do
+
+- Retrieve context and cite where it came from
+- Summarize evidence, quoting rather than paraphrasing the source
+- Interpret deterministic findings it was handed
+- Assist human judgment — including by naming what it cannot account for
+- Formulate explanations in business language
+
+### What the LLM is not allowed to do
+
+- Calculate financial truth
+- Silently modify a governed metric
+- Become the system of record
+- Approve a decision autonomously
+- Execute a material action outside the configured control path
+
+The last two are structural, not prompt instructions: approval is a state machine (`src/approval.py`) that raises on illegal transitions, and the AI layer holds no reference to it.
 
 ## What the reference implementation contains
 
@@ -122,17 +172,6 @@ Verified against the current codebase — nothing here is aspirational:
 - Append-only Audit Trail, exportable as JSON (`src/audit.py`)
 - Executive Decision Cockpit, Architecture view and Audit Trail view (`app.py`, `src/theme.py`)
 - 155 tests, including the AI-independence proof
-
-## See it
-
-Screenshots are deferred to the release / visual QA phase (capture plan:
-`assets/generated/screenshots/README.md` — five shots, Executive Cockpit →
-Attention/Decision Detail → Evidence + Interpretation → Human Review +
-Action → Architecture View). Until then, run it yourself in about a minute:
-
-```bash
-DEMO_MODE=true streamlit run app.py
-```
 
 ## Technical architecture
 
@@ -170,7 +209,6 @@ python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 
 pip install -r requirements.txt
-cp .env.example .env             # DEMO_MODE=true by default — Windows: copy .env.example .env
 
 pytest -q                        # 155 passed
 python scripts/demo_decision_loop.py   # CLI walk through TRUTH → CONTEXT → INTERPRETATION → REVIEW → ACTION → AUDIT
@@ -178,9 +216,9 @@ python scripts/demo_decision_loop.py   # CLI walk through TRUTH → CONTEXT → 
 streamlit run app.py             # the Executive Decision Cockpit — opens at localhost:8501
 ```
 
-No API key is required for any of the above. `DEMO_MODE=true` is the default and the supported public configuration — the deterministic layer, retrieval, review workflow and audit trail all run exactly as described with commentary produced from controlled, evidence-based templates.
+No API key, no configuration file and no environment variable is required for any of the above. Demo Mode is the built-in default — `DEMO_MODE` is only read if you set it — and it is the supported public configuration: the deterministic layer, retrieval, review workflow and audit trail all run exactly as described, with commentary produced from controlled, evidence-based templates. `.env.example` documents the two variables that exist; nothing loads it for you.
 
-To enable real LLM commentary instead, install the optional dependency, set `DEMO_MODE=false` and provide a key:
+To enable real LLM commentary instead, install the optional dependency, set `DEMO_MODE=false` in your environment and provide a key:
 
 ```bash
 pip install anthropic
@@ -214,9 +252,17 @@ benacta-decision-intelligence-blueprint/
 │   ├── pipeline.py              assembles the loop into one session
 │   └── theme.py                 charter tokens + Streamlit CSS
 │
-├── scripts/demo_decision_loop.py  CLI walkthrough of the full loop
+├── assets/
+│   ├── fonts/                   charter type families, vendored for offline PDF rendering
+│   └── generated/               logo lockups · cockpit screenshots
+│
+├── scripts/
+│   ├── demo_decision_loop.py    CLI walkthrough of the full loop
+│   ├── render_blueprint.py      Blueprint HTML → PDF + page images for visual QA
+│   └── vendor_fonts.py · prepare_brand_assets.py
+│
 ├── tests/                       155 tests across 8 files
-└── docs/                        architecture, acceptance criteria, UI QA, demo script, implementation guide
+└── docs/                        architecture · implementation guide · demo script · Blueprint (HTML + PDF)
 ```
 
 ## Tests
@@ -226,6 +272,17 @@ python -m pytest -q
 ```
 
 155 tests across 8 files: variance/percentage correctness and boundary cases, control-rule thresholds and severities, retrieval determinism and evidence fields, source-to-transaction reconciliation, approval and decision-lifecycle transitions (legal and illegal), audit-record completeness, and AI independence — both structural (no import path from the deterministic modules to any LLM SDK) and behavioral (the full truth pipeline re-run with those imports blocked). All 155 pass with no API key present in the environment.
+
+## Documentation
+
+| | |
+|---|---|
+| [**Executive Blueprint** (PDF)](docs/BENACTA_Controlled_Intelligence_Blueprint.pdf) | *Controlled Intelligence* — the ten-page architecture note behind this implementation, written for executives and architects. Start here if you want the thinking rather than the code. |
+| [Architecture](docs/architecture.md) | Layers, data contracts, module responsibilities, the trust boundary as an enforced rule |
+| [Implementation guide](docs/implementation-guide.md) | Run it, extend it, adapt it — adding a metric, a control rule, a context document, a commentary provider |
+| [Demo script](docs/demo-script.md) | Three walkthroughs of the same running app — 30 seconds, 5 minutes, 15 minutes |
+
+The Blueprint's print master is committed as HTML (`docs/controlled-intelligence-blueprint.html`) and regenerated with `python scripts/render_blueprint.py`, so the PDF is reproducible rather than a binary drop.
 
 ## Limitations
 
@@ -263,11 +320,15 @@ The broader BENACTA direction — not V1 functionality:
   <img src="assets/generated/benacta-primary-light.png" alt="BENACTA" width="240">
 </picture>
 
-**BENACTA** · Enterprise AI · Decision Intelligence
-### AI-Native Decision Systems
-Finance · Operations · Performance · Workflows
+## About BENACTA
 
-BENACTA designs and builds AI-native decision systems at the intersection of enterprise AI, decision intelligence, data, business logic, workflows and human judgment. This repository is the first reference implementation of that architecture — Finance is the wedge, not the whole of it.
+**BENACTA** · Enterprise AI · Decision Intelligence
+
+### Turning enterprise data into decisions and action.
+
+BENACTA designs AI-native decision systems that connect enterprise data, governed business logic, contextual AI and human judgment — across Finance, Operations, Performance and Workflows.
+
+This repository is the first public reference implementation of that architecture. Finance is the wedge, not the whole of it.
 
 **Built on Truth. Designed for Decisions.**
 
@@ -275,4 +336,4 @@ Anas Benazzouz — BENACTA · AI Engineering · Finance & Operations
 
 ---
 
-*License: none selected yet — deliberately deferred, all rights reserved by default in the meantime. All data in this repository is fictional.*
+*Published as a public reference implementation. No open-source license has been selected yet — that decision is deliberately deferred, and all rights are reserved in the meantime. All business data in this repository is fictional.*

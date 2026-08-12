@@ -4,9 +4,8 @@ Render the Blueprint HTML master to PDF, then to page images for visual QA.
     python scripts/render_blueprint.py            # render PDF + QA page images
     python scripts/render_blueprint.py --pdf-only # render PDF only
 
-The visual QA loop is mandatory before the PDF is considered done
-(`.claude/benacta/content-system.md` §5): render, inspect every page, compare
-against the charter and Architecture Note #001, fix, render again.
+The visual QA loop is mandatory before the PDF is considered done: render,
+inspect every page, compare against the charter, fix, render again.
 
 The page images are working artefacts and are written to `outputs/` (gitignored).
 """

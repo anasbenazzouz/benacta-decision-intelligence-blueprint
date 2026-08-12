@@ -9,7 +9,7 @@ than a CID subset, so each weight the Blueprint uses is baked into its own
 static instance here. The result is committed; this script only needs to run
 again if a weight is added or the upstream fonts are updated.
 
-Charter roles (`.claude/benacta/brand-system.md` §2):
+Charter roles:
   role 2 · ENTERPRISE — Instrument Sans, the whole system (no Light weight)
   role 3 · EDITORIAL  — Source Serif 4, statements and quotes only
   role 1 · HERITAGE   — Libre Caslon Display: NOT vendored. It is reserved for
