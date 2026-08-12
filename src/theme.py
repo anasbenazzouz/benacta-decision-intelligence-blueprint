@@ -1183,10 +1183,10 @@ def status_chip(label: str) -> str:
 
 def footer_band() -> str:
     return (
-        f'<div class="ba-band" style="margin-top:56px;padding:22px 30px">'
-        f'<div class="ba-label kicker">Built on Truth. Designed for Decisions.</div>'
-        f'<div class="ba-body" style="margin-top:8px;opacity:0.72">'
-        f"Code computes. AI explains. Humans decide.</div></div>"
+        '<div class="ba-band" style="margin-top:56px;padding:22px 30px">'
+        '<div class="ba-label kicker">Built on Truth. Designed for Decisions.</div>'
+        '<div class="ba-body" style="margin-top:8px;opacity:0.72">'
+        "Code computes. AI explains. Humans decide.</div></div>"
     )
 
 

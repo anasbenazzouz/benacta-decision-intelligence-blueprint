@@ -19,7 +19,7 @@ from datetime import date
 from pathlib import Path
 from typing import Sequence
 
-from src.approval import ReviewRecord, ReviewState
+from src.approval import ReviewRecord
 from src.audit import AuditStep, AuditTrail
 from src.commentary import (
     Commentary,

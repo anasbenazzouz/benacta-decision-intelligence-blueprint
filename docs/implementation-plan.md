@@ -54,7 +54,7 @@ The executive **attention list** is the top 5; the full set remains available to
 - Objects: `BusinessUnit`, `CostCenter`, `Account` (with `AccountCategory`), `MetricDefinition`, `FinancialFact`, `ControlAlert`, `Evidence`, `Commentary`, `DecisionIssue`, `AuditRecord`.
 - Relationships: BusinessUnit → CostCenters → Accounts; MetricDefinition maps AccountCategories to metrics with a **direction** (`higher_is_better`) so favorability is business meaning, not presentation; FinancialFact belongs to a Metric (and optionally a BusinessUnit); ControlAlert references a FinancialFact; Evidence supports a Commentary; DecisionIssue references alert + commentary.
 - Row→object mapping lives here: this file **is** the "raw data ≠ business meaning" proof. The brief's `Variance` object is folded into `FinancialFact` (actual, budget, variance, variance_pct, materiality) — one object, one truth.
-- Metric set: Revenue · Gross Margin (= Revenue − Direct Costs) · Operating Expenses (= personnel + travel + facilities + other opex) · EBITDA (= GM − OpEx) · plus component metrics External Contractors, Materials, Personnel, Travel for controls and drill-down. Cockpit headline shows 4 KPIs; the engine computes the full set.
+- Metric set: Revenue · Gross Margin (= Revenue − Direct Costs) · Operating Expenses (= personnel + travel + facilities + other opex) · EBITDA (= GM − OpEx) · plus component metrics (External Contractors, Direct Materials, Direct Project Costs, Personnel, Travel, Facilities, Other OpEx) for controls and drill-down — eleven in total. Cockpit headline shows 4 KPIs; the engine computes the full set.
 
 ### 4.2 Deterministic truth — `src/finance_engine.py`
 - Loads `data/actuals.csv` + `data/budget.csv` (pandas), maps rows through the semantic layer, aggregates per metric (company level; per-BU for Revenue drill-down).
@@ -85,7 +85,7 @@ The executive **attention list** is the top 5; the full set remains available to
 
 ### 4.7 Decision / action — `src/decision_log.py`
 - `DecisionIssue`: lifecycle `OPEN · UNDER REVIEW · APPROVED · ACTION REQUIRED · CLOSED` + owner, next step, optional due date. Demonstrates INSIGHT → DECISION → ACTION without a workflow engine.
-- Demo state seeding: on first load, one issue pre-carried to ACTION REQUIRED with owner "Project Finance" (the milestone story) so the decision log is meaningful immediately; the reviewer can still walk other issues through the full loop live.
+- Demo state seeding: on first load, one issue is pre-carried to ACTION REQUIRED so the decision log is meaningful immediately — the **travel** finding, owner "Cost Center Manager · Projects", due 21 Aug 2026. The headline revenue issue is deliberately left as a live draft so the review loop can be walked in a demonstration. (`app.py::seed_demo_state` is the authority for these values.)
 
 ### 4.8 Audit — `src/audit.py`
 - Append-only in-session audit log (exportable JSON under `outputs/`, gitignored): for each important output — input source files, `CALC_VERSION`, metric calculation, control rule, evidence retrieved, interpretation mode (demo/LLM + model), reviewer, decision status, next step, timestamps.
@@ -135,6 +135,11 @@ The executive **attention list** is the top 5; the full set remains available to
 No full ERP · no real Foundry clone · no complex ontology engine · no multi-agent systems · no Kafka · no Kubernetes · no microservices · no enterprise IAM · no real SAP/ERP integration · no production event buses · no no-code builders · no React/Next.js frontend · no full workflow engine · no vector infrastructure · no production authentication · no database · no forecasting/prediction or scenario simulation · no multi-currency, no i18n (English only) · no real-time data · no writing back to any source system (read-only by design).
 
 ## 7. Repository tree (target)
+
+> This is the **Phase 2 target**, kept as a record of what was planned. The tree
+> as built differs — `src/lineage.py` and `src/pipeline.py` were added, the demo
+> dataset grew to five CSVs, and the suite grew to eight test files. The
+> accurate tree is in `README.md`; where the two disagree, the README is right.
 
 ```text
 benacta-decision-intelligence-blueprint/

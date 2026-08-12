@@ -452,14 +452,67 @@ def _accounts_for_fact(fact: FinancialFact, model: SemanticModel) -> set[str] | 
     }
 
 
+def _traceable_accounts(
+    fact: FinancialFact,
+    available: set[str],
+    model: SemanticModel,
+) -> set[str]:
+    """
+    The accounts to trace, or an empty set when no honest posting-level answer
+    exists for this fact.
+
+    A figure may only be traced to postings when the row ledger can actually
+    reproduce it, which requires both:
+
+    * **Full coverage** — every account composing the metric is present in the
+      ledger. Partial coverage would show some of the rows behind a figure as
+      though they were all of them.
+    * **A uniform sign** — the metric adds its accounts rather than netting
+      them. A composed metric such as Gross Margin (revenue *minus* direct
+      costs) cannot be reconciled by summing raw posting amounts.
+
+    V1 elaborates only Revenue to posting grain; the other metrics resolve to
+    nothing here and the cockpit says so plainly rather than presenting a
+    partial ledger as complete. Widening the demo dataset is what changes this,
+    not a change to the reconciliation rule.
+    """
+    accounts = _accounts_for_fact(fact, model)
+    if not accounts or not accounts <= available:
+        return set()
+    if fact.grain is not FactGrain.ACCOUNT:
+        try:
+            metric = model.metric(fact.key)
+        except SemanticMappingError:  # pragma: no cover - guarded above
+            return set()
+        signs = {
+            metric.sign_for(account.category)
+            for account in model.accounts
+            if account.code in accounts
+        }
+        if len(signs) > 1:
+            return set()
+    return accounts
+
+
+def has_posting_grain(
+    fact: FinancialFact,
+    transactions: Iterable[TransactionLine],
+    model: SemanticModel = SEMANTIC_MODEL,
+) -> bool:
+    """Whether a figure can honestly be traced to individual postings."""
+    rows = [t for t in transactions if t.period == fact.period]
+    return bool(_traceable_accounts(fact, {t.account for t in rows}, model))
+
+
 def transactions_for_fact(
     fact: FinancialFact,
     transactions: Iterable[TransactionLine],
     model: SemanticModel = SEMANTIC_MODEL,
 ) -> tuple[TransactionLine, ...]:
-    """The postings that sum to a fact's Actual figure."""
-    accounts = _accounts_for_fact(fact, model)
-    rows = [t for t in transactions if t.period == fact.period and t.account in accounts]
+    """The postings that sum to a fact's Actual figure, or none if it has no traceable ledger."""
+    rows = [t for t in transactions if t.period == fact.period]
+    accounts = _traceable_accounts(fact, {t.account for t in rows}, model)
+    rows = [t for t in rows if t.account in accounts]
     if fact.business_unit:
         rows = [t for t in rows if t.business_unit == fact.business_unit]
     return tuple(sorted(rows, key=lambda t: (t.account, t.posting_date, t.transaction_id)))
@@ -470,9 +523,10 @@ def budget_lines_for_fact(
     budget_lines: Iterable[BudgetLine],
     model: SemanticModel = SEMANTIC_MODEL,
 ) -> tuple[BudgetLine, ...]:
-    """The planning lines that sum to a fact's Budget figure."""
-    accounts = _accounts_for_fact(fact, model)
-    rows = [b for b in budget_lines if b.period == fact.period and b.account in accounts]
+    """The planning lines that sum to a fact's Budget figure, or none if it has no traceable ledger."""
+    rows = [b for b in budget_lines if b.period == fact.period]
+    accounts = _traceable_accounts(fact, {b.account for b in rows}, model)
+    rows = [b for b in rows if b.account in accounts]
     if fact.business_unit:
         rows = [b for b in rows if b.business_unit == fact.business_unit]
     return tuple(sorted(rows, key=lambda b: (b.account, b.budget_line_id)))
@@ -644,6 +698,10 @@ def business_lineage(
     cause: RootCause,
     fact: FinancialFact,
     transactions: Sequence[TransactionLine] = (),
+    #: Whether this fact has a posting-level ledger at all. Distinguishes
+    #: "nothing was posted" from "this metric is not carried to posting grain",
+    #: which are different statements and must not share a caption.
+    posting_grain: bool = True,
     rule_name: str | None,
     threshold_label: str | None,
     severity: str | None,
@@ -698,11 +756,21 @@ def business_lineage(
             f"Main accounts: {accounts_line}. "
             "Full posting list in the Financial Transactions tab."
         )
-    else:
+    elif posting_grain:
         tx_headline = "No postings this period"
         tx_detail = (
             "This is what the variance means: the plan assumed a posting here "
             "that did not occur."
+        )
+    else:
+        # Absence of rows is not absence of activity: this metric simply has no
+        # posting-level ledger in the reference dataset. Saying "no postings"
+        # here would misreport a scope limit as a business fact.
+        tx_headline = "Not elaborated to posting grain"
+        tx_detail = (
+            f"{fact.label} is composed from other accounts, which this reference "
+            "dataset does not carry down to individual postings. The Source Records "
+            "tab holds the evidence behind this movement."
         )
 
     steps = [

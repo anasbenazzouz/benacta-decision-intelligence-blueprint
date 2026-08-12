@@ -21,3 +21,19 @@ outputs/*
 Thumbs.db
 .idea/
 .vscode/
+
+# Build-process memos — kept locally, never published.
+# These are the working instructions used to construct the project (phase
+# sequencing, model routing, distribution plan). They are not project doctrine
+# and not a deliverable: the public story is told by README.md, docs/ and
+# .claude/benacta/. Publishing an operating manual for how the repository was
+# produced would say nothing about the architecture and a great deal about the
+# process.
+00_START_HERE_BENACTA.md
+01_MASTER_BRIEF_BENACTA.md
+02_EXECUTION_PLAYBOOK_CLAUDE_CODE.md
+
+# Local environment overrides
+.env.local
+.env.*
+!.env.example

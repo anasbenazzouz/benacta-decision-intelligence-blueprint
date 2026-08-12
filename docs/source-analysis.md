@@ -10,9 +10,9 @@
 
 | File | Type | Content | Status |
 |---|---|---|---|
-| `00_START_HERE_BENACTA.md` | Process | Setup order, model routing, gate sequence, public asset system | Read |
-| `01_MASTER_BRIEF_BENACTA.md` | Master brief | Positioning, philosophy, doctrine, V1 scope, deliverables, QA | Read |
-| `02_EXECUTION_PLAYBOOK_CLAUDE_CODE.md` | Process | Phase-by-phase execution plan, release gates | Read |
+| `00_START_HERE_BENACTA.md` † | Process | Setup order, gate sequence, public asset system | Read |
+| `01_MASTER_BRIEF_BENACTA.md` † | Master brief | Positioning, philosophy, doctrine, V1 scope, deliverables, QA | Read |
+| `02_EXECUTION_PLAYBOOK_CLAUDE_CODE.md` † | Process | Phase-by-phase execution plan, release gates | Read |
 | `source/README.md` | Process | Folder conventions | Read |
 | `source/brand/Graphical_Design_Final.pdf` | **Brand charter** | "BENACTA — Visual Identity System · Master Définitif" — 10 numbered sections, locked | Read (full transcription) |
 | `source/brand/BENACTA Logo Pack -Dark.png` | Brand asset | Primary lockup on Deep Heritage Green | Read |
@@ -20,6 +20,8 @@
 | `source/architecture-note/An LLM should never own your numbers_Final.pdf` | **Architecture Note #001** | Full note (1 page, `FIN-AI-001`) | Read |
 | `source/architecture-note/An LLM should never own your numbers.png` | Note export | Identical content to the PDF (LinkedIn version) | Read, verified identical |
 | `source/reference/` | — | Empty (`.gitkeep` only) | Noted — no extra positioning docs supplied |
+
+† Local build-process memos, untracked by design — they describe how the project was constructed, not what it is. Everything they contributed that governs the project has been distilled into `.claude/benacta/*` and `docs/`.
 
 ---
 

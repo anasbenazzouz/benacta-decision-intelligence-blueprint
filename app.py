@@ -39,14 +39,13 @@ from src.decision_log import DecisionStatus  # noqa: E402
 from src.domain import COMPANY_NAME  # noqa: E402
 from src.finance_engine import (  # noqa: E402
     CALC_VERSION,
-    FactGrain,
     classify_direction,
-    facts_at_grain,
 )
 from src.lineage import (  # noqa: E402
     business_lineage,
     budget_lines_to_csv,
     export_filename,
+    has_posting_grain,
     reconcile,
     reconcile_actual,
     reconcile_budget,
@@ -370,6 +369,9 @@ def render_trace_dialog(session, fact, *, item=None, focus_cause=None) -> None:
                 cause=cause,
                 fact=fact,
                 transactions=tx_rows,
+                posting_grain=has_posting_grain(
+                    fact, session.transactions, session.model
+                ),
                 model=session.model,
                 rule_name=item.alert.rule_name if item else None,
                 threshold_label=item.alert.threshold_label if item else None,
@@ -1020,8 +1022,8 @@ def render_architecture(session) -> None:
         "</div>"
     )
     md(
-        f'<div class="ba-caption" style="margin-top:14px">'
-        f"tests/test_ai_independence.py :: test_financial_truth_is_independent_from_llm</div>"
+        '<div class="ba-caption" style="margin-top:14px">'
+        "tests/test_ai_independence.py :: test_financial_truth_is_independent_from_llm</div>"
     )
 
     md(theme.section("04", "Live trace", "the selected issue through every layer"))

@@ -30,7 +30,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Iterable, Mapping, Sequence
 
-from src.control_engine import ControlAlert, Severity
+from src.control_engine import ControlAlert
 from src.finance_engine import FinancialFact, VarianceDirection
 from src.retrieval import Evidence
 
@@ -245,7 +245,6 @@ class DemoProvider(CommentaryProvider):
     name = "demo"
 
     def generate(self, request: CommentaryRequest) -> Commentary:
-        fact = request.fact
         evidence = request.evidence
 
         return Commentary(

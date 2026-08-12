@@ -80,9 +80,13 @@ app.py — Executive Decision Cockpit (default) · Architecture view · Audit Tr
 
 ## 3. The trust boundary (the architecture's central claim)
 
-**Above the boundary (deterministic):** `domain.py`, `finance_engine.py`, `control_engine.py`, `retrieval.py`. These modules produce all numbers and all evidence. They import no LLM SDK and never import `commentary.py`. Retrieval sits above the boundary because it selects and quotes existing text with a transparent score — it generates nothing.
+**Above the boundary (deterministic):** `domain.py`, `finance_engine.py`, `control_engine.py`, `retrieval.py`, `lineage.py`. These modules produce all numbers and all evidence. They import no LLM SDK and never import `commentary.py`. Retrieval sits above the boundary because it selects and quotes existing text with a transparent score — it generates nothing.
 
 **Below the boundary (probabilistic):** `commentary.py` only. It receives `FinancialFact`s, `ControlAlert`s and `Evidence` — already computed, already selected — and returns a draft. It cannot reach the CSVs, cannot recompute, and its output is quarantined until a human approves it.
+
+**Alongside, crossing nothing:** `pipeline.py` assembles the loop into one session so the cockpit and the CLI demo drive identical code; `theme.py` carries the charter's visual system. Neither computes truth nor interprets it.
+
+**Lineage has a declared limit.** `lineage.py` resolves a figure to the postings behind it only when the ledger can actually reproduce that figure — every composing account present, and a single uniform sign. In this dataset that is Revenue; Gross Margin, Operating Expenses and EBITDA resolve to their root-cause source records and stop there, and the cockpit says so rather than showing a partial ledger as if it were complete (`has_posting_grain`, and the tests in `tests/test_lineage.py`).
 
 **Enforcement:**
 - Structural: `test_financial_truth_is_independent_from_llm` asserts the deterministic modules have no import path to `commentary` or any LLM SDK.

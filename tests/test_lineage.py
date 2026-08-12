@@ -281,3 +281,85 @@ def test_lineage_leads_with_business_language(facts, records):
     )
     assert "fact id" not in steps[3].headline
     assert "calculation version" in steps[3].technical
+
+
+# --------------------------------------------------------------------------- #
+# Posting-grain honesty
+#
+# The cockpit offers "Trace to source" on every headline KPI, and the whole
+# claim of that button is that the rows behind a figure add up to it. A metric
+# whose ledger cannot reproduce it must therefore return *no* rows rather than
+# some rows: a partial or sign-blind row set would present a false
+# reconciliation on the project's most load-bearing screen.
+# --------------------------------------------------------------------------- #
+
+
+def test_revenue_traces_to_postings_that_reconcile(facts):
+    """Revenue is elaborated to posting grain, and the rows prove the figure."""
+    from src.lineage import (
+        has_posting_grain,
+        load_budget_lines,
+        load_transactions,
+        reconcile_actual,
+        reconcile_budget,
+    )
+
+    fact = fact_for(facts, "revenue")
+    assert has_posting_grain(fact, load_transactions())
+
+    rows, actual_check = reconcile_actual(fact, load_transactions())
+    assert rows
+    assert actual_check.reconciled, actual_check.difference
+
+    lines, budget_check = reconcile_budget(fact, load_budget_lines())
+    assert lines
+    assert budget_check.reconciled, budget_check.difference
+
+
+@pytest.mark.parametrize("metric", ["gross_margin", "operating_expenses", "ebitda"])
+def test_composed_metrics_report_no_posting_trace_rather_than_a_false_one(facts, metric):
+    """
+    Gross Margin, Operating Expenses and EBITDA are composed from accounts this
+    reference dataset does not carry to posting grain — and Gross Margin and
+    EBITDA net their accounts rather than summing them. Either way there is no
+    honest posting-level answer, so the layer must return nothing and let the
+    cockpit say so.
+    """
+    from src.lineage import (
+        has_posting_grain,
+        load_budget_lines,
+        load_transactions,
+        reconcile_actual,
+        reconcile_budget,
+    )
+
+    fact = fact_for(facts, metric)
+    assert not has_posting_grain(fact, load_transactions())
+
+    rows, _ = reconcile_actual(fact, load_transactions())
+    lines, _ = reconcile_budget(fact, load_budget_lines())
+    assert rows == ()
+    assert lines == ()
+
+
+def test_missing_posting_grain_is_not_reported_as_a_missing_posting(facts, records):
+    """
+    "Nothing was posted" and "this metric has no posting ledger" are different
+    statements. Sharing a caption would misreport a scope limit as a business
+    fact.
+    """
+    fact = fact_for(facts, "ebitda")
+    cause = reconcile(fact, records).causes[0]
+
+    common = dict(
+        cause=cause, fact=fact, transactions=(), rule_name=None, threshold_label=None,
+        severity=None, interpretation_mode="DEMO", confidence="HIGH",
+        review_label="AI DRAFT", reviewer=None, issue_status="OPEN", owner=None,
+        next_step=None, calc_version="1.0.0",
+    )
+    no_ledger = business_lineage(**common, posting_grain=False)[2]
+    nothing_posted = business_lineage(**common, posting_grain=True)[2]
+
+    assert no_ledger.headline != nothing_posted.headline
+    assert "posting grain" in no_ledger.headline.lower()
+    assert "no postings this period" in nothing_posted.headline.lower()

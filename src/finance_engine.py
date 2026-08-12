@@ -31,7 +31,6 @@ from src.domain import (
     MATERIALITY_RELATIVE_PCT,
     SEMANTIC_MODEL,
     Account,
-    AccountCategory,
     CATEGORY_HIGHER_IS_BETTER,
     LedgerEntry,
     MetricDefinition,

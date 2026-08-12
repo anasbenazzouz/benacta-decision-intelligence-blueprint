@@ -107,22 +107,19 @@ launched `streamlit run app.py` under `DEMO_MODE=true` and confirmed it serves
 a non-visual functional trace of TRUTH → CONTEXT → INTERPRETATION → REVIEW →
 DECISION/ACTION → AUDIT.
 
-**Limitation this pass:** the browser tooling available in this session runs
-against the user's local Chrome, which cannot reach the sandboxed process
-that serves the Streamlit app, so the CSS/typography/motion assertions above
-could not be re-verified pixel-by-pixel here. They were instead checked by
+**Limitation this pass:** the pixel-level CSS, typography and motion
+assertions above were not re-verified in a browser; they were checked by
 reading `src/theme.py` and `app.py` in full and confirming the markup and
 rules the previous pass describes are still present and unchanged (hero
 zones, KPI entrance classes, trace-button styling, workflow stepper, lineage
 rail markers, hidden native sidebar-collapse control, tab/dialog overrides).
-A future session with browser access to the same host as the app should still
-re-run the visual pass before public release.
+A rendered visual pass should still be run before public release.
 
 **Issue found and fixed:**
 
 | # | Issue | Fix |
 |---|---|---|
-| 20 | `scripts/demo_decision_loop.py` raised `UnicodeEncodeError` and exited non-zero whenever stdout was not an interactive UTF-8 console — piped, redirected, or a Windows legacy-codepage terminal — because it prints em dashes, curly quotes, `→` and box-drawing rule lines. Reproduced on this Windows machine via `python scripts/demo_decision_loop.py > out.txt`. This is the CLI companion to `streamlit run app.py` and acceptance criteria require documented commands to run as written. | Added a guarded `sys.stdout.reconfigure(encoding="utf-8")` at the top of the script. Re-ran with stdout redirected to a file: exit code 0, all 96 lines printed, revenue/EBITDA figures match the story targets. |
+| 20 | `scripts/demo_decision_loop.py` raised `UnicodeEncodeError` and exited non-zero whenever stdout was not an interactive UTF-8 console — piped, redirected, or a Windows legacy-codepage terminal — because it prints em dashes, curly quotes, `→` and box-drawing rule lines. Reproduced on Windows via `python scripts/demo_decision_loop.py > out.txt`. This is the CLI companion to `streamlit run app.py` and acceptance criteria require documented commands to run as written. | Added a guarded `sys.stdout.reconfigure(encoding="utf-8")` at the top of the script. Re-ran with stdout redirected to a file: exit code 0, all 96 lines printed, revenue/EBITDA figures match the story targets. |
 
 No other issues found: no dead code, unused imports, hard-coded absolute
 paths, print statements outside `scripts/`, secrets, deprecated Streamlit
@@ -130,6 +127,21 @@ APIs, or forbidden vocabulary on the default cockpit view.
 
 **Checks run:** `python -m pytest -q` → **150 passed**. Streamlit served
 successfully under `DEMO_MODE=true` with no API key (verified by HTTP
-request; visual walkthrough not possible this session, see limitation
-above). `scripts/demo_decision_loop.py` runs clean with output redirected
+request; rendered visual walkthrough not run, see limitation above). `scripts/demo_decision_loop.py` runs clean with output redirected
 to a file (previously crashed; now exit code 0).
+
+## Deferred pre-publication tasks
+
+Two items are **explicitly deferred** rather than outstanding defects:
+
+1. **Cockpit screenshots.** Not yet captured. Capture plan (page,
+   application state, viewport, crop, five shots) lives in
+   `assets/generated/screenshots/README.md`. To be captured manually before
+   publication, after which the README's "See it" section is updated with
+   the images.
+2. **LICENSE.** No license file exists yet. This is an owner decision, not
+   an engineering one — see `docs/acceptance-criteria.md` §11. To be chosen
+   and added before the repository is made public, if it becomes public.
+
+Both are tracked in `docs/acceptance-criteria.md` §11 (Gate H) so they stay
+visible without blocking the work in between.
