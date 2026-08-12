@@ -144,7 +144,7 @@ nothing, so evidence is quoted source rather than model output.
 ### P1-6 · Build-process memos would have published
 
 `00_START_HERE_BENACTA.md`, `01_MASTER_BRIEF_BENACTA.md` and
-`02_EXECUTION_PLAYBOOK_CLAUDE_CODE.md` were tracked and would have gone public.
+`02_EXECUTION_PLAYBOOK.md` were tracked and would have gone public.
 They contain model-routing and usage-credit instructions, a "Do NOT waste it on"
 table, DM scripts for prospects ("warm version"), and a commit-cadence section
 closing on *"This makes the public repo itself tell a credible engineering

@@ -31,7 +31,7 @@ Thumbs.db
 # process.
 00_START_HERE_BENACTA.md
 01_MASTER_BRIEF_BENACTA.md
-02_EXECUTION_PLAYBOOK_CLAUDE_CODE.md
+02_EXECUTION_PLAYBOOK.md
 
 # Local environment overrides
 .env.local

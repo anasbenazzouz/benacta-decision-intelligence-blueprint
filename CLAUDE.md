@@ -44,6 +44,6 @@ Ground truth beneath all of the above: the supplied materials in `/source` (bran
 
 ## Process
 
-Work proceeds in gated phases defined in `02_EXECUTION_PLAYBOOK_CLAUDE_CODE.md`. Do only the current phase; run the relevant checks before stopping. Master requirements: `01_MASTER_BRIEF_BENACTA.md`.
+Work proceeds in gated phases defined in `02_EXECUTION_PLAYBOOK.md`. Do only the current phase; run the relevant checks before stopping. Master requirements: `01_MASTER_BRIEF_BENACTA.md`.
 
 Those two files and `00_START_HERE_BENACTA.md` are **local build-process memos, deliberately untracked** (see `.gitignore`): they describe how the project is constructed, not what it is. They may be absent from a fresh clone — when they are, the doctrine in `.claude/benacta/` plus `docs/implementation-plan.md` and `docs/acceptance-criteria.md` is the complete governing set.

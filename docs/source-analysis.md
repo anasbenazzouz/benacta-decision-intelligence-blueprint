@@ -12,7 +12,7 @@
 |---|---|---|---|
 | `00_START_HERE_BENACTA.md` † | Process | Setup order, gate sequence, public asset system | Read |
 | `01_MASTER_BRIEF_BENACTA.md` † | Master brief | Positioning, philosophy, doctrine, V1 scope, deliverables, QA | Read |
-| `02_EXECUTION_PLAYBOOK_CLAUDE_CODE.md` † | Process | Phase-by-phase execution plan, release gates | Read |
+| `02_EXECUTION_PLAYBOOK.md` † | Process | Phase-by-phase execution plan, release gates | Read |
 | `source/README.md` | Process | Folder conventions | Read |
 | `source/brand/Graphical_Design_Final.pdf` | **Brand charter** | "BENACTA — Visual Identity System · Master Définitif" — 10 numbered sections, locked | Read (full transcription) |
 | `source/brand/BENACTA Logo Pack -Dark.png` | Brand asset | Primary lockup on Deep Heritage Green | Read |
