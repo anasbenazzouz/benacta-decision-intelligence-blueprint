@@ -1,5 +1,5 @@
 """
-BENACTA — Deterministic Finance Engine. The value core.
+BENACTA Deterministic Finance Engine. The value core.
 
 Every figure in the system is computed here, in code, from the governed business
 objects. Nothing downstream may recompute financial truth: the interpretation
@@ -138,7 +138,7 @@ def compute_variance(actual: float, budget: float | None) -> tuple[float | None,
     The two formulas the whole system depends on.
 
     Returns (variance, variance_pct). Both are None when there is no budget line.
-    variance_pct is None when the budget is exactly zero — a zero budget has a
+    variance_pct is None when the budget is exactly zero a zero budget has a
     variance but no meaningful percentage.
     """
     if budget is None:
@@ -364,9 +364,9 @@ def build_facts(
     """
     Compute every fact for the period, at three grains:
 
-      METRIC                   company-level metrics — what controls run on
-      METRIC_BY_BUSINESS_UNIT  the same metrics per business unit — drill-down
-      ACCOUNT                  one fact per account — budget coverage
+      METRIC                   company-level metrics what controls run on
+      METRIC_BY_BUSINESS_UNIT  the same metrics per business unit drill-down
+      ACCOUNT                  one fact per account budget coverage
 
     Deterministic: metric order follows the semantic model, units and accounts
     are sorted, so the same inputs always produce the same sequence.

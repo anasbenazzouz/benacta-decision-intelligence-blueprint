@@ -1,5 +1,5 @@
 """
-BENACTA — Decision and Action Layer.
+BENACTA Decision and Action Layer.
 
 Insight without action is incomplete.
 
@@ -7,7 +7,7 @@ A reviewed issue does not end at commentary: it acquires an owner, a next step
 and a status. This is the smallest thing that honestly demonstrates
 INSIGHT → DECISION → ACTION without pretending to be a workflow engine.
 
-An issue cannot be marked ACTION_REQUIRED without an owner and a next step —
+An issue cannot be marked ACTION_REQUIRED without an owner and a next step
 an action nobody owns is not an action.
 """
 

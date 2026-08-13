@@ -1,5 +1,5 @@
 """
-BENACTA — Decision Cockpit.
+BENACTA Decision Cockpit.
 
     streamlit run app.py
 
@@ -25,7 +25,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 st.set_page_config(
-    page_title="BENACTA — Decision Cockpit",
+    page_title="BENACTA Decision Cockpit",
     page_icon=str(Path(__file__).parent / "assets" / "generated" / "benacta-primary-dark.png"),
     layout="wide",
     initial_sidebar_state="expanded",
@@ -58,7 +58,7 @@ from src.pipeline import build_session  # noqa: E402
 VIEWS = ("Executive Decision Cockpit", "Architecture", "Audit Trail")
 
 #: The owner proposed alongside a suggested follow-up and pre-filled in the
-#: decision form. A suggestion only — a human assigns every owner.
+#: decision form. A suggestion only a human assigns every owner.
 DEFAULT_OWNER_SUGGESTION = "Project Finance"
 
 
@@ -99,7 +99,7 @@ def get_session():
         seed_demo_state(session)
         st.session_state.session = session
         st.session_state.selected = session.items[0].issue_id
-        # The moment this session's pipeline actually ran — shown in the hero
+        # The moment this session's pipeline actually ran shown in the hero
         # status rail as the data-freshness statement.
         st.session_state.data_as_of = datetime.now()
     st.session_state.setdefault("panel_open", True)
@@ -176,7 +176,7 @@ def sidebar(session) -> str:
 
 
 # --------------------------------------------------------------------------- #
-# View A — Executive Decision Cockpit
+# View A Executive Decision Cockpit
 # --------------------------------------------------------------------------- #
 
 
@@ -190,7 +190,7 @@ _REVIEW_PHRASE = {
 
 def _hero_status(session) -> list[tuple[str, str]]:
     """
-    The hero's quiet status rail — the two to four facts that make the page
+    The hero's quiet status rail the two to four facts that make the page
     read as a live review environment, all derived from session truth.
     """
     refreshed = st.session_state.get("data_as_of")
@@ -200,9 +200,9 @@ def _hero_status(session) -> list[tuple[str, str]]:
     ]
     review = " · ".join(f"{n} {phrase}" for phrase, n in review_counts if n)
     return [
-        ("Last refresh", refreshed.strftime("%d %b %Y · %H:%M") if refreshed else "—"),
+        ("Last refresh", refreshed.strftime("%d %b %Y · %H:%M") if refreshed else " "),
         ("Control findings", f"{len(session.items)} of {len(session.alerts)} in attention"),
-        ("Controller review", review or "—"),
+        ("Controller review", review or " "),
     ]
 
 
@@ -258,7 +258,7 @@ def render_cockpit(session) -> None:
 
 def _account_label(session, code: str | None) -> str:
     if not code:
-        return "—"
+        return " "
     try:
         return f"{code} · {session.model.account(code).name}"
     except KeyError:
@@ -267,7 +267,7 @@ def _account_label(session, code: str | None) -> str:
 
 def _cost_center_label(session, code: str | None) -> str:
     if not code:
-        return "—"
+        return " "
     try:
         return f"{code} · {session.model.cost_center(code).name}"
     except KeyError:
@@ -279,9 +279,9 @@ def _transaction_row(session, t) -> dict:
         "Posting date": t.posting_date,
         "Document": t.document_number,
         "Business unit": session.unit_names.get(t.business_unit, t.business_unit),
-        "Project": t.project_name or "—",
-        "Customer": t.customer or "—",
-        "Milestone": t.milestone_name or "—",
+        "Project": t.project_name or " ",
+        "Customer": t.customer or " ",
+        "Milestone": t.milestone_name or " ",
         "Account": _account_label(session, t.account),
         "Cost center": _cost_center_label(session, t.cost_center),
         "Amount (EUR)": t.amount,
@@ -291,9 +291,9 @@ def _transaction_row(session, t) -> dict:
 def _budget_line_row(session, b) -> dict:
     return {
         "Business unit": session.unit_names.get(b.business_unit, b.business_unit),
-        "Project": b.project_name or "—",
-        "Customer": b.customer or "—",
-        "Milestone": b.milestone_name or "—",
+        "Project": b.project_name or " ",
+        "Customer": b.customer or " ",
+        "Milestone": b.milestone_name or " ",
         "Account": _account_label(session, b.account),
         "Cost center": _cost_center_label(session, b.cost_center),
         "Amount (EUR)": b.amount,
@@ -306,10 +306,10 @@ def render_trace_dialog(session, fact, *, item=None, focus_cause=None) -> None:
     """
     Progressive drill-through from a headline figure to the rows behind it.
 
-    Opened either from a KPI card (`item` and `focus_cause` both None — every
+    Opened either from a KPI card (`item` and `focus_cause` both None every
     attributed cause and the full transaction ledger for the metric are
     shown), or from one specific root cause under an issue (`focus_cause` set
-    — the lineage narrows to that cause, everything else stays scoped to the
+    the lineage narrows to that cause, everything else stays scoped to the
     metric it belongs to). Both paths land on the same four tabs: summary
     first, structured rows on demand, never raw JSON by default.
     """
@@ -330,7 +330,7 @@ def render_trace_dialog(session, fact, *, item=None, focus_cause=None) -> None:
         f'<span style="color:{theme.direction_color(fact.direction.value)}">'
         f"{theme.money(fact.variance)}</span>"
         if fact.variance is not None
-        else "—"
+        else " "
     )
     figure_rows = "".join(
         f'<tr><td class="k">{key}</td><td class="v">{value}</td></tr>'
@@ -353,7 +353,7 @@ def render_trace_dialog(session, fact, *, item=None, focus_cause=None) -> None:
         ["Lineage", "Financial Transactions", "Source Records", "Audit"]
     )
 
-    # ---- Tab 1 — Lineage ------------------------------------------------- #
+    # ---- Tab 1 Lineage ------------------------------------------------- #
     with tab_lineage:
         if not causes:
             md(
@@ -387,7 +387,7 @@ def render_trace_dialog(session, fact, *, item=None, focus_cause=None) -> None:
             )
             md(theme.lineage_chain(steps))
 
-    # ---- Tab 2 — Financial Transactions ----------------------------------- #
+    # ---- Tab 2 Financial Transactions ----------------------------------- #
     with tab_transactions:
         md(
             '<div class="ba-label ba-stone" style="margin:16px 0 10px 0">Financial truth</div>'
@@ -406,7 +406,7 @@ def render_trace_dialog(session, fact, *, item=None, focus_cause=None) -> None:
         )
         md(
             f'<div style="margin-top:10px">{theme.reconciliation_status(variance_check)}'
-            f'<span class="ba-caption"> — checked against actual − budget; variance is '
+            f'<span class="ba-caption"> checked against actual − budget; variance is '
             f"a calculation, not a posting.</span></div>"
         )
 
@@ -435,7 +435,7 @@ def render_trace_dialog(session, fact, *, item=None, focus_cause=None) -> None:
                 "behind this figure.</div>"
             )
         else:
-            # Simple control-room filters — never an analytics workbench. They
+            # Simple control-room filters never an analytics workbench. They
             # narrow what is SHOWN; the reconciliation line below always
             # covers the full, unfiltered set.
             unit_col, account_col, search_col = st.columns([1.1, 1.5, 1.4])
@@ -483,7 +483,7 @@ def render_trace_dialog(session, fact, *, item=None, focus_cause=None) -> None:
             if len(filtered) != len(pairs):
                 shown_total = round(sum(r.amount for r, _ in filtered), 2)
                 filtered_note = (
-                    f'<div class="ba-caption" style="margin-bottom:4px">Filter active — '
+                    f'<div class="ba-caption" style="margin-bottom:4px">Filter active '
                     f"showing {len(filtered)} of {len(pairs)} rows · "
                     f"{theme.money(shown_total)}</div>"
                 )
@@ -507,7 +507,7 @@ def render_trace_dialog(session, fact, *, item=None, focus_cause=None) -> None:
                 key=f"dl_{kind}_{fact.fact_id}",
             )
 
-    # ---- Tab 3 — Source Records ------------------------------------------- #
+    # ---- Tab 3 Source Records ------------------------------------------- #
     with tab_sources:
         if not causes or not any(c.records for c in causes):
             md(
@@ -518,11 +518,11 @@ def render_trace_dialog(session, fact, *, item=None, focus_cause=None) -> None:
             for record in cause.records:
                 md(theme.source_record_card(record))
 
-    # ---- Tab 4 — Audit ----------------------------------------------------- #
+    # ---- Tab 4 Audit ----------------------------------------------------- #
     with tab_audit:
         records = session.audit.for_issue(item.issue_id) if item else []
         last_step = (
-            records[-1].timestamp.strftime("%Y-%m-%d %H:%M:%S UTC") if records else "—"
+            records[-1].timestamp.strftime("%Y-%m-%d %H:%M:%S UTC") if records else " "
         )
         md('<div style="margin-top:16px">')
         audit_rows = [
@@ -537,12 +537,12 @@ def render_trace_dialog(session, fact, *, item=None, focus_cause=None) -> None:
                 "Interpretation mode",
                 f"{item.commentary.mode.value} · confidence {item.commentary.confidence.value.lower()}"
                 if item
-                else "—",
+                else " ",
             ),
-            ("Reviewer", item.review.reviewer or "Not yet reviewed" if item else "—"),
-            ("Review state", item.review.label if item else "—"),
-            ("Decision status", item.issue.status_label if item else "—"),
-            ("Action owner", item.issue.owner or "Not yet assigned" if item else "—"),
+            ("Reviewer", item.review.reviewer or "Not yet reviewed" if item else " "),
+            ("Review state", item.review.label if item else " "),
+            ("Decision status", item.issue.status_label if item else " "),
+            ("Action owner", item.issue.owner or "Not yet assigned" if item else " "),
             ("Last recorded step", last_step),
         ]
         md(
@@ -600,7 +600,7 @@ def render_issue(session, item) -> None:
         # The interpretation reads as the secondary, evidence-informed
         # narrative; the derived root cause below carries the stronger type.
         # The business question is "what is the cause?", not "what did the
-        # AI write?" — the hierarchy says so.
+        # AI write?" the hierarchy says so.
         md(
             f'<div class="ba-ai">'
             f'<div class="ba-label tag">AI-generated interpretation · '
@@ -679,7 +679,7 @@ def render_issue(session, item) -> None:
     # ---- 05 What could we do next --------------------------------------- #
     md(theme.section("05", "What could we do next", "a proposal for a human, not a decision"))
     for index, step in enumerate(commentary.suggested_follow_up):
-        md(f'<div class="ba-body-lg">— {step}</div>')
+        md(f'<div class="ba-body-lg"> {step}</div>')
         if index == 0:
             owner_meta = (
                 f"Owner · {item.issue.owner}"
@@ -768,7 +768,7 @@ def _follow_up_reason(item) -> str:
 
 def _workflow_stages(item) -> list[tuple[str, str]]:
     """
-    The review chain as stepper stages. Current stage is filled — champagne
+    The review chain as stepper stages. Current stage is filled champagne
     only when the stage IS the action; the vocabulary is the fixed UI state
     vocabulary, never invented.
     """
@@ -911,15 +911,15 @@ def render_decision_log(session) -> None:
     rows = []
     for item in session.items:
         last = item.review.history[-1] if item.review.history else None
-        stamp = last.timestamp.strftime("%Y-%m-%d %H:%M UTC") if last else "—"
+        stamp = last.timestamp.strftime("%Y-%m-%d %H:%M UTC") if last else " "
         rows.append(
             f"<tr>"
             f'<td style="white-space:nowrap"><strong>{item.issue_id}</strong></td>'
             f"<td>{item.fact.label}</td>"
             f'<td class="ba-caption">{item.review.label}</td>'
-            f'<td class="ba-caption">{item.review.reviewer or "—"}</td>'
-            f'<td>{item.issue.next_step or "—"}</td>'
-            f'<td class="ba-caption">{item.issue.owner or "—"}</td>'
+            f'<td class="ba-caption">{item.review.reviewer or " "}</td>'
+            f'<td>{item.issue.next_step or " "}</td>'
+            f'<td class="ba-caption">{item.issue.owner or " "}</td>'
             f"<td>{theme.status_chip(item.issue.status_label)}</td>"
             f'<td class="sec" style="white-space:nowrap">{stamp}</td>'
             f"</tr>"
@@ -934,7 +934,7 @@ def render_decision_log(session) -> None:
 
 
 # --------------------------------------------------------------------------- #
-# View B — Architecture
+# View B Architecture
 # --------------------------------------------------------------------------- #
 
 LAYERS = [
@@ -1017,7 +1017,7 @@ def render_architecture(session) -> None:
         '<div class="ba-body-lg" style="max-width:760px">Only computed facts cross the '
         "boundary. The interpretation layer receives figures, control findings and quoted "
         "evidence; it cannot reach the ledger and cannot recalculate. Disabling it removes "
-        "commentary and changes nothing else — the figures, the controls and the materiality "
+        "commentary and changes nothing else the figures, the controls and the materiality "
         "are identical, which the test suite asserts both structurally and behaviourally."
         "</div>"
     )
@@ -1063,12 +1063,12 @@ def trace(session, item) -> None:
         ),
         (
             "Human Control",
-            f"{item.review.label} · reviewer {item.review.reviewer or '—'}",
+            f"{item.review.label} · reviewer {item.review.reviewer or ' '}",
             None,
         ),
         (
             "Decision & Action",
-            f"{item.issue.status_label} · owner {item.issue.owner or '—'}",
+            f"{item.issue.status_label} · owner {item.issue.owner or ' '}",
             None,
         ),
         (
@@ -1091,7 +1091,7 @@ def trace(session, item) -> None:
 
 
 # --------------------------------------------------------------------------- #
-# View C — Audit Trail
+# View C Audit Trail
 # --------------------------------------------------------------------------- #
 
 
@@ -1158,7 +1158,7 @@ def main() -> None:
         # The panel is closed: nothing lives in st.sidebar this run, so the
         # navigation choice is read back from the same session_state key the
         # radio writes to when open. The explicit reopen control is the only
-        # way back — the native collapse arrow is hidden because this build
+        # way back the native collapse arrow is hidden because this build
         # renders no way to undo it once used.
         left, _ = st.columns([1, 7])
         with left:

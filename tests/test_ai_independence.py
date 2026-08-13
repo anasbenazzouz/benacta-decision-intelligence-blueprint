@@ -2,17 +2,17 @@
 The trust boundary, enforced.
 
 This is the philosophically load-bearing test file for BENACTA. The claim the
-whole project makes — *code computes, AI explains, humans decide* — is only
+whole project makes *code computes, AI explains, humans decide* is only
 credible if the financial truth layer keeps working, unchanged, when the AI
 layer is removed entirely.
 
 Two independent proofs:
 
-1. Structural — the deterministic modules have no import path to any LLM SDK or
+1. Structural the deterministic modules have no import path to any LLM SDK or
    to the interpretation layer. Verified by parsing the source, so it holds even
    for code paths the tests never execute.
 
-2. Behavioural — with those imports actively blocked at the import system level,
+2. Behavioural with those imports actively blocked at the import system level,
    the truth layer is re-imported from scratch and produces byte-identical
    results: the same facts, the same controls, the same materiality.
 
@@ -67,7 +67,7 @@ FORBIDDEN_ROOTS = frozenset(
 )
 
 #: The interpretation layer itself (built in a later phase). The truth layer must
-#: never import it — the dependency only ever points the other way.
+#: never import it the dependency only ever points the other way.
 INTERPRETATION_MODULES = frozenset({"src.commentary", "commentary"})
 
 
@@ -220,7 +220,7 @@ def test_financial_truth_is_independent_from_llm():
     """
     With the AI layer disabled, the system still produces the complete truth:
     business objects, actuals, budgets, variances, variance percentages,
-    materiality and control alerts — identical to a normal run.
+    materiality and control alerts identical to a normal run.
     """
     from src.control_engine import evaluate
     from src.finance_engine import run_truth_layer
@@ -236,7 +236,7 @@ def test_financial_truth_is_independent_from_llm():
         entry.account.code for entry in reference_ledger.actuals
     }
 
-    # The numbers are not merely present — they are unchanged.
+    # The numbers are not merely present they are unchanged.
     assert _project(facts) == _project(reference_facts)
     assert _project_alerts(alerts) == _project_alerts(reference_alerts)
 

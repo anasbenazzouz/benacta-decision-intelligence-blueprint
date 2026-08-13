@@ -1,1 +1,1 @@
-"""BENACTA Decision Intelligence Blueprint — reference implementation."""
+"""BENACTA Decision Intelligence Blueprint reference implementation."""

@@ -1,9 +1,9 @@
 """
-BENACTA — AI Interpretation Layer.
+BENACTA AI Interpretation Layer.
 
 This is the only module below the trust boundary, and the only one permitted to
 talk to a language model. It receives computed facts, control alerts and
-retrieved evidence — all produced upstream — and returns a *draft* explanation
+retrieved evidence all produced upstream and returns a *draft* explanation
 that a human must approve before it means anything.
 
 What it may never do:
@@ -34,7 +34,7 @@ from src.control_engine import ControlAlert
 from src.finance_engine import FinancialFact, VarianceDirection
 from src.retrieval import Evidence
 
-try:  # optional dependency — the application is fully functional without it
+try:  # optional dependency the application is fully functional without it
     import anthropic
 except ImportError:  # pragma: no cover - exercised by environments without the SDK
     anthropic = None
@@ -95,7 +95,7 @@ class Commentary:
 
     @property
     def generated_text(self) -> tuple[str, ...]:
-        """The prose this layer wrote — as opposed to evidence it quoted."""
+        """The prose this layer wrote as opposed to evidence it quoted."""
         return (self.summary, *self.drivers, *self.open_questions, *self.suggested_follow_up)
 
 
@@ -145,7 +145,7 @@ def allowed_numbers(request: CommentaryRequest) -> set[float]:
 
     That is: the computed figures it was given, the control threshold it
     breached, the period itself, and any number appearing verbatim in the
-    retrieved evidence — a figure quoted from a source document with
+    retrieved evidence a figure quoted from a source document with
     attribution is reported, not invented.
     """
     values: set[float] = set()
@@ -178,7 +178,7 @@ def allowed_numbers(request: CommentaryRequest) -> set[float]:
 
     for evidence in request.evidence:
         # The snippet and the reference it is attributed to are both quoted
-        # source text — a document titled "… FY26" contributes its own numbers.
+        # source text a document titled "… FY26" contributes its own numbers.
         values |= _numbers_in(evidence.snippet)
         values |= _numbers_in(evidence.document)
         values |= _numbers_in(evidence.section)
@@ -215,7 +215,7 @@ class CommentaryProvider(ABC):
 
 
 # --------------------------------------------------------------------------- #
-# Demo provider — the default, no API key required
+# Demo provider the default, no API key required
 # --------------------------------------------------------------------------- #
 
 #: Follow-ups a controller would actually recognise, per movement.
@@ -306,7 +306,7 @@ class DemoProvider(CommentaryProvider):
             )
 
         for item in request.evidence:
-            drivers.append(f"{_first_sentence(item.snippet)} — {item.reference}.")
+            drivers.append(f"{_first_sentence(item.snippet)} {item.reference}.")
 
         return tuple(drivers)
 
@@ -355,7 +355,7 @@ class DemoProvider(CommentaryProvider):
         return (follow_up,)
 
     def _confidence(self, evidence: Sequence[Evidence]) -> Confidence:
-        """Confidence tracks evidence coverage — nothing else."""
+        """Confidence tracks evidence coverage nothing else."""
         if not evidence:
             return Confidence.LOW
         if len(evidence) >= 2 and evidence[0].score >= 0.5:
@@ -454,7 +454,7 @@ class AnthropicProvider(CommentaryProvider):
     """
     Real LLM commentary, behind the same interface as the demo provider.
 
-    The model gets computed facts and quoted evidence — never the ledger. Its
+    The model gets computed facts and quoted evidence never the ledger. Its
     output is validated before it is accepted; on any failure the deterministic
     demo commentary is returned instead, with the reason recorded for the audit
     trail.

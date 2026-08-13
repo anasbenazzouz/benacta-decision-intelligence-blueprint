@@ -4,7 +4,7 @@ Transaction-level and budget-line-level reconciliation.
 Phase 6 gave every root cause a set of source records. This phase goes one
 level finer: the postings and planning lines that sum to the Actual and
 Budget figures themselves, so a controller can answer "show me the
-transactions" and "show me the budget" — not just "show me the explanation".
+transactions" and "show me the budget" not just "show me the explanation".
 
 The load-bearing claim is unchanged in kind, only in grain: **every number
 shown as traceable must actually be traceable**, to the cent, with the
@@ -87,7 +87,7 @@ def test_transaction_and_budget_line_ids_are_unique(transactions, budget_lines):
 def test_transactions_and_budget_lines_share_the_actuals_cost_center(transactions, budget_lines):
     """
     Each account has exactly one cost center in actuals.csv/budget.csv. The
-    elaborated rows must agree with it — a controller cross-checking the
+    elaborated rows must agree with it a controller cross-checking the
     coarse extract against the fine one should never find a contradiction.
     """
     expected = {"700100": "CC-4100", "700200": "CC-4200", "700300": "CC-5100", "700400": "CC-5100"}
@@ -98,7 +98,7 @@ def test_transactions_and_budget_lines_share_the_actuals_cost_center(transaction
 
 
 # --------------------------------------------------------------------------- #
-# Actual — transactions reconcile to the metric
+# Actual transactions reconcile to the metric
 # --------------------------------------------------------------------------- #
 
 
@@ -139,7 +139,7 @@ def test_revenue_actual_transactions_reconcile_per_business_unit(facts, transact
 
 
 # --------------------------------------------------------------------------- #
-# Budget — planning lines reconcile to the metric
+# Budget planning lines reconcile to the metric
 # --------------------------------------------------------------------------- #
 
 
@@ -177,7 +177,7 @@ def test_budget_includes_the_two_slipped_milestones_with_no_matching_transaction
 
 
 # --------------------------------------------------------------------------- #
-# Variance — the derived calculation, not a transaction
+# Variance the derived calculation, not a transaction
 # --------------------------------------------------------------------------- #
 
 
@@ -198,7 +198,7 @@ def test_variance_reconciliation_holds_for_every_headline_metric(facts):
 
 
 def test_variance_reconciliation_is_trivially_true_with_no_budget(facts):
-    """An account with no budget line has no variance to reconcile — not an error."""
+    """An account with no budget line has no variance to reconcile not an error."""
     workshop = fact_for(facts, "628400", grain=FactGrain.ACCOUNT)
     check, ok = variance_reconciliation(workshop)
     assert ok
@@ -239,7 +239,7 @@ def test_residual_decomposes_to_real_unattributed_accounts(facts, source_records
     """
     The +€65k left over after the milestone cause is not narrative filler: it
     is exactly account 700200 (Engineering Services) plus the whole of
-    Service & Maintenance revenue — both real, both traceable via the
+    Service & Maintenance revenue both real, both traceable via the
     Financial Transactions tab, neither currently assigned a root-cause
     narrative.
     """
@@ -260,7 +260,7 @@ def test_residual_decomposes_to_real_unattributed_accounts(facts, source_records
 
 def test_trace_source_records_exist(facts, source_records, transactions):
     """
-    Every HIGH-severity attention item is traceable to structured rows — via
+    Every HIGH-severity attention item is traceable to structured rows via
     the transaction ledger where one exists (Revenue), and via root-cause
     source records everywhere else (the cost-side causes). Both are real,
     row-level data; which one applies depends on what was built for this
@@ -283,7 +283,7 @@ def test_revenue_is_the_only_metric_with_full_transaction_coverage(facts, transa
     transaction grain because it is the flagship trace-to-source example.
     Operating Expenses (a pure cost metric) has no transaction ledger at all;
     Gross Margin and EBITDA include Revenue's accounts on their positive side,
-    so they see partial coverage, but neither reconciles fully — their cost
+    so they see partial coverage, but neither reconciles fully their cost
     side remains traceable only through root-cause source records, not a
     full ledger. The test asserts the boundary rather than papering over it.
     """
@@ -329,7 +329,7 @@ def test_csv_export_is_scoped_not_the_whole_dataset(facts, transactions):
 
 
 def test_csv_export_omits_no_internal_state(facts, transactions):
-    """The exported CSV is business columns only — no session/app internals."""
+    """The exported CSV is business columns only no session/app internals."""
     revenue = fact_for(facts, "revenue")
     rows, _ = reconcile_actual(revenue, transactions)
     csv_text = transactions_to_csv(rows)

@@ -1,12 +1,12 @@
 """
-BENACTA — Knowledge & Context Layer.
+BENACTA Knowledge & Context Layer.
 
 Finds the business documents that explain a movement, and shows its working.
 
 Retrieval here is deliberately simple: a section scores by how much of the query
 it covers, and every evidence item carries the exact terms that matched. There
 is no vector store and no embedding model, because the point of this layer is
-not retrieval sophistication — it is that a controller can always answer
+not retrieval sophistication it is that a controller can always answer
 *why did the system show me this note?*
 
 Retrieval sits **above** the trust boundary. It selects and quotes text that
@@ -43,7 +43,7 @@ _STOPWORDS = frozenset(
     """.split()
 )
 
-#: Business vocabulary per metric — the words a finance document would use when
+#: Business vocabulary per metric the words a finance document would use when
 #: it is talking about this metric. Kept beside the retrieval logic because it
 #: is search vocabulary, not accounting definition; a test asserts every metric
 #: in the semantic model is covered here.
@@ -168,8 +168,8 @@ def load_corpus(context_dir: Path = DEFAULT_CONTEXT_DIR) -> tuple[Section, ...]:
     """
     Read every context document into searchable sections.
 
-    Files are read in sorted order so the corpus — and therefore every
-    tie-break in ranking — is deterministic.
+    Files are read in sorted order so the corpus and therefore every
+    tie-break in ranking is deterministic.
     """
     sections: list[Section] = []
 
@@ -267,7 +267,7 @@ def score_section(section: Section, query: Query) -> float:
     The share of the query's weight this section covers.
 
     A score of 0.5 reads as "this section matches half of what we were looking
-    for" — which is exactly what gets shown to the user.
+    for" which is exactly what gets shown to the user.
     """
     if query.total_weight == 0:
         return 0.0

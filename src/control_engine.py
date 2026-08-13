@@ -1,5 +1,5 @@
 """
-BENACTA — Control Engine.
+BENACTA Control Engine.
 
 Transparent rules that decide what a controller should look at. The objective is
 explainability, not statistical sophistication: every alert states the rule that
@@ -14,7 +14,7 @@ Three rules, applied to the facts produced by the deterministic finance engine:
 
 Two design decisions worth stating, because both are visible in the output:
 
-1. A fact produces at most one alert — the most severe rule that fired. Rule id
+1. A fact produces at most one alert the most severe rule that fired. Rule id
    and threshold are recorded, so why an item was flagged stays inspectable,
    but a CFO is not shown the same variance twice.
 
@@ -192,7 +192,7 @@ def _format_eur(amount: float) -> str:
 
 
 def _variance_clause(fact: FinancialFact) -> str:
-    """"Revenue is €280,000 below budget (-5.6%)" — sign only, no judgement."""
+    """"Revenue is €280,000 below budget (-5.6%)" sign only, no judgement."""
     assert fact.variance is not None  # guarded by the rule predicates
     position = "below" if fact.variance < 0 else "above"
     clause = f"{fact.label} is {_format_eur(fact.variance)} {position} budget"

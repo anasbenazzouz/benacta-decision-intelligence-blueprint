@@ -1,5 +1,5 @@
 """
-Control engine — the rules must fire exactly where the policy says they fire.
+Control engine the rules must fire exactly where the policy says they fire.
 
 Threshold behaviour is tested on synthetic facts so the boundaries are explicit,
 then the whole framework is run against the reference story.
@@ -147,7 +147,7 @@ def test_favorable_breach_ranks_one_level_below_the_unfavorable_equivalent():
 
 
 def test_favorable_cost_underspend_is_still_reported():
-    """Governed truth reports good news too — it just does not outrank bad news."""
+    """Governed truth reports good news too it just does not outrank bad news."""
     alert = evaluate_fact(make_fact(800_000, 980_000, higher_is_better=False))
     assert alert is not None
     assert alert.direction is VarianceDirection.FAVORABLE

@@ -1,4 +1,4 @@
-# Finance Policy — Variance Reporting, Materiality and Commentary
+# Finance Policy Variance Reporting, Materiality and Commentary
 
 Meridian Industrial Group · Group Finance · FY26
 Fictional document, produced for the BENACTA reference implementation.

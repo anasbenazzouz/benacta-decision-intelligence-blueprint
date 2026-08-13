@@ -1,4 +1,4 @@
-# Management Commentary — July 2026
+# Management Commentary July 2026
 
 Meridian Industrial Group · Business Unit submissions to Group Finance
 Fictional document, produced for the BENACTA reference implementation.

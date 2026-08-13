@@ -1,9 +1,9 @@
 """
-BENACTA — visual system for the Decision Cockpit.
+BENACTA visual system for the Decision Cockpit.
 
 Tokens and components taken from BENACTA's supplied graphical charter
 ("Master Définitif"). The charter's own governing rule applies: the system
-is locked — select from it, do not reinterpret it.
+is locked select from it, do not reinterpret it.
 
 Three principles drive everything here:
 
@@ -11,13 +11,13 @@ Three principles drive everything here:
     governance, porcelain is truth, mineral blue means AI and nothing else,
     champagne means a decision or an action and stays scarce.
   * **There is no red in this palette.** An unfavourable variance is therefore
-    signalled by typography and wording — a minus sign, "below budget", a
-    severity label — never by colour. That is a charter constraint, and it also
+    signalled by typography and wording a minus sign, "below budget", a
+    severity label never by colour. That is a charter constraint, and it also
     happens to be how a finance publication reads.
   * **Motion for state, not decoration.** The only things that move are the
     signals of a live, governed system: the data-current pulse, a one-time
     entrance, a selection change. Financial figures never blink, count or
-    shimmer — a number the reader cannot trust to hold still is not a fact.
+    shimmer a number the reader cannot trust to hold still is not a fact.
     Every animation is wrapped in `prefers-reduced-motion: no-preference`.
 """
 
@@ -32,24 +32,24 @@ LOGO_DARK = _ASSETS / "benacta-primary-dark.png"
 LOGO_LIGHT = _ASSETS / "benacta-primary-light.png"
 
 # --------------------------------------------------------------------------- #
-# Palette — exact charter values
+# Palette exact charter values
 # --------------------------------------------------------------------------- #
 
-GREEN = "#122B20"        # Deep Heritage Green — systems, governance, foundation
-PORCELAIN = "#F1E9DA"    # Warm Porcelain — truth, information, clarity
-BLUE = "#6C9BA3"         # Mineral Intelligence Blue — AI, reasoning
+GREEN = "#122B20"        # Deep Heritage Green systems, governance, foundation
+PORCELAIN = "#F1E9DA"    # Warm Porcelain truth, information, clarity
+BLUE = "#6C9BA3"         # Mineral Intelligence Blue AI, reasoning
 BLUE_TEXT = "#54808A"    # blue that holds contrast on porcelain
-CHAMPAGNE = "#BBA06B"    # Antique Champagne — decision, value, action
+CHAMPAGNE = "#BBA06B"    # Antique Champagne decision, value, action
 CHAMPAGNE_TEXT = "#8F7440"  # champagne that holds contrast on porcelain
-BLUE_GREY = "#536875"    # Heritage Blue-Grey — data, infrastructure
-STONE = "#7C898B"        # Stone — annotations, legends, metadata
-SAND = "#D6BE98"         # Sand — rare editorial accent, under 3%
+BLUE_GREY = "#536875"    # Heritage Blue-Grey data, infrastructure
+STONE = "#7C898B"        # Stone annotations, legends, metadata
+SAND = "#D6BE98"         # Sand rare editorial accent, under 3%
 
 SANS = "'Instrument Sans', 'Segoe UI', system-ui, -apple-system, sans-serif"
 SERIF = "'Source Serif 4', Georgia, 'Times New Roman', serif"
 
 # --------------------------------------------------------------------------- #
-# Semantic status — an owner-approved extension to the locked charter
+# Semantic status an owner-approved extension to the locked charter
 #
 # The charter palette carries no favourable/unfavourable signal, because it was
 # drawn for publications rather than for a variance report. These three tokens
@@ -165,7 +165,7 @@ html, body, [data-testid="stAppViewContainer"] * {{
 .ba-band .kicker {{ color: {CHAMPAGNE}; }}
 
 /* Two-zone hero: the review on the left, a quiet status rail on the right.
-   The rail is deliberately smaller type than anything else on the page — a
+   The rail is deliberately smaller type than anything else on the page a
    system panel, not a second dashboard. */
 .ba-hero-zones {{ display: flex; align-items: stretch; gap: 40px; }}
 .ba-hero-main {{ flex: 1 1 auto; min-width: 0; }}
@@ -205,7 +205,7 @@ html, body, [data-testid="stAppViewContainer"] * {{
     box-shadow: 0 0 0 0 rgba(79,107,79,0); flex-shrink: 0;
 }}
 
-/* The decision chain — the doctrine, drawn once, as the hero's closing rule.
+/* The decision chain the doctrine, drawn once, as the hero's closing rule.
    Champagne is permitted here because every dot marks a step toward decision
    and action; five 5px dots keep it far inside the <10% champagne budget. */
 .ba-chain {{
@@ -227,7 +227,7 @@ html, body, [data-testid="stAppViewContainer"] * {{
     transition: background-color 0.18s ease, box-shadow 0.18s ease;
 }}
 .ba-kpi-cell:first-child {{ border-left: none; padding-left: 0; }}
-/* Hover: a barely-there warm wash and a champagne base rule — the cell can
+/* Hover: a barely-there warm wash and a champagne base rule the cell can
    act (trace), and the rule says so without lifting, shading or bouncing. */
 .ba-kpi-cell:hover {{
     background: rgba(18,43,32,0.03);
@@ -274,7 +274,7 @@ div[class*="st-key-att_"] button p {{
 }}
 /* Contrast rule: body text on a light surface is never inverted. The global
    button hover fills with green and lightens its label, which would put
-   porcelain text on a pale row — so attention rows opt out explicitly. */
+   porcelain text on a pale row so attention rows opt out explicitly. */
 div[class*="st-key-att_"] button:hover {{
     background: rgba(18,43,32,0.055) !important;
     border-bottom-color: rgba(18,43,32,0.22);
@@ -291,8 +291,8 @@ div[class*="st-key-att_"] button:focus-visible {{ outline: 2px solid {GREEN}; ou
 
 /* ---- trace-to-source actions --------------------------------------------
    The KPI value is the hero; traceability is its supporting action. A small
-   hairline outline button in tracked caps — the same quiet button grammar as
-   the panel toggle — so it reads as clickable at a glance without competing
+   hairline outline button in tracked caps the same quiet button grammar as
+   the panel toggle so it reads as clickable at a glance without competing
    with the figures. Hover fills green like every other button in the app. */
 div[class*="st-key-trace_"] button {{
     border: 1px solid rgba(18,43,32,0.35) !important;
@@ -341,8 +341,8 @@ div[class*="st-key-trace_kpi_revenue"] button {{ margin-left: 0 !important; }}
 /* ---- root cause ---------------------------------------------------------
    Held clear of the interpretation block above it: a derived cause and an AI
    draft are different kinds of claim and must not read as one nested card.
-   The cause now leads the hierarchy — a business user asks "what is the
-   cause?" before "what did the AI write?" — so its title and impact carry
+   The cause now leads the hierarchy a business user asks "what is the
+   cause?" before "what did the AI write?" so its title and impact carry
    more weight than the interpretation's body text. No container fill; the
    accent is a hairline in the semantic direction colour. Not champagne:
    champagne means decision or action, and a root cause is analysis. */
@@ -373,7 +373,7 @@ div[class*="st-key-trace_kpi_revenue"] button {{ margin-left: 0 !important; }}
 
 /* ---- lineage chain -------------------------------------------------------
    A controlled chain, not a table: each step carries a marker on a thin
-   vertical rail, in the charter's architecture grammar — green outline for
+   vertical rail, in the charter's architecture grammar green outline for
    governed truth, blue-grey for data, mineral blue for the AI step, solid
    porcelain for human judgment, and exactly one champagne mark on Action. */
 .ba-step {{ display: grid; grid-template-columns: 14px 158px 1fr;
@@ -397,8 +397,8 @@ div[class*="st-key-trace_kpi_revenue"] button {{ margin-left: 0 !important; }}
 
 /* ---- source record -------------------------------------------------------
    The business event leads: what happened, to which project and milestone,
-   with what financial impact. Where to verify it — system, document, record
-   id — is one step down, behind a restrained disclosure. */
+   with what financial impact. Where to verify it system, document, record
+   id is one step down, behind a restrained disclosure. */
 .ba-record {{ border: 1px solid rgba(18,43,32,0.20); padding: 18px 22px 14px 22px;
     margin-bottom: 14px; }}
 .ba-record .obj {{ font-size: 11px; font-weight: 600; letter-spacing: 0.14em;
@@ -439,7 +439,7 @@ div[class*="st-key-trace_kpi_revenue"] button {{ margin-left: 0 !important; }}
 
 /* ---- workflow progression -----------------------------------------------
    The review chain as a quiet stepper: past stages in ink outline, the
-   current stage filled — green while judgment is pending, champagne only
+   current stage filled green while judgment is pending, champagne only
    when the stage IS the action. Future stages stay stone. Reads as a
    workflow, not administration. */
 .ba-flow {{ display: flex; align-items: center; flex-wrap: wrap;
@@ -469,7 +469,7 @@ div[class*="st-key-trace_kpi_revenue"] button {{ margin-left: 0 !important; }}
     background: transparent; }}
 .ba-log td.sec, .ba-log th.sec {{ font-size: 12px; color: {STONE}; }}
 
-/* key/value figures — hairlines only, never a grid */
+/* key/value figures hairlines only, never a grid */
 .ba-kv {{ width: 100%; border-collapse: collapse; }}
 .ba-kv td {{ padding: 8px 0; border: none;
     border-bottom: 1px solid rgba(18,43,32,0.12); background: transparent; }}
@@ -486,7 +486,7 @@ div[class*="st-key-trace_kpi_revenue"] button {{ margin-left: 0 !important; }}
    reopen it (the reopen chevron lives in the header, which this theme
    removes). The explicit Close/Menu pair below is the only toggle. */
 [data-testid="stSidebarCollapseButton"] {{ display: none !important; }}
-/* Navigation: the radio is restyled as an editorial nav list — no widget
+/* Navigation: the radio is restyled as an editorial nav list no widget
    circles; a champagne left rule marks the active view. */
 [data-testid="stSidebar"] [data-testid="stRadioOption"] {{
     display: block; padding: 9px 12px; margin: 0 0 2px 0;
@@ -536,7 +536,7 @@ div[class*="st-key-trace_kpi_revenue"] button {{ margin-left: 0 !important; }}
 .stButton button:hover, .stButton button:hover * {{ color: {PORCELAIN}; }}
 .stButton button:hover {{ background: {GREEN}; border-color: {GREEN}; }}
 /* The primary action reads as a filled block, so its label must be porcelain
-   on every nested element — the inner <p> otherwise inherits the ink colour. */
+   on every nested element the inner <p> otherwise inherits the ink colour. */
 div[class*="st-key-primary_"] button,
 div[class*="st-key-primary_"] button * {{ background: {GREEN}; color: {PORCELAIN}; }}
 div[class*="st-key-primary_"] button:hover,
@@ -567,7 +567,7 @@ hr {{ border: none; border-top: 1px solid rgba(18,43,32,0.16); margin: 26px 0; }
 
 /* ---- panel toggle -------------------------------------------------------
    An explicit, always-discoverable open/close control, standing in for
-   Streamlit's native collapse arrow (hidden above — this build renders no
+   Streamlit's native collapse arrow (hidden above this build renders no
    way to undo the native collapse). Small, hairline, never a navigation
    bar of its own. */
 div[class*="st-key-open_panel"] button {{
@@ -595,7 +595,7 @@ div[class*="st-key-open_panel"] button:hover * {{
 /* ---- tabs (Trace to Source) ----------------------------------------------
    This Streamlit build renders tabs as react-aria stTab nodes, not BaseWeb.
    Restyled to the charter: tracked sans labels, stone at rest, ink when
-   active — never champagne text on porcelain, which fails contrast — with
+   active never champagne text on porcelain, which fails contrast with
    the champagne kept for the 2px active indicator only. */
 [data-testid="stTabs"] [role="tablist"] {{
     gap: 28px; border-bottom: 1px solid rgba(18,43,32,0.18);
@@ -612,7 +612,7 @@ div[class*="st-key-open_panel"] button:hover * {{
 [data-testid="stTab"]:focus-visible {{ outline: 2px solid {GREEN}; outline-offset: 2px; }}
 
 /* ---- dialog (Trace to Source) --------------------------------------------
-   Squared to the charter — no rounded modal chrome — and the dialog's fixed
+   Squared to the charter no rounded modal chrome and the dialog's fixed
    title becomes a quiet kicker so the metric heading inside leads. */
 [data-testid="stDialog"] > div,
 [data-testid="stDialog"] > div > div {{ border-radius: 0 !important; }}
@@ -634,10 +634,10 @@ div[class*="st-key-open_panel"] button:hover * {{
 .ba-recon.gap {{ color: {UNFAVORABLE}; }}
 .ba-recon.gap .dot {{ background: {UNFAVORABLE}; }}
 
-/* dataframe (Financial Transactions table) — quiet the default grid chrome */
+/* dataframe (Financial Transactions table) quiet the default grid chrome */
 [data-testid="stDataFrame"] {{ border: 1px solid rgba(18,43,32,0.18); }}
 
-/* ---- motion — for state, never decoration --------------------------------
+/* ---- motion for state, never decoration --------------------------------
    Everything that moves lives inside this block, so a reduced-motion
    preference silences the entire system at once. Durations are slow and
    singular: the data pulse breathes at 2.8s; entrances play once per
@@ -671,7 +671,7 @@ div[class*="st-key-open_panel"] button:hover * {{
         from {{ opacity: 0; }}
         to {{ opacity: 1; }}
     }}
-    /* One soft pulse for unfavourable marks on first load — then stillness. */
+    /* One soft pulse for unfavourable marks on first load then stillness. */
     .ba-kpis.entrance .ba-tag .dot.once {{ animation: ba-dot-once 1.1s ease-out 0.8s 1; }}
     @keyframes ba-dot-once {{
         0%, 100% {{ transform: scale(1); }}
@@ -699,14 +699,14 @@ div[class*="st-key-open_panel"] button:hover * {{
 def money(value: float | None, decimals: int = 0) -> str:
     """Charter-consistent money: the sign leads, then the symbol."""
     if value is None:
-        return "—"
+        return " "
     sign = "-" if value < 0 else ""
     return f"{sign}€{abs(value):,.{decimals}f}"
 
 
 def money_compact(value: float | None) -> str:
     if value is None:
-        return "—"
+        return " "
     sign = "-" if value < 0 else ""
     magnitude = abs(value)
     if magnitude >= 1_000_000:
@@ -717,7 +717,7 @@ def money_compact(value: float | None) -> str:
 
 
 def percent(value: float | None) -> str:
-    return "—" if value is None else f"{value:+.1%}"
+    return " " if value is None else f"{value:+.1%}"
 
 
 _MONTHS = (
@@ -757,8 +757,8 @@ def header_band(
 ) -> str:
     """
     The application header. One zone by default; with `status_rows` or
-    `live_label` it becomes the two-zone hero — review identity on the left,
-    a quiet system-status rail on the right — and `chain` closes the band
+    `live_label` it becomes the two-zone hero review identity on the left,
+    a quiet system-status rail on the right and `chain` closes the band
     with the decision chain drawn as a hairline motif.
     """
     main = (
@@ -816,7 +816,7 @@ def kpi_band(facts, entrance: bool = False) -> str:
     Direction comes from the metric's own definition, not the sign: revenue
     below plan and operating expenses above plan are both unfavourable, and are
     coloured the same way even though their variances have opposite signs. The
-    actual stays in ink and stays the largest thing in the cell — the status
+    actual stays in ink and stays the largest thing in the cell the status
     colour sits on the variance line, where interpretation happens.
 
     `entrance` plays the one-time first-render rise; reruns render still.
@@ -888,7 +888,7 @@ def attention_styles(items, selected_key: str) -> str:
     Hover is a neutral warm wash; selection is a champagne-tinted ground with a
     solid severity rule on the left, and a single 550ms settle when the
     selection changes (`ba-select` flashes once because the rule only newly
-    applies on a selection change — an unchanged rerun does not replay it).
+    applies on a selection change an unchanged rerun does not replay it).
     """
     rules = []
     for item in items:
@@ -932,13 +932,13 @@ def evidence_block(evidence, show_relevance: bool = False) -> str:
 
 def root_cause_block(cause, direction: str, share: float | None = None) -> str:
     """
-    A derived cause: what happened, what it cost, and why — in that order.
+    A derived cause: what happened, what it cost, and why in that order.
 
     The financial impact is the one place colour carries meaning here; the
-    border accent, title and explanation stay ink. `share` — this cause's
-    portion of the headline variance — draws a 2px contribution rule under
+    border accent, title and explanation stay ink. `share` this cause's
+    portion of the headline variance draws a 2px contribution rule under
     the impact, typography-first. Supporting evidence is rendered separately
-    by the caller — an analytical driver and the document that corroborates
+    by the caller an analytical driver and the document that corroborates
     it are different kinds of claim.
     """
     colour = direction_color(direction)
@@ -1005,7 +1005,7 @@ def lineage_chain(steps) -> str:
     """
     The business lineage as a controlled chain: marker dots on a thin
     vertical rail, business language first, metadata second. The dot grammar
-    follows the charter — truth green, data blue-grey, AI mineral blue,
+    follows the charter truth green, data blue-grey, AI mineral blue,
     human judgment porcelain, and one champagne mark on Action.
     """
     rendered = []
@@ -1026,7 +1026,7 @@ def source_record_card(record) -> str:
     """
     One business event, business-first: what happened, to which project and
     milestone, in which period, at what financial impact, and why. Where a
-    controller verifies it — source system, document, record id — sits
+    controller verifies it source system, document, record id sits
     behind a restrained "Verify source record" disclosure.
     """
     kv2 = "".join(
@@ -1036,13 +1036,13 @@ def source_record_card(record) -> str:
                 "Project",
                 f"{record.project_name} ({record.project_id})"
                 if record.project_id
-                else "—",
+                else " ",
             ),
             (
                 "Milestone",
                 f"{record.milestone_name} ({record.milestone_id})"
                 if record.milestone_id
-                else "—",
+                else " ",
             ),
             ("Original period", period_label(record.original_period)),
             (
@@ -1061,7 +1061,7 @@ def source_record_card(record) -> str:
             ("Source document", f"{record.source_document} § {record.source_section}"),
             ("Record ID", record.source_record_id),
             ("Account", record.account),
-            ("Customer", record.customer or "—"),
+            ("Customer", record.customer or " "),
         )
     )
 
@@ -1091,7 +1091,7 @@ def source_record_card(record) -> str:
 
 def reconciliation_status(check) -> str:
     """
-    RECONCILED, or the exact gap — never a large banner, never hidden.
+    RECONCILED, or the exact gap never a large banner, never hidden.
 
     `check` is a `src.lineage.ReconciliationCheck`.
     """
@@ -1111,7 +1111,7 @@ def reconciliation_status(check) -> str:
 def reconciliation_detail_table(check) -> str:
     """The three-line arithmetic behind the status pill, for the controller who wants it."""
     rows = [
-        ("Displayed figure", money(check.displayed) if check.displayed is not None else "—"),
+        ("Displayed figure", money(check.displayed) if check.displayed is not None else " "),
         ("Source row total", money(check.source_total)),
         ("Difference", money(check.difference)),
     ]
@@ -1150,7 +1150,7 @@ def panel_visibility_css(open: bool) -> str:
     collapses the native sidebar, there is no control anywhere in the DOM to
     reopen it (so the native arrow is hidden in the main stylesheet). This
     CSS switch, driven by `st.session_state.panel_open`, is the whole
-    mechanism — reliable because it is plain state, not frontend-only UI
+    mechanism reliable because it is plain state, not frontend-only UI
     state Python cannot see.
     """
     if open:
@@ -1190,7 +1190,7 @@ def footer_band() -> str:
 
 
 # --------------------------------------------------------------------------- #
-# Architecture diagram — charter §09 grammar, as vector
+# Architecture diagram charter §09 grammar, as vector
 # --------------------------------------------------------------------------- #
 
 
@@ -1204,7 +1204,7 @@ def architecture_document(width: int = 1100) -> tuple[str, int]:
 
     Streamlit's markdown sanitiser strips `<svg>`, so the diagram is served
     through an isolated frame instead. That frame is its own document, which
-    means it needs the charter font imported again — a diagram set in a
+    means it needs the charter font imported again a diagram set in a
     fallback typeface is not the charter's diagram.
     """
     height = int(width * DIAGRAM_RATIO) + 8
@@ -1227,7 +1227,7 @@ def architecture_diagram() -> str:
     System of record: green thin outline. Semantic and knowledge layers:
     blue-grey thick left edge. Deterministic rules: double stroke. AI: mineral
     blue tint with a dotted edge. Human approval: solid porcelain. Action:
-    solid champagne — exactly one node in the diagram carries it.
+    solid champagne exactly one node in the diagram carries it.
     """
     label = f'font-family:{SANS};font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase'
     node = f'font-family:{SANS};font-size:15px;font-weight:600'

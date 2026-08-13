@@ -1,5 +1,5 @@
 """
-Interpretation layer — AI explains, it does not compute.
+Interpretation layer AI explains, it does not compute.
 
 The load-bearing test here is `test_demo_commentary_invents_no_numbers`: whatever
 the interpretation layer writes, every figure in it must already exist in the
@@ -202,7 +202,7 @@ class _StubResponse:
 
 
 class _StubClient:
-    """Stands in for anthropic.Anthropic — no network, no key."""
+    """Stands in for anthropic.Anthropic no network, no key."""
 
     def __init__(self, text, stop_reason="end_turn"):
         response = _StubResponse(text, stop_reason)

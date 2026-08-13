@@ -1,5 +1,5 @@
 """
-Deterministic finance engine — the figures must be right, and reproducibly right.
+Deterministic finance engine the figures must be right, and reproducibly right.
 
 The reconciliation tests deliberately recompute the headline metrics from their
 components rather than asserting hard-coded totals, so a change to the fictional
@@ -135,7 +135,7 @@ def test_cost_center_must_belong_to_the_declared_business_unit():
 
 
 # --------------------------------------------------------------------------- #
-# Story reconciliation — the numbers the whole project narrates
+# Story reconciliation the numbers the whole project narrates
 # --------------------------------------------------------------------------- #
 
 
@@ -196,7 +196,7 @@ def test_metric_totals_equal_the_sum_of_their_categories(truth):
 
 
 def test_gross_margin_percentage_holds_despite_the_revenue_miss(facts):
-    """Lower procurement costs protect the margin rate — a story detail that must be true."""
+    """Lower procurement costs protect the margin rate a story detail that must be true."""
     gross_margin = fact_for(facts, "gross_margin")
     revenue = fact_for(facts, "revenue")
 

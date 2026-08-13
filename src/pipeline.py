@@ -1,5 +1,5 @@
 """
-BENACTA — the Decision Intelligence loop, assembled.
+BENACTA the Decision Intelligence loop, assembled.
 
     TRUTH → CONTEXT → INTERPRETATION → REVIEW → DECISION → ACTION → AUDIT
 
@@ -111,7 +111,7 @@ class DecisionSession:
 
     @property
     def attention(self) -> tuple[DecisionItem, ...]:
-        """Ranked items requiring attention — the cockpit's main list."""
+        """Ranked items requiring attention the cockpit's main list."""
         return tuple(self.items)
 
     def item(self, issue_id: str) -> DecisionItem:
@@ -123,8 +123,8 @@ class DecisionSession:
     def item_for_metric(self, metric_key: str) -> DecisionItem | None:
         """
         The decision item for a company-level metric, if a control finding
-        raised one. Several headline KPIs — Operating Expenses in the
-        reference story — never breach materiality and therefore have no
+        raised one. Several headline KPIs Operating Expenses in the
+        reference story never breach materiality and therefore have no
         item; callers must handle that as a real, expected case, not an error.
         """
         for item in self.items:
@@ -246,7 +246,7 @@ class DecisionSession:
 def _supporting_facts(
     facts: Sequence[FinancialFact], alert: ControlAlert
 ) -> tuple[FinancialFact, ...]:
-    """Business-unit detail for a company-level metric — the semantic drill-down."""
+    """Business-unit detail for a company-level metric the semantic drill-down."""
     return tuple(
         fact
         for fact in facts_at_grain(facts, FactGrain.METRIC_BY_BUSINESS_UNIT)

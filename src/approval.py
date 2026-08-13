@@ -1,5 +1,5 @@
 """
-BENACTA — Human Control.
+BENACTA Human Control.
 
 AI drafts. Humans approve.
 
@@ -95,7 +95,7 @@ class ReviewRecord:
 
     @property
     def reviewer(self) -> str | None:
-        """Who last acted on the review — the accountable human."""
+        """Who last acted on the review the accountable human."""
         for event in reversed(self._history):
             if event.to_state in (ReviewState.APPROVED, ReviewState.REVISION_REQUESTED):
                 return event.actor

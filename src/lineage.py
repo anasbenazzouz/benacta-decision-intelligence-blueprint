@@ -1,5 +1,5 @@
 """
-BENACTA — Source lineage and root-cause attribution.
+BENACTA Source lineage and root-cause attribution.
 
 Answers the question a controller actually asks of a variance: *where would I go
 to verify this?*
@@ -8,7 +8,7 @@ A control finding says a metric moved. A root cause says **why**, backed by
 source records a controller can look up in the originating system. The two are
 kept apart on purpose:
 
-  * a **root cause** is derived — an analytical grouping of source records that
+  * a **root cause** is derived an analytical grouping of source records that
     share one business explanation, carrying a summed financial impact;
   * **supporting evidence** is quoted source text, which corroborates a cause
     but is not itself the cause.
@@ -18,7 +18,7 @@ reports what the source records explain and what is left over, so a partial
 explanation reads as partial rather than complete. That residual is the honest
 part of this module.
 
-Deterministic and offline. No AI dependency — this sits above the trust
+Deterministic and offline. No AI dependency this sits above the trust
 boundary alongside the finance, control and retrieval layers.
 """
 
@@ -48,7 +48,7 @@ class SourceRecord:
     One root-cause record: a controller-facing explanation of *why*, backed by
     enough identifying detail to find the underlying operational record.
 
-    This is deliberately not the transaction ledger — see `TransactionLine` for
+    This is deliberately not the transaction ledger see `TransactionLine` for
     the postings that make up the Actual and Budget figures themselves. A
     source record explains a movement; a transaction *is* the movement.
     """
@@ -92,7 +92,7 @@ class TransactionLine:
     One posting that contributed to a metric's Actual figure.
 
     The sum of transaction lines for a given account and period is defined to
-    equal that account's row in `data/actuals.csv` — enforced by
+    equal that account's row in `data/actuals.csv` enforced by
     `test_lineage.py::test_revenue_actual_transactions_reconcile_to_metric` and
     its siblings, not merely asserted here.
     """
@@ -120,7 +120,7 @@ class BudgetLine:
     """
     One planning line that contributed to a metric's Budget figure.
 
-    A budget line is not a transaction — it is a plan, and some budget lines
+    A budget line is not a transaction it is a plan, and some budget lines
     (the two slipped milestones) have no corresponding transaction this
     period. That asymmetry is the point: it is what the Revenue variance *is*.
     """
@@ -374,7 +374,7 @@ def records_for_fact(
     The source records that contribute to a computed fact.
 
     At account grain that is the account itself; at metric grain it is every
-    account whose category the metric is composed from — the semantic layer
+    account whose category the metric is composed from the semantic layer
     deciding what belongs to what, exactly as it does for the figures.
     """
     scoped = [r for r in records if r.current_period == fact.period or r.original_period == fact.period]
@@ -464,10 +464,10 @@ def _traceable_accounts(
     A figure may only be traced to postings when the row ledger can actually
     reproduce it, which requires both:
 
-    * **Full coverage** — every account composing the metric is present in the
+    * **Full coverage** every account composing the metric is present in the
       ledger. Partial coverage would show some of the rows behind a figure as
       though they were all of them.
-    * **A uniform sign** — the metric adds its accounts rather than netting
+    * **A uniform sign** the metric adds its accounts rather than netting
       them. A composed metric such as Gross Margin (revenue *minus* direct
       costs) cannot be reconciled by summing raw posting amounts.
 
@@ -541,7 +541,7 @@ def reconcile_actual(
     rows = transactions_for_fact(fact, transactions, model)
     total = round(sum(row.amount for row in rows), 2)
     return rows, ReconciliationCheck(
-        label=f"{fact.label} — Actual",
+        label=f"{fact.label} Actual",
         displayed=fact.actual,
         source_total=total,
         row_count=len(rows),
@@ -557,7 +557,7 @@ def reconcile_budget(
     rows = budget_lines_for_fact(fact, budget_lines, model)
     total = round(sum(row.amount for row in rows), 2)
     return rows, ReconciliationCheck(
-        label=f"{fact.label} — Budget",
+        label=f"{fact.label} Budget",
         displayed=fact.budget,
         source_total=total,
         row_count=len(rows),
@@ -568,7 +568,7 @@ def variance_reconciliation(fact: FinancialFact) -> tuple[ReconciliationCheck, b
     """
     The deterministic calculation, checked against itself.
 
-    Not a second computation — `variance = actual - budget` is computed exactly
+    Not a second computation `variance = actual - budget` is computed exactly
     once, in `finance_engine.compute_variance`. This re-derives it from the
     fact's own actual/budget fields and confirms the fact agrees with its own
     arithmetic, so a future refactor that breaks the invariant fails loudly
@@ -576,12 +576,12 @@ def variance_reconciliation(fact: FinancialFact) -> tuple[ReconciliationCheck, b
     """
     if fact.budget is None or fact.variance is None:
         check = ReconciliationCheck(
-            label=f"{fact.label} — Variance", displayed=None, source_total=0.0, row_count=0
+            label=f"{fact.label} Variance", displayed=None, source_total=0.0, row_count=0
         )
         return check, True
     recomputed = round(fact.actual - fact.budget, 2)
     check = ReconciliationCheck(
-        label=f"{fact.label} — Variance",
+        label=f"{fact.label} Variance",
         displayed=fact.variance,
         source_total=recomputed,
         row_count=1,
@@ -603,7 +603,7 @@ def _rows_to_csv(rows: Sequence, headers: Sequence[str]) -> str:
     return buffer.getvalue()
 
 
-#: Column order for the exported transaction CSV — business-meaningful fields
+#: Column order for the exported transaction CSV business-meaningful fields
 #: only, matching what the Financial Transactions tab displays.
 TRANSACTION_CSV_COLUMNS: tuple[str, ...] = (
     "transaction_id",
@@ -687,9 +687,9 @@ def contribution_breakdown(
 
 
 def _eur(value: float | None) -> str:
-    """Sign leads, then the symbol — the same convention as the cockpit."""
+    """Sign leads, then the symbol the same convention as the cockpit."""
     if value is None:
-        return "—"
+        return " "
     return f"{'-' if value < 0 else ''}€{abs(value):,.0f}"
 
 
@@ -733,7 +733,7 @@ def business_lineage(
             f"{len(transactions)} posting{'' if len(transactions) == 1 else 's'} · "
             f"{_eur(tx_total)}"
         )
-        # Summarised by main account, never listed posting by posting — the
+        # Summarised by main account, never listed posting by posting the
         # full ledger lives in the Financial Transactions tab and is not
         # duplicated into the chain.
         by_account: dict[str, float] = {}
@@ -783,8 +783,8 @@ def business_lineage(
         ),
         LineageStep(
             "Business object",
-            objects or "—",
-            subjects or "—",
+            objects or " ",
+            subjects or " ",
             f"record ids: {record_ids}",
         ),
         LineageStep(
@@ -806,7 +806,7 @@ def business_lineage(
             "Control finding",
             f"{rule_name or 'No rule fired'}"
             + (f" · {severity}" if severity else ""),
-            f"threshold {threshold_label}" if threshold_label else "—",
+            f"threshold {threshold_label}" if threshold_label else " ",
             None,
         ),
         LineageStep(
@@ -815,7 +815,7 @@ def business_lineage(
             f"{cause.explanation} Drafted "
             f"{('by ' + interpretation_mode.lower()) if interpretation_mode else ''}"
             f"{(' · confidence ' + confidence.lower()) if confidence else ''}"
-            " — the interpretation explains the computed figures; it does not produce them.",
+            " the interpretation explains the computed figures; it does not produce them.",
             None,
         ),
         LineageStep(

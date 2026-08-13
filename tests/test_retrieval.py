@@ -1,5 +1,5 @@
 """
-Context retrieval — the user must always be able to see why the system said
+Context retrieval the user must always be able to see why the system said
 what it said.
 
 These tests care about two things: that the right document comes back, and that

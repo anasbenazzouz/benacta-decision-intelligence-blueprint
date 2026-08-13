@@ -67,8 +67,8 @@ def stamp_metadata() -> None:
     document = pymupdf.open(PDF)
     document.set_metadata(
         {
-            "title": "BENACTA — Controlled Intelligence Blueprint",
-            "author": "Anas Benazzouz — BENACTA",
+            "title": "BENACTA Controlled Intelligence Blueprint",
+            "author": "Anas Benazzouz BENACTA",
             "subject": "How to introduce AI into enterprise decision-making "
             "without giving up control of the truth.",
             "keywords": "decision intelligence, enterprise AI, governed data, "

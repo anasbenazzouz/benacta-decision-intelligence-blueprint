@@ -4,7 +4,7 @@ Copy the supplied BENACTA logo packs into the project and derive tight crops.
 The supplied packs are full artboards on the charter grounds (#122B20 dark,
 #F1E9DA light) with generous margin. The application needs the same lockup
 cropped to its content so it can be placed against a matching band without a
-visible artboard edge. Nothing is recoloured, stretched or re-proportioned —
+visible artboard edge. Nothing is recoloured, stretched or re-proportioned
 the crop is the only transformation, per the charter's logo rules.
 
     python scripts/prepare_brand_assets.py
@@ -12,7 +12,7 @@ the crop is the only transformation, per the charter's logo rules.
 The supplied logo packs are not redistributed with this repository; only the
 derived crops in `assets/generated/` are committed. This script is therefore a
 provenance record of how those crops were produced rather than something a
-cloner needs to run — the application never invokes it.
+cloner needs to run the application never invokes it.
 """
 
 from __future__ import annotations

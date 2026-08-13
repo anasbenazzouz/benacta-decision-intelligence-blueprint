@@ -1,5 +1,5 @@
 """
-BENACTA — Business Semantic Layer.
+BENACTA Business Semantic Layer.
 
 A ledger row is not a business fact. This module holds the governed definitions
 that give raw extract rows their business meaning:
@@ -10,7 +10,7 @@ that give raw extract rows their business meaning:
 The extract carries codes. The semantic model carries meaning, and it is the
 authority: a row referencing an unknown account, or claiming a category that
 disagrees with the governed chart of accounts, is rejected rather than silently
-aggregated. That rejection is the point — it is where "raw data" becomes
+aggregated. That rejection is the point it is where "raw data" becomes
 "business meaning".
 
 Sign convention: all amounts are stored as positive magnitudes. Revenue and cost
@@ -18,7 +18,7 @@ accounts are distinguished by their category, and metric definitions apply the
 signs. This keeps the extract readable and keeps debit/credit sign errors out of
 the demonstration.
 
-This module has no dependency on any AI component — part of the trust
+This module has no dependency on any AI component part of the trust
 boundary enforced by `tests/test_ai_independence.py`.
 """
 
@@ -247,7 +247,7 @@ METRICS: tuple[MetricDefinition, ...] = (
 # --------------------------------------------------------------------------- #
 # The governed model of the fictional company
 #
-# Meridian Industrial Group — a mid-sized industrial and project engineering
+# Meridian Industrial Group a mid-sized industrial and project engineering
 # company. Entirely fictional. Amounts in Euros.
 # --------------------------------------------------------------------------- #
 
@@ -267,8 +267,8 @@ COST_CENTERS: tuple[CostCenter, ...] = (
 )
 
 ACCOUNTS: tuple[Account, ...] = (
-    Account("700100", "Project Revenue — Milestones", AccountCategory.REVENUE),
-    Account("700200", "Project Revenue — Engineering Services", AccountCategory.REVENUE),
+    Account("700100", "Project Revenue Milestones", AccountCategory.REVENUE),
+    Account("700200", "Project Revenue Engineering Services", AccountCategory.REVENUE),
     Account("700300", "Service Contract Revenue", AccountCategory.REVENUE),
     Account("700400", "Spare Parts & Repairs Revenue", AccountCategory.REVENUE),
     Account("601100", "Raw Materials & Components", AccountCategory.DIRECT_MATERIALS),
@@ -276,17 +276,17 @@ ACCOUNTS: tuple[Account, ...] = (
     Account("604100", "External Engineering Contractors", AccountCategory.EXTERNAL_CONTRACTORS),
     Account("604200", "Subcontracted Field Labour", AccountCategory.EXTERNAL_CONTRACTORS),
     Account("605100", "Site Installation & Commissioning", AccountCategory.DIRECT_PROJECT_COSTS),
-    Account("605200", "Equipment Rental — Projects", AccountCategory.DIRECT_PROJECT_COSTS),
-    Account("641100", "Salaries — Project Delivery", AccountCategory.PERSONNEL),
-    Account("641200", "Salaries — Engineering", AccountCategory.PERSONNEL),
-    Account("641300", "Salaries — Field Service", AccountCategory.PERSONNEL),
-    Account("641900", "Salaries — Projects Administration", AccountCategory.PERSONNEL),
-    Account("641950", "Salaries — Service Administration", AccountCategory.PERSONNEL),
-    Account("625100", "Travel & Accommodation — Projects", AccountCategory.TRAVEL),
-    Account("625200", "Travel & Accommodation — Service", AccountCategory.TRAVEL),
-    Account("625300", "Travel — Administration", AccountCategory.TRAVEL),
-    Account("613100", "Facilities & Utilities — Projects", AccountCategory.FACILITIES),
-    Account("613200", "Facilities & Utilities — Service", AccountCategory.FACILITIES),
+    Account("605200", "Equipment Rental Projects", AccountCategory.DIRECT_PROJECT_COSTS),
+    Account("641100", "Salaries Project Delivery", AccountCategory.PERSONNEL),
+    Account("641200", "Salaries Engineering", AccountCategory.PERSONNEL),
+    Account("641300", "Salaries Field Service", AccountCategory.PERSONNEL),
+    Account("641900", "Salaries Projects Administration", AccountCategory.PERSONNEL),
+    Account("641950", "Salaries Service Administration", AccountCategory.PERSONNEL),
+    Account("625100", "Travel & Accommodation Projects", AccountCategory.TRAVEL),
+    Account("625200", "Travel & Accommodation Service", AccountCategory.TRAVEL),
+    Account("625300", "Travel Administration", AccountCategory.TRAVEL),
+    Account("613100", "Facilities & Utilities Projects", AccountCategory.FACILITIES),
+    Account("613200", "Facilities & Utilities Service", AccountCategory.FACILITIES),
     Account("628100", "Professional Fees", AccountCategory.OTHER_OPEX),
     Account("628200", "IT & Communications", AccountCategory.OTHER_OPEX),
     Account("628400", "Customer Workshop Logistics", AccountCategory.OTHER_OPEX),

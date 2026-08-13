@@ -1,5 +1,5 @@
 """
-BENACTA — Audit Trail. Every step logged.
+BENACTA Audit Trail. Every step logged.
 
 An append-only record of what the system did and why, so that any statement in
 the cockpit can be walked backwards to the rows, the rule, the evidence, the
@@ -23,7 +23,7 @@ class AuditStep(str, Enum):
     FACTS_COMPUTED = "FACTS_COMPUTED"
     CONTROLS_EVALUATED = "CONTROLS_EVALUATED"
     CONTEXT_RETRIEVED = "CONTEXT_RETRIEVED"
-    #: Variance attributed to source records — distinct from retrieving context.
+    #: Variance attributed to source records distinct from retrieving context.
     SOURCE_ATTRIBUTED = "SOURCE_ATTRIBUTED"
     INTERPRETATION_DRAFTED = "INTERPRETATION_DRAFTED"
     REVIEW_SUBMITTED = "REVIEW_SUBMITTED"

@@ -110,7 +110,7 @@ def test_a_cause_states_one_explanation_not_one_per_record(records):
 
 
 # --------------------------------------------------------------------------- #
-# Reconciliation — the load-bearing tests
+# Reconciliation the load-bearing tests
 # --------------------------------------------------------------------------- #
 
 
@@ -145,7 +145,7 @@ def test_project_milestone_impacts_reconcile_to_milestone_revenue(facts, records
 def test_milestone_impacts_plus_engineering_services_reconcile_to_projects(facts, records):
     """
     The Projects shortfall is the milestone deferral partly offset by
-    engineering services — the distinction the cockpit has to make explicit.
+    engineering services the distinction the cockpit has to make explicit.
     """
     projects = fact_for(
         facts, "revenue", grain=FactGrain.METRIC_BY_BUSINESS_UNIT, business_unit="BU-PRJ"
@@ -269,7 +269,7 @@ def test_business_lineage_includes_transactions_when_supplied(facts, records):
 
 
 def test_lineage_leads_with_business_language(facts, records):
-    """Business first, metadata second — no identifiers in the headlines."""
+    """Business first, metadata second no identifiers in the headlines."""
     fact = fact_for(facts, "revenue")
     cause = reconcile(fact, records).causes[0]
     steps = business_lineage(
@@ -320,7 +320,7 @@ def test_revenue_traces_to_postings_that_reconcile(facts):
 def test_composed_metrics_report_no_posting_trace_rather_than_a_false_one(facts, metric):
     """
     Gross Margin, Operating Expenses and EBITDA are composed from accounts this
-    reference dataset does not carry to posting grain — and Gross Margin and
+    reference dataset does not carry to posting grain and Gross Margin and
     EBITDA net their accounts rather than summing them. Either way there is no
     honest posting-level answer, so the layer must return nothing and let the
     cockpit say so.

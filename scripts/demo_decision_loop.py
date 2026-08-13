@@ -1,5 +1,5 @@
 """
-BENACTA — command-line demonstration of the Decision Intelligence loop.
+BENACTA command-line demonstration of the Decision Intelligence loop.
 
     TRUTH → CONTEXT → INTERPRETATION → REVIEW → DECISION → ACTION → AUDIT
 
@@ -38,7 +38,7 @@ def heading(step: str, title: str) -> None:
 
 def money(value: float | None) -> str:
     if value is None:
-        return "—"
+        return " "
     sign = "-" if value < 0 else ""
     return f"{sign}€{abs(value):,.0f}"
 
@@ -47,7 +47,7 @@ def main() -> int:
     session = build_session()
 
     print(RULE)
-    print(f"{COMPANY_NAME} — Monthly Performance Review · {session.period}")
+    print(f"{COMPANY_NAME} Monthly Performance Review · {session.period}")
     print(f"Demo mode: {demo_mode_enabled()} · {session.provider_reason}")
     print(RULE)
 
@@ -55,7 +55,7 @@ def main() -> int:
     heading("TRUTH", "Computed by code from the general ledger and budget")
     print(f"{'':22}{'Actual':>14}{'Budget':>14}{'Variance':>14}{'Var %':>9}")
     for fact in session.headline:
-        pct = f"{fact.variance_pct:+.1%}" if fact.variance_pct is not None else "—"
+        pct = f"{fact.variance_pct:+.1%}" if fact.variance_pct is not None else " "
         print(
             f"{fact.label:<22}{money(fact.actual):>14}{money(fact.budget):>14}"
             f"{money(fact.variance):>14}{pct:>9}"
@@ -72,7 +72,7 @@ def main() -> int:
     item = session.items[0]
 
     # ---- CONTEXT -------------------------------------------------------- #
-    heading("CONTEXT", f"Evidence retrieved for {item.issue_id} — {item.fact.label}")
+    heading("CONTEXT", f"Evidence retrieved for {item.issue_id} {item.fact.label}")
     for evidence in item.evidence:
         print(f"· {evidence.reference}   (relevance {evidence.score:.2f})")
         print(f"  matched: {', '.join(evidence.matched_terms[:8])}")
@@ -91,7 +91,7 @@ def main() -> int:
     print("\nSuggested follow-up")
     for step in item.commentary.suggested_follow_up:
         print(f"  · {step}")
-    print(f"\n[{item.review.label}] — not published until a controller approves.")
+    print(f"\n[{item.review.label}] not published until a controller approves.")
 
     # ---- REVIEW --------------------------------------------------------- #
     heading("REVIEW", "Human control")
@@ -118,14 +118,14 @@ def main() -> int:
         due_date=date(2026, 8, 14),
     )
     issue = item.issue
-    print(f"Issue     {issue.issue_id} — {issue.title}")
+    print(f"Issue     {issue.issue_id} {issue.title}")
     print(f"Owner     {issue.owner}")
     print(f"Next step {issue.next_step}")
     print(f"Due       {issue.due_date}")
     print(f"Status    {issue.status_label}")
 
     # ---- AUDIT ---------------------------------------------------------- #
-    heading("AUDIT", f"Lineage for {issue.issue_id} — every step logged")
+    heading("AUDIT", f"Lineage for {issue.issue_id} every step logged")
     for record in session.audit.for_issue(issue.issue_id):
         detail = {k: v for k, v in record.detail.items() if v is not None}
         summary = ", ".join(f"{k}={v}" for k, v in list(detail.items())[:3])
