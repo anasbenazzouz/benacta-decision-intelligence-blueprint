@@ -48,9 +48,9 @@ class SourceRecord:
     One root-cause record: a controller-facing explanation of *why*, backed by
     enough identifying detail to find the underlying operational record.
 
-    This is deliberately not the transaction ledger see `TransactionLine` for
-    the postings that make up the Actual and Budget figures themselves. A
-    source record explains a movement; a transaction *is* the movement.
+    This is not the transaction ledger; see `TransactionLine` for the postings
+    that make up the Actual and Budget figures themselves. A source record
+    explains a movement; a transaction *is* the movement.
     """
 
     source_record_id: str

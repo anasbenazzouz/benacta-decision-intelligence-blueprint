@@ -7,10 +7,9 @@ The default view is built for a CEO or CFO and answers six questions in order:
 what happened, why, what requires attention, what could we do next, what
 evidence supports this, and who approves or owns the next step.
 
-It is deliberately not a dashboard and deliberately not a chat window. There is
-no free-text box to interrogate, because the point of a decision system is that
-the questions worth asking have already been asked, and answered with evidence a
-controller can sign.
+It is neither a dashboard nor a chat window. There is no free-text box to
+interrogate, because in a governed review the questions worth asking are known
+in advance, and each one is answered with evidence a controller can sign.
 """
 
 from __future__ import annotations
@@ -70,8 +69,8 @@ DEFAULT_OWNER_SUGGESTION = "Project Finance"
 def seed_demo_state(session) -> None:
     """
     Carry one issue through to a recorded action so the decision log is not
-    empty on first load. The headline revenue issue is deliberately left as a
-    live draft, so the review workflow can be walked in the demonstration.
+    empty on first load. The headline revenue issue stays a live draft, so the
+    review workflow can be walked in the demonstration.
     """
     seeded = next(
         (item for item in session.items if item.alert.metric == "travel"), None

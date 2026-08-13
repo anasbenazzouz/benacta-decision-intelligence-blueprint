@@ -9,15 +9,15 @@ ENTERPRISE DATA          actuals & budget (ERP mock: CSV)
 ↓
 BUSINESS MEANING         business units · cost centers · accounts · metric definitions
 ↓
-DETERMINISTIC TRUTH      every figure computed by code reproducible, versioned
+DETERMINISTIC TRUTH      every figure computed by code: reproducible, versioned
 ↓
 CONTROL                  transparent materiality rules surface what needs attention
 ↓
-CONTEXT                  management notes, milestones, policies retrieved with visible reasons
+CONTEXT                  management notes, milestones, policies, retrieved with visible reasons
 ↓
 INTERPRETATION           AI drafts an explanation from facts + evidence (never owns numbers)
 ↓
-HUMAN DECISION           controller reviews, approves or sends back accountability stays human
+HUMAN DECISION           controller reviews, approves or sends back; accountability stays human
 ↓
 ACTION                   issue → owner → next step → status
 ↓
@@ -38,7 +38,7 @@ data/actuals.csv · data/budget.csv          data/context/*.md
 └───────────────┬────────────────────────┘         │
                 ▼                                  │
 ┌─ src/finance_engine.py ────────────────┐         │
-│ DETERMINISTIC CORE THE VALUE CORE    │         │
+│ DETERMINISTIC CORE · THE VALUE CORE    │         │
 │ FinancialFact: actual · budget ·       │         │
 │ variance · variance_pct · materiality  │         │
 │ CALC_VERSION recorded                  │         │
@@ -75,18 +75,18 @@ data/actuals.csv · data/budget.csv          data/context/*.md
 │ → decision → timestamps                                     │
 └─────────────────────────────────────────────────────────────┘
                 ▼
-app.py Executive Decision Cockpit (default) · Architecture view · Audit Trail view
+app.py: Executive Decision Cockpit (default) · Architecture view · Audit Trail view
 ```
 
 ## 3. The trust boundary (the architecture's central claim)
 
-**Above the boundary (deterministic):** `domain.py`, `finance_engine.py`, `control_engine.py`, `retrieval.py`, `lineage.py`. These modules produce all numbers and all evidence. They import no LLM SDK and never import `commentary.py`. Retrieval sits above the boundary because it selects and quotes existing text with a transparent score it generates nothing.
+**Above the boundary (deterministic):** `domain.py`, `finance_engine.py`, `control_engine.py`, `retrieval.py`, `lineage.py`. These modules produce all numbers and all evidence. They import no LLM SDK and never import `commentary.py`. Retrieval sits above the boundary because it selects and quotes existing text with a transparent score; it generates nothing.
 
-**Below the boundary (probabilistic):** `commentary.py` only. It receives `FinancialFact`s, `ControlAlert`s and `Evidence` already computed, already selected and returns a draft. It cannot reach the CSVs, cannot recompute, and its output is quarantined until a human approves it.
+**Below the boundary (probabilistic):** `commentary.py` only. It receives `FinancialFact`s, `ControlAlert`s and `Evidence`, already computed and already selected, and returns a draft. It cannot reach the CSVs, cannot recompute, and its output is quarantined until a human approves it.
 
 **Alongside, crossing nothing:** `pipeline.py` assembles the loop into one session so the cockpit and the CLI demo drive identical code; `theme.py` carries the charter's visual system. Neither computes truth nor interprets it.
 
-**Lineage has a declared limit.** `lineage.py` resolves a figure to the postings behind it only when the ledger can actually reproduce that figure every composing account present, and a single uniform sign. In this dataset that is Revenue; Gross Margin, Operating Expenses and EBITDA resolve to their root-cause source records and stop there, and the cockpit says so rather than showing a partial ledger as if it were complete (`has_posting_grain`, and the tests in `tests/test_lineage.py`).
+**Lineage has a declared limit.** `lineage.py` resolves a figure to the postings behind it only when the ledger can actually reproduce that figure: every composing account present, and a single uniform sign. In this dataset that is Revenue; Gross Margin, Operating Expenses and EBITDA resolve to their root-cause source records and stop there, and the cockpit says so rather than showing a partial ledger as if it were complete (`has_posting_grain`, and the tests in `tests/test_lineage.py`).
 
 **Enforcement:**
 - Structural: `test_financial_truth_is_independent_from_llm` asserts the deterministic modules have no import path to `commentary` or any LLM SDK.
@@ -148,11 +148,11 @@ Every cockpit statement can be walked backwards:
 
 ## 7. Application architecture
 
-- **`app.py`** three views via sidebar navigation; Streamlit session state holds pipeline outputs + workflow state; demo seeding gives the decision log one completed example on first load.
-  - **View A Executive Decision Cockpit (default):** KPI band (Revenue, Gross Margin, Operating Expenses, EBITDA) → Attention (ranked) → issue detail (What happened / Why / Evidence / Suggested follow-up) → human control → Decision Log. No AI vocabulary, no chat box.
-  - **View B Architecture:** the §2 diagram rendered in brand grammar (deterministic = double stroke, AI = mineral-blue tint, human approval = porcelain, one champagne action node), executive + technical caption per layer, live payload trace of the revenue issue.
-  - **View C Audit Trail (non-dominant):** lineage per issue + raw JSON inspection expanders.
-- **`src/theme.py`** charter tokens (colors, type) + CSS injection per `brand-system.md`.
+- **`app.py`**: three views via sidebar navigation; Streamlit session state holds pipeline outputs + workflow state; demo seeding gives the decision log one completed example on first load.
+  - **View A · Executive Decision Cockpit (default):** KPI band (Revenue, Gross Margin, Operating Expenses, EBITDA) → Attention (ranked) → issue detail (What happened / Why / Evidence / Suggested follow-up) → human control → Decision Log. No AI vocabulary, no chat box.
+  - **View B · Architecture:** the §2 diagram rendered in brand grammar (deterministic = double stroke, AI = mineral-blue tint, human approval = porcelain, one champagne action node), executive + technical caption per layer, live payload trace of the revenue issue.
+  - **View C · Audit Trail (non-dominant):** lineage per issue + raw JSON inspection expanders.
+- **`src/theme.py`**: charter tokens (colors, type) + CSS injection per the locked brand charter.
 
 ## 8. Configuration
 
@@ -171,4 +171,4 @@ Every cockpit statement can be walked backwards:
 
 ## 10. Extension points (documented, not built)
 
-The V1 seams that a real engagement would extend proving composability without platform-building: sources (CSV → ERP/EPM read-only pipelines) · semantic layer (dataclasses → governed semantic model) · controls (rule list → control catalog) · retrieval (keyword → hybrid/vector, same Evidence contract) · provider (demo/LLM behind the same interface, plus evals) · workflow (state machines → enterprise workflow/task systems) · audit (JSON export → immutable store). The **contracts** in §4 are the stable part; implementations behind them are replaceable.
+The V1 seams that a real engagement would extend, proving composability without platform-building: sources (CSV → ERP/EPM read-only pipelines) · semantic layer (dataclasses → governed semantic model) · controls (rule list → control catalog) · retrieval (keyword → hybrid/vector, same Evidence contract) · provider (demo/LLM behind the same interface, plus evals) · workflow (state machines → enterprise workflow/task systems) · audit (JSON export → immutable store). The **contracts** in §4 are the stable part; implementations behind them are replaceable.

@@ -275,12 +275,12 @@ a{color:inherit}
         <p>An enterprise of any scale already owns an ERP, an EPM, a CRM, a BI stack,
         document stores and a data platform. The data exists. The reports exist. Yet
         between those systems and an actual decision, people still collect, reconcile,
-        search, interpret, explain, email, approve and follow up every month, in
+        search, interpret, explain, email, approve and follow up, every month, in
         every function.</p>
         <p>None of these systems is useless. The problem is that truth lives in one
         place, context in another, judgment in meetings and inboxes, and action in
         whatever tool the owner opens next. Truth, context, judgment and action are
-        fragmented and the fragmentation, not the data, is the bottleneck.</p>
+        fragmented, and the fragmentation, not the data, is the bottleneck.</p>
       </div>
       <aside>
         <div class="kicker kicker--stone">Where most stop</div>
@@ -295,7 +295,7 @@ a{color:inherit}
         <hr class="rule" style="margin:6mm 0 4mm">
         <div style="font-size:19pt;font-weight:600;letter-spacing:-.01em">58%</div>
         <p class="caption" style="margin-top:1.6mm">of finance functions already use AI,
-        up 21 points in one year.<br> Gartner, CFO &amp; Finance AI Survey, Sept. 2024</p>
+        up 21 points in one year.<br>Gartner, CFO &amp; Finance AI Survey, Sept. 2024</p>
         <p class="annot" style="margin-top:2.6mm">adoption is no longer the question; control is</p>
       </aside>
     </div>
@@ -393,7 +393,7 @@ a{color:inherit}
       <rect class="g-det-inner" x="55" y="43.4" width="98" height="13"/>
       <text class="n-cap" x="149" y="49" text-anchor="end" fill="var(--champagne-ink)">The value core</text>
       <text class="n-title" x="58.8" y="49" >DETERMINISTIC TRUTH</text>
-      <text class="n-desc" x="58.8" y="54">every figure computed by code metrics, variances, controls</text>
+      <text class="n-desc" x="58.8" y="54">every figure computed by code: metrics, variances, controls</text>
       <text class="n-annot" x="0" y="49">every figure computed,</text>
       <text class="n-annot" x="0" y="52.8">none invented</text>
 
@@ -408,7 +408,7 @@ a{color:inherit}
       <!-- 5 · AI interpretation -->
       <rect class="g-ai" x="54" y="80.8" width="100" height="15"/>
       <text class="n-title" x="58" y="87.4" fill="var(--blue-ink)">AI INTERPRETATION</text>
-      <text class="n-desc" x="58" y="92.4">retrieves · explains · drafts · questions never owns the numbers</text>
+      <text class="n-desc" x="58" y="92.4">retrieves · explains · drafts · questions · never owns the numbers</text>
       <text class="n-annot" x="0" y="87.4">commentary in hours,</text>
       <text class="n-annot" x="0" y="91.2">not days</text>
 
@@ -480,10 +480,9 @@ a{color:inherit}
     </div>
 
     <p style="margin-top:22mm;max-width:152mm;font-size:10.5pt">
-      This is not a restriction on AI. It is the placement that makes AI usable in an enterprise:
-      probabilistic intelligence where interpretation adds value, deterministic code where truth is
-      non-negotiable, and human judgment where accountability lives. Each does what it is structurally
-      best at and nothing else.
+      The placement is what makes AI usable in an enterprise: probabilistic interpretation where it
+      adds value, deterministic code where the figures must be reproducible, human judgment where
+      accountability lives. Each layer does the work it is built for, and only that work.
     </p>
 
     <div class="spacer"></div>
@@ -518,8 +517,8 @@ a{color:inherit}
 
     <h1 style="margin-top:8mm">Not every part of the system<br>should be probabilistic.</h1>
 
-    <p style="margin-top:5mm">A decision system contains three kinds of components, and they must never be
-    confused. The line between them is not a metaphor. It is a design rule:
+    <p style="margin-top:5mm">A decision system contains three kinds of components, and the architecture
+    must keep them apart. The trust boundary is a working design rule with one contract:
     <strong>only computed facts cross the boundary.</strong></p>
 
     <svg width="174mm" height="113mm" viewBox="0 0 174 113" style="margin-top:7mm" role="img"
@@ -559,7 +558,7 @@ a{color:inherit}
       <rect class="g-ai" x="16" y="59" width="158" height="20"/>
       <text class="n-title" x="22" y="65.6" fill="var(--blue-ink)">AI KNOWLEDGE LAYER</text>
       <text class="n-desc" x="22" y="70.8">retrieves context · explains movements · drafts commentary · raises questions</text>
-      <text class="n-desc" x="22" y="75.4">receives computed facts, control alerts and evidence never the ledger, never a number of its own</text>
+      <text class="n-desc" x="22" y="75.4">receives computed facts, control alerts and evidence: never the ledger, never a number of its own</text>
 
       <g class="g-flow" marker-end="url(#ar2)"><path d="M95 79 V85"/></g>
       <text class="n-cap" x="98" y="83.4">governed draft</text>
@@ -569,7 +568,7 @@ a{color:inherit}
       <text class="n-cap" x="174" y="93" text-anchor="end">Human</text>
       <rect class="g-human" x="16" y="96" width="158" height="15"/>
       <text class="n-title" x="22" y="102.4">CONTROLLER SIGN-OFF</text>
-      <text class="n-desc" x="22" y="107.6">approves · rejects with feedback · escalates · owns nothing publishes without it</text>
+      <text class="n-desc" x="22" y="107.6">approves · rejects with feedback · escalates · owns · nothing publishes without it</text>
 
       <!-- rejection: a designed path back to the interpretation layer, in the left gutter -->
       <path class="g-reason" d="M16 103.5 H6 V69 H14" marker-end="url(#ar2b)"/>
@@ -585,10 +584,10 @@ a{color:inherit}
     <div class="callout">
       <div class="kicker kicker--gold" style="margin-bottom:2.6mm">The removability test</div>
       <p style="max-width:none">Switch the AI off, and every figure, every control and every materiality
-      classification must be unchanged because none of it was ever the AI’s to compute. In the
+      classification must be unchanged, because none of it was ever the AI’s to compute. In the
       accompanying reference implementation this is a permanent automated test, not a claim.</p>
-      <p class="caption" style="margin-top:2.6mm">Technical note: <code>test_financial_truth_is_independent_from_llm</code>
-      the truth layer has no import path to any AI component, and the full pipeline is re-run with
+      <p class="caption" style="margin-top:2.6mm">Technical note: <code>test_financial_truth_is_independent_from_llm</code>.
+      The truth layer has no import path to any AI component, and the full pipeline is re-run with
       those paths blocked.</p>
     </div>
 
@@ -608,7 +607,7 @@ a{color:inherit}
 
     <div class="section-label"><b>05 /</b><span>From Tables to Business Objects</span></div>
 
-    <h1 style="margin-top:8mm">Decisions happen around business<br>objects not database rows.</h1>
+    <h1 style="margin-top:8mm">Decisions happen around business<br>objects, not database rows.</h1>
 
     <p style="margin-top:5mm">A ledger row records that an amount moved. It does not know that the amount
     belongs to a project; that the project serves a customer under a contract; that revenue is recognized
@@ -670,7 +669,7 @@ a{color:inherit}
       <text x="87" y="31.6" text-anchor="middle" style="font-size:5.4px;font-weight:700;letter-spacing:.08em">PROJECT</text>
       <text class="n-desc" x="87" y="37.8" text-anchor="middle">what decisions are about</text>
 
-      <text class="n-annot" x="0" y="70">Every line is a relationship a decision depends on who the work is for, what governs it, who owns it.</text>
+      <text class="n-annot" x="0" y="70">Every line is a relationship a decision depends on: who the work is for, what governs it, who owns it.</text>
 
       <!-- contrast strip -->
       <line class="g-hair" x1="0" y1="76" x2="174" y2="76"/>
@@ -688,10 +687,10 @@ a{color:inherit}
 
     <p style="margin-top:8mm">A <strong>Business Semantic Layer</strong> makes that knowledge part of the
     system: what an object represents, what it relates to, which rules apply to it, who owns it, and which
-    decisions can be taken around it. Only then is AI given something worth interpreting and only then
+    decisions can be taken around it. Only then is AI given something worth interpreting, and only then
     can an insight land on the person who can act on it.</p>
 
-    <p style="margin-top:3.4mm"><strong>In July, two customer acceptance milestones slipped</strong> on two
+    <p style="margin-top:3.4mm"><strong>In July, two customer acceptance milestones slipped</strong>, on two
     different projects, for two different customers. Because each milestone is connected to its project, its
     revenue and its owner, the shortfall resolves to named work with a named owner rather than to a number.
     The next page shows that month.</p>
@@ -699,9 +698,9 @@ a{color:inherit}
     <div class="spacer"></div>
 
     <p class="caption" style="max-width:none">Technical readers know this layer as a lightweight ontology or
-    domain model. The reference implementation keeps it deliberately small objects, relationships, metric
-    definitions, ownership sized to one decision process, and it rejects source rows that disagree with
-    the governed model rather than silently aggregating them.</p>
+    domain model. The reference implementation keeps it small (objects, relationships, metric definitions,
+    ownership), sized to one decision process, and it rejects source rows that disagree with the governed
+    model rather than silently aggregating them.</p>
 
     <div class="chain" style="margin-top:6mm">
       <span>Data</span><i class="arw"></i><span class="on">Business objects</span><i class="arw"></i><span>Truth</span><i class="arw"></i><span>Context</span><i class="arw"></i><span>Interpretation</span><i class="arw"></i><span>Decision</span><i class="arw"></i><span>Action</span><i class="arw"></i><span>Outcome</span>
@@ -737,7 +736,7 @@ a{color:inherit}
         <hr class="rule" style="margin:5mm 0 3mm">
         <div class="sev">HIGH · MATERIAL</div>
         <p class="caption" style="margin-top:2.6mm">Every figure on this page is computed by code from the
-        general ledger and the FY26 budget never estimated, never generated.</p>
+        general ledger and the FY26 budget: never estimated, never generated.</p>
       </aside>
 
       <div>
@@ -759,7 +758,7 @@ a{color:inherit}
             <li>Project Milestone Register FY26 · <em>July 2026 Milestone Status</em></li>
           </ul>
           <p class="caption" style="margin-top:1.8mm">Retrieved by the system, with the reason each passage
-          was selected not a curated list.</p>
+          was selected, not a curated list.</p>
         </div>
         <div class="qa">
           <div class="q">What requires attention?</div>
@@ -769,7 +768,7 @@ a{color:inherit}
         <div class="qa">
           <div class="q">What could we do next?</div>
           <p>Review milestone recognition with Project Finance.
-          <em style="color:var(--stone)">A suggested follow-up for a human never labeled a decision.</em></p>
+          <em style="color:var(--stone)">A suggested follow-up for a human, never labeled a decision.</em></p>
         </div>
       </div>
     </div>
@@ -787,11 +786,11 @@ a{color:inherit}
       <div>
         <div class="q">Who owns the next step?</div>
         <p style="margin-top:1.8mm;font-size:9.5pt;max-width:none">Project Finance. The owner is proposed by
-        the system alongside the finding and assigned by the reviewer never assigned automatically.</p>
+        the system alongside the finding and assigned by the reviewer, never assigned automatically.</p>
       </div>
     </div>
 
-    <p class="caption" style="max-width:none;margin-top:14mm">All data fictional Meridian Industrial Group
+    <p class="caption" style="max-width:none;margin-top:14mm">All data is fictional: Meridian Industrial Group
     is a reference scenario built for this Blueprint and its accompanying implementation. The figures above
     are produced by the running system and verified by its automated tests.</p>
 
@@ -816,7 +815,7 @@ a{color:inherit}
     <h1 class="h1--sm" style="margin-top:8mm">A dashboard ends at insight.<br>A decision system continues into action.</h1>
 
     <p style="margin-top:5mm">Insight without action is incomplete. In a decision system, an accepted
-    interpretation does not stop at “noted” it becomes an issue with an owner, a next step, a status and a
+    interpretation does not stop at “noted”; it becomes an issue with an owner, a next step, a status and a
     due date, and the loop closes when the outcome is recorded.</p>
 
     <svg width="174mm" height="58mm" viewBox="0 0 174 58" style="margin-top:9mm" role="img"
@@ -879,10 +878,10 @@ a{color:inherit}
     </svg>
 
     <div class="callout" style="margin-top:11mm">
-      <div class="kicker kicker--gold" style="margin-bottom:3.4mm">From the decision log one issue, carried all the way through</div>
+      <div class="kicker kicker--gold" style="margin-bottom:3.4mm">From the decision log: one issue, carried all the way through</div>
       <table class="record">
-        <tr><th>Issue</th><td>Travel above budget €38,000 over plan (+31.1%), unplanned customer workshops</td></tr>
-        <tr><th>Reviewed by</th><td>A. Controller “Consistent with the travel policy; workshops were customer-driven.”</td></tr>
+        <tr><th>Issue</th><td>Travel above budget: €38,000 over plan (+31.1%), unplanned customer workshops</td></tr>
+        <tr><th>Reviewed by</th><td>A. Controller · “Consistent with the travel policy; workshops were customer-driven.”</td></tr>
         <tr><th>Owner</th><td>Cost Center Manager · Projects</td></tr>
         <tr><th>Next step</th><td>Confirm workshop travel against policy and open the missing budget line.</td></tr>
         <tr><th>Status</th><td><strong style="letter-spacing:.06em">ACTION REQUIRED</strong>
@@ -904,7 +903,7 @@ a{color:inherit}
         <div class="kicker kicker--gold">The enterprise direction</div>
         <hr class="rule" style="margin:2.8mm 0 3.2mm">
         <p style="font-size:9.5pt;max-width:none">connects the same loop to the task, approval and workflow
-        systems a company already runs, and measures outcomes decision latency, cycle time, adoption
+        systems a company already runs, and measures outcomes (decision latency, cycle time, adoption)
         over time.</p>
       </div>
     </div>
@@ -928,14 +927,14 @@ a{color:inherit}
     <div class="grid-rail" style="margin-top:9mm">
       <div>
         <h1>Start with one decision.</h1>
-        <p class="lead" style="margin-top:4.4mm;color:var(--bluegrey)">Prove it on one cycle six to eight
-        weeks then scale.</p>
+        <p class="lead" style="margin-top:4.4mm;color:var(--bluegrey)">Prove it on one cycle, six to eight
+        weeks, then scale.</p>
       </div>
       <aside style="padding-top:2mm">
         <div class="kicker kicker--stone">Example baselines</div>
         <hr class="rule" style="margin:2.8mm 0 3.2mm">
         <p class="caption">Top-quartile finance functions close in
-          <strong style="color:var(--green)">5 days or fewer</strong><br> APQC, Open Standards Benchmarking</p>
+          <strong style="color:var(--green)">5 days or fewer</strong><br>APQC, Open Standards Benchmarking</p>
         <p class="caption" style="margin-top:2.8mm">and run at
           <strong style="color:var(--green)">0.55% of revenue</strong> against a ~1% median<br>
           PwC, Finance Effectiveness Benchmarking 2024</p>
@@ -952,7 +951,7 @@ a{color:inherit}
       <div class="step">
         <div class="step-n">02</div>
         <div class="step-t">Map the business objects</div>
-        <p>The entities and relationships the decision is actually about and who owns each of them.</p>
+        <p>The entities and relationships the decision is actually about, and who owns each of them.</p>
       </div>
       <div class="step">
         <div class="step-n">03</div>
@@ -972,7 +971,7 @@ a{color:inherit}
       <div class="step">
         <div class="step-n">06</div>
         <div class="step-t">Keep humans in control</div>
-        <p>Review, approval and escalation as designed paths rejection is a feature, not a failure.</p>
+        <p>Review, approval and escalation as designed paths; rejection is a feature, not a failure.</p>
       </div>
       <div class="step">
         <div class="step-n">07</div>
@@ -1032,14 +1031,16 @@ a{color:inherit}
         <hr class="rule" style="margin:2.8mm 0 3.2mm">
         <p style="font-size:9.5pt;max-width:none">If you are choosing the first decision process to prove
         this on, BENACTA can help you scope it.</p>
-        <p class="caption" style="margin-top:2.6mm">Website · LinkedIn <em>to be added</em></p>
+        <p class="caption" style="margin-top:2.6mm">Website · LinkedIn: <em>to be added</em></p>
       </div>
       <div>
         <div class="kicker kicker--blue">For your architects</div>
         <hr class="rule" style="margin:2.8mm 0 3.2mm">
         <p style="font-size:9.5pt;max-width:none">Send them the reference implementation. The boundaries
         described in this Blueprint are enforced there by tests, not by slideware.</p>
-        <p class="caption" style="margin-top:2.6mm">Live demo <em>to be added</em></p>
+        <p class="caption" style="margin-top:2.6mm">Live demo:
+          <a href="https://benacta-di.streamlit.app"
+             style="text-decoration:none;border-bottom:1px solid var(--hair-dark);color:inherit">benacta-di.streamlit.app</a></p>
       </div>
     </div>
 
@@ -1056,7 +1057,7 @@ a{color:inherit}
           Finance · Operations · Performance · Workflows<br>
           <span style="color:var(--stone)">Turning enterprise data into decisions and action.</span>
         </p>
-        <p class="caption" style="margin-top:4.4mm">Anas Benazzouz BENACTA · AI Engineering · Finance &amp; Operations</p>
+        <p class="caption" style="margin-top:4.4mm">Anas Benazzouz · BENACTA · AI Engineering · Finance &amp; Operations</p>
       </div>
       <img class="lockup" src="../assets/generated/benacta-primary-dark.png"
            alt="BENACTA Built on Truth. Designed for Decisions." style="width:48mm">

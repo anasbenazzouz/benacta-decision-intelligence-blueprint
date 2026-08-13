@@ -55,7 +55,7 @@ SERIF = "'Source Serif 4', Georgia, 'Times New Roman', serif"
 # drawn for publications rather than for a variance report. These three tokens
 # add that signal at the minimum strength needed to read, and no more:
 #
-#   * FAVOURABLE   a muted sage, deliberately far from a trading-terminal green
+#   * FAVOURABLE   a muted sage, kept well away from trading-terminal green
 #   * UNFAVOURABLE the muted terracotta already used as BENACTA's discreet red
 #   * NEUTRAL      Heritage Blue-Grey, straight from the charter
 #
@@ -165,8 +165,8 @@ html, body, [data-testid="stAppViewContainer"] * {{
 .ba-band .kicker {{ color: {CHAMPAGNE}; }}
 
 /* Two-zone hero: the review on the left, a quiet status rail on the right.
-   The rail is deliberately smaller type than anything else on the page a
-   system panel, not a second dashboard. */
+   The rail is set in smaller type than anything else on the page: a system
+   panel, not a second dashboard. */
 .ba-hero-zones {{ display: flex; align-items: stretch; gap: 40px; }}
 .ba-hero-main {{ flex: 1 1 auto; min-width: 0; }}
 .ba-hero-status {{
