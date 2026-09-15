@@ -5,6 +5,32 @@ Status vocabulary: `IMPLEMENTED` (code exists) · `TESTED_LOCAL` (automated test
 real read-only run against the connected Odoo) · `NOT_VERIFIED` · `BLOCKED`.
 A fixture test never proves an Odoo integration. Plan: `docs/implementation_plan.md`.
 
+## Milestone 3b: CFO cockpit (delivered on fixtures)
+
+### Evidence (2026-09-15)
+
+| Command | Result |
+|---|---|
+| `uv run pytest -q tests/integration/test_cockpit_smoke.py` | 2 passed: every view renders headlessly on the fixture database (Streamlit `AppTest`), the cockpit imports no oracle and no writer |
+| `uv sync --project apps/api --extra cockpit && benacta demo` | cockpit on 127.0.0.1:8501 over the same service functions as the command line and the API |
+
+### Items
+
+| Item | Status | Where |
+|---|---|---|
+| Executive overview: revenue with goods and services split, COGS with basis, gross margin, goods margin percentage with the deterioration signal, leakage tiles, approved and realised recovery, margin bridge, drivers, reconciliation trace | TESTED_LOCAL (smoke) | `apps/cockpit/margin_control.py` |
+| Exception queue ranked with class, cause, exposure, severity, confidence, controllability, owner, status, recommendation, age, suggested follow-up | TESTED_LOCAL (smoke) | same |
+| Exception case: what happened, rule and formula, transactions, evidence, reconciliation, investigation (run button, deterministic or model with the human-control label), recommendation, lineage | TESTED_LOCAL (smoke) | same |
+| Decision workspace: declared identity, decisions with reasons, refusals shown, dry-run and guarded execution of the review activity, decision and action history | TESTED_LOCAL (smoke) | same |
+| Impact tracking and audit view with JSON export | TESTED_LOCAL (smoke) | same |
+| Visual system from the locked charter (Deep Heritage Green, Warm Porcelain, Antique Champagne scarce, Mineral Blue only for AI-labelled blocks, Instrument Sans, one serif for statements) | IMPLEMENTED | same |
+
+### Known limits
+
+- The cockpit opens the analytics database directly (same process); it does not go through the HTTP API.
+- No screenshot in the repository yet; the visual QA loop of the doctrine runs before any public capture.
+- Streamlit is an optional extra; the API and the command line never need it.
+
 ## Milestone 3a: AI-assisted investigation on governed documents (delivered on fixtures)
 
 ### Evidence (2026-09-15)

@@ -1,11 +1,12 @@
-# V2 Decision System Lab commands. Only implemented targets are listed.
+# V2 Decision System Lab commands. Only targets that are implemented are listed.
 # Every target delegates to the `benacta` CLI, so on a machine without make:
 #   uv run --project apps/api benacta <command>
 
 API := uv run --project apps/api
 
-.PHONY: doctor discover-odoo migrate seed-fixtures ingest marts reconcile verify-audit \
-        seed-odoo-dry-run seed-odoo local-db-stop test test-live lint api
+.PHONY: doctor discover-odoo migrate seed-fixtures ingest marts reconcile load-policies exceptions index-documents \
+        margin-overview margin-exceptions reconciliation-report verify-audit \
+        seed-odoo-dry-run seed-odoo local-db-stop test test-live lint api demo
 
 doctor:
 	$(API) benacta doctor
@@ -16,7 +17,8 @@ discover-odoo:
 migrate:
 	$(API) benacta migrate
 
-# Fixture mode, no external credential: migrate, ingest the demo dataset, build marts, reconcile.
+# Fixture mode, no external credential: migrate, ingest the demo dataset, build marts, reconcile, load the governed
+# terms, run the margin rules, index the governed documents.
 seed-fixtures:
 	$(API) benacta seed-fixtures
 
@@ -36,6 +38,9 @@ load-policies:
 # Margin Control: deterministic rules on the latest snapshot, then the CFO views.
 exceptions:
 	$(API) benacta exceptions
+
+index-documents:
+	$(API) benacta index-documents
 
 margin-overview:
 	$(API) benacta margin-overview
@@ -67,7 +72,11 @@ test-live:
 	cd apps/api && BENACTA_LIVE_ODOO=1 uv run pytest -q -m odoo_live
 
 lint:
-	cd apps/api && uv run ruff check app tests migrations && uv run ruff format --check app tests migrations
+	cd apps/api && uv run ruff check app tests migrations ../cockpit
 
 api:
 	$(API) benacta serve
+
+# Margin Control cockpit (Streamlit): `uv sync --project apps/api --extra cockpit` once.
+demo:
+	$(API) benacta demo

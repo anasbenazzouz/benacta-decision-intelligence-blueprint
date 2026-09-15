@@ -42,7 +42,7 @@ Odoo transaction -> governed analytical data -> reconciled financial metric -> d
 |---|---|---|
 | 3.1 | LLM provider interface in V2: typed payload of computed facts, schema-validated output, invented-number and citation checks, deterministic fallback labelled | delivered 2026-09-15 (`docs/progress.md`, milestone 3a); real model run NOT_VERIFIED |
 | 3.2 | Governed document corpus (source, owner, effective date, authorisation, version) with transparent retrieval and citations; injection document refused | delivered 2026-09-15 |
-| 3.3 | Streamlit cockpit: executive overview, exception queue, exception case, decision workspace, impact tracking, audit view | demo script runs without an API key |
+| 3.3 | Streamlit cockpit: executive overview, exception queue, exception case, decision workspace, impact tracking, audit view | delivered 2026-09-15 (`benacta demo`, headless smoke test) |
 | 3.4 | Demonstration seed profile: about 3 fiscal years, 500 customers, 100 suppliers, 200 products, seasonality, cost drift, FX, late payments, refunds, 18 ground-truth scenarios in a separate oracle | deterministic, idempotent, structure test |
 | 3.5 | Odoo seed executor for the trading company (development profile first), replaying safely | `VERIFIED_ODOO_SANDBOX` only after a real run |
 | 3.6 | Evaluation plan, security and permissions notes, production-readiness gap assessment, README setup and demo instructions | documents reviewed |

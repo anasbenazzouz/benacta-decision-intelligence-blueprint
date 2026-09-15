@@ -157,6 +157,21 @@ def _local_db_stop(_: argparse.Namespace) -> int:
     return 0
 
 
+def _demo(args: argparse.Namespace) -> int:
+    """Launch the Margin Control cockpit (Streamlit, optional extra `cockpit`) on loopback."""
+    import subprocess
+
+    cockpit = REPO_ROOT / "apps" / "cockpit" / "margin_control.py"
+    try:
+        import streamlit  # noqa: F401
+    except ImportError:
+        print("streamlit is not installed: run `uv sync --project apps/api --extra cockpit`")
+        return 2
+    command = [sys.executable, "-m", "streamlit", "run", str(cockpit), "--server.address", "127.0.0.1", "--server.port", str(args.port),
+               "--server.headless", "true", "--browser.gatherUsageStats", "false"]
+    return subprocess.call(command)  # noqa: S603 - fixed command, local development only
+
+
 def _serve(args: argparse.Namespace) -> int:
     import uvicorn
 
@@ -263,6 +278,9 @@ def main(argv: list[str] | None = None) -> int:
     investigate.add_argument("--cutoff")
     investigate.add_argument("--save", action="store_true", help="store the report and its proposals pending review")
     investigate.set_defaults(func=_investigate)
+    demo = commands.add_parser("demo", help="open the Margin Control cockpit (Streamlit) on 127.0.0.1")
+    demo.add_argument("--port", type=int, default=8501)
+    demo.set_defaults(func=_demo)
     serve = commands.add_parser("serve", help="run the API on 127.0.0.1")
     serve.add_argument("--port", type=int, default=8000)
     serve.set_defaults(func=_serve)

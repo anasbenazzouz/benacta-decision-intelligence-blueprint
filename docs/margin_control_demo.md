@@ -33,7 +33,17 @@ Every command below reads the fixture instance (`BENACTA_MODE=fixture`, or the `
 same figures: `uv run --project apps/api benacta serve`, then `GET /api/v1/margin/overview`, `/api/v1/margin/exceptions`,
 `/api/v1/margin/exceptions/{case_ref}`, `/api/v1/margin/rules`, `/api/v1/reconciliation`.
 
-## 2. The story (about six minutes)
+The cockpit shows the same figures on six screens (executive overview, exception queue, exception case, decision
+workspace, impact tracking, audit view):
+
+```bash
+uv sync --project apps/api --extra cockpit
+uv run --project apps/api benacta demo          # http://127.0.0.1:8501
+```
+
+Declare a pilot identity in the sidebar (identifier and roles); the workspace refuses what the roles do not allow.
+
+## 2. The story (about six minutes, command line or cockpit)
 
 ### Step 1. The CFO asks whether gross margin is deteriorating
 
