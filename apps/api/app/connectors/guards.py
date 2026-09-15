@@ -87,13 +87,17 @@ def odoo_write_guard(
     *,
     sandbox_company_exists: bool | None = None,
     today: date | None = None,
+    require_backup: bool = True,
 ) -> GuardReport:
     """Every condition required before writing to Odoo.
 
     `sandbox_company_exists` comes from a live read of res.company; None means
-    it was not checked, which blocks.
+    it was not checked, which blocks. `require_backup=False` is reserved for
+    instance configuration explicitly authorised by the owner (module
+    installation, currency activation, extension fields); business data writes
+    always require an attested backup.
     """
-    report = GuardReport("odoo_write")
+    report = GuardReport("odoo_write" if require_backup else "odoo_configuration")
     today = today or datetime.now(UTC).date()
 
     report.add(
@@ -122,6 +126,8 @@ def odoo_write_guard(
         "sandbox company must be verified on the live instance",
     )
 
+    if not require_backup:
+        return report
     attested = _parse_date(settings.odoo_backup_attested_at)
     fresh = attested is not None and 0 <= (today - attested).days <= settings.odoo_backup_max_age_days
     report.add(

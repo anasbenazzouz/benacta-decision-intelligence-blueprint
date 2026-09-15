@@ -108,3 +108,20 @@ class TestOdooWriteGuard:
     def test_fixture_mode_blocks_even_with_everything_else(self):
         report = odoo_write_guard(_sandbox_ready(benacta_mode="fixture"), sandbox_company_exists=True, today=TODAY)
         assert _failed(report) == {"mode_is_sandbox"}
+
+
+class TestOdooConfigurationGuard:
+    def test_configuration_does_not_require_a_backup_but_keeps_every_other_check(self):
+        settings = _sandbox_ready(odoo_backup_attested_at=None, odoo_backup_reference=None)
+        report = odoo_write_guard(settings, sandbox_company_exists=True, today=TODAY, require_backup=False)
+        assert report.allowed and report.guard == "odoo_configuration"
+        assert "backup_attested" not in {c.name for c in report.checks}
+
+    def test_configuration_still_blocks_without_writes_or_allowlist(self):
+        settings = _sandbox_ready(odoo_writes_enabled=False, odoo_sandbox_allowlist="")
+        report = odoo_write_guard(settings, sandbox_company_exists=True, today=TODAY, require_backup=False)
+        assert _failed(report) == {"writes_enabled", "target_allowlisted"}
+
+    def test_business_writes_still_require_the_backup(self):
+        settings = _sandbox_ready(odoo_backup_attested_at=None)
+        assert _failed(odoo_write_guard(settings, sandbox_company_exists=True, today=TODAY)) == {"backup_attested"}

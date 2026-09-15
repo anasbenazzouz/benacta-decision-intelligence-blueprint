@@ -83,6 +83,18 @@ def _seed_odoo(_: argparse.Namespace) -> int:
     return seed_odoo.seed(get_settings())
 
 
+def _odoo_configure(args: argparse.Namespace) -> int:
+    from app.ops import odoo_configure
+
+    return odoo_configure.run(get_settings(), confirm=args.confirm)
+
+
+def _seed_odoo_projects(args: argparse.Namespace) -> int:
+    from app.ops import seed_projects
+
+    return seed_projects.run(get_settings(), confirm=args.confirm)
+
+
 def _local_db_stop(_: argparse.Namespace) -> int:
     from app.db.engine import LOCAL_PGDATA, stop_local_server
 
@@ -121,6 +133,16 @@ def main(argv: list[str] | None = None) -> int:
     commands.add_parser("seed-odoo", help="seed the Odoo sandbox; refused unless the write guard passes").set_defaults(
         func=_seed_odoo
     )
+    configure = commands.add_parser(
+        "odoo-configure", help="install authorised modules, currencies and extension fields; dry run without --confirm"
+    )
+    configure.add_argument("--confirm", action="store_true")
+    configure.set_defaults(func=_odoo_configure)
+    projects_seed = commands.add_parser(
+        "seed-odoo-projects", help="write the synthetic project company into Odoo; dry run without --confirm"
+    )
+    projects_seed.add_argument("--confirm", action="store_true")
+    projects_seed.set_defaults(func=_seed_odoo_projects)
     commands.add_parser("local-db-stop", help="stop the embedded fixture database (data kept)").set_defaults(
         func=_local_db_stop
     )
