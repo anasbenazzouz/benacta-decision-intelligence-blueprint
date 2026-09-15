@@ -69,7 +69,7 @@ def test_everything_happens_inside_the_window(dataset):
 
 def test_golden_cases_are_isolated(dataset):
     orders_by_customer = Counter(o["partner_id"][1] for o in dataset.records["sale.order"])
-    for key in ("G1", "G2", "G3"):
+    for key in ("G1", "G2", "G3", "G4", "G5", "N13"):
         assert orders_by_customer[SCENARIO_CUSTOMERS[key][0]] == 1
     lines_by_product = Counter(line["product_id"][1] for line in dataset.records["sale.order.line"])
     for code in ("SC1", "SC2", "SC3", "SC4", "SC5"):
@@ -121,6 +121,10 @@ def test_business_terms_realise_the_oracle_context(dataset, oracle):
     assert dec(contracts[freight["contract"]]["amount"]) == dec(freight["contract_amount"])
     assert contracts[case(oracle, "NEG-02")["facts"]["contract"]]["terms"] == "waived"
 
+    price = next(c for c in terms["contract_prices"] if c["contract_id"] == case(oracle, "PRICE-001")["facts"]["contract"])
+    assert (price["customer"], price["product"], dec(price["unit_price"])) == ("G4", "P07", dec(case(oracle, "PRICE-001")["facts"]["contract_unit_price"]))
+    items = {i["product_tmpl_id"][1]: dec(i["fixed_price"]) for i in dataset.records["product.pricelist.item"]}
+    assert items["[P02] Flow Meter P02"] == dec(case(oracle, "PLIST-001")["facts"]["distributor_fixed_price"])
     references = {r["product"]: dec(r["unit_cost"]) for r in terms["cost_references"]}
     assert references["SC3"] == dec(case(oracle, "COST-001")["facts"]["reference_unit_cost"])
     assert references["SC4"] == dec(case(oracle, "NEG-08")["facts"]["reference_unit_cost"])

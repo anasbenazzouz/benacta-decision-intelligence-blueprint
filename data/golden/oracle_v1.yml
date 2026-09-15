@@ -20,9 +20,9 @@ company: BENACTA DEMO
 currency: EUR
 
 structure:
-  sale_orders: 120
-  sale_orders_by_state: {sale: 115, draft: 4, cancel: 1}
-  customers: 21
+  sale_orders: 123
+  sale_orders_by_state: {sale: 118, draft: 4, cancel: 1}
+  customers: 24
   suppliers: 5
   storable_products: 17
   service_products: 1
@@ -114,6 +114,96 @@ cases:
       severity: HIGH
       controllability: PARTIALLY_CONTROLLABLE
       customer_receivable: false
+
+  - case_id: PRICE-001
+    kind: golden
+    rule: price_below_contract
+    subject: {type: sale_order_line, order: BD/SO/PRICE-001, product: P07}
+    facts:
+      order_date: "2026-07-20"
+      customer_segment: standard
+      contract: CTR-PRICE-G4
+      contract_unit_price: "500.00"
+      list_price: "520.00"
+      quantity: "20"
+      price_unit: "470.00"
+      discount_pct: "0"
+      line_subtotal: "9400.00"
+      qty_delivered: "20"
+      qty_invoiced: "20"
+      invoiced_subtotal: "9400.00"
+    expected:
+      rule: PRICE_BELOW_BASELINE
+      status: VIOLATION
+      classification: CONFIRMED_LEAKAGE
+      cause: PRICE_BELOW_CONTRACT
+      baseline_level: 1
+      exposure_type: price
+      component: billing_leakage
+      expected_amount: "10000.00"
+      actual_amount: "9400.00"
+      adverse_exposure: "600.00"
+      severity: MEDIUM
+      controllability: CONTROLLABLE
+
+  - case_id: PLIST-001
+    kind: golden
+    rule: pricelist_misapplied
+    subject: {type: sale_order_line, order: BD/SO/PLIST-001, product: P02}
+    facts:
+      order_date: "2026-07-26"
+      customer_pricelist: BENACTA_DEMO Public
+      order_pricelist: BENACTA_DEMO Distributor
+      distributor_fixed_price: "300.00"
+      list_price: "340.00"
+      quantity: "10"
+      price_unit: "300.00"
+      discount_pct: "0"
+      line_subtotal: "3000.00"
+      qty_delivered: "10"
+      qty_invoiced: "10"
+    expected:
+      rule: PRICE_BELOW_BASELINE
+      status: VIOLATION
+      classification: CONFIRMED_LEAKAGE
+      cause: PRICELIST_MISMATCH
+      baseline_level: 3
+      exposure_type: price
+      component: billing_leakage
+      expected_amount: "3400.00"
+      actual_amount: "3000.00"
+      adverse_exposure: "400.00"
+      severity: MEDIUM
+      controllability: CONTROLLABLE
+
+  - case_id: FREIGHT-002
+    kind: golden
+    rule: freight_partial_recharge
+    subject: {type: sale_order, order: BD/SO/FREIGHT-002}
+    facts:
+      contract: CTR-FREIGHT-G5
+      contract_terms: rebill
+      contract_amount: "250.00"
+      trigger: full_delivery
+      goods_quantity: "5"
+      goods_delivered: "5"
+      goods_invoiced: "5"
+      freight_lines_on_order: 1
+      freight_invoiced: "100.00"
+    expected:
+      rule: FREIGHT_REBILL
+      status: VIOLATION
+      classification: CONFIRMED_LEAKAGE
+      cause: FREIGHT_PARTIALLY_INVOICED
+      exposure_type: freight
+      component: billing_leakage
+      expected_amount: "250.00"
+      actual_amount: "100.00"
+      adverse_exposure: "150.00"
+      severity: LOW
+      controllability: CONTROLLABLE
+      material: false          # below the 200 EUR materiality of the demo thresholds
+      case_created: false      # counted in freight leakage, never in the queue
 
   # ------------------------------------------------------------------ negative controls
   - case_id: NEG-01
@@ -207,18 +297,19 @@ cases:
       both_aggregation_eligible: true
 
 totals:
-  golden_cases_only:
-    billing_leakage: "1250.00"
+  golden_cases_only:  # DISC-001, FREIGHT-001, COST-001, PRICE-001, PLIST-001, FREIGHT-002
+    billing_leakage: "2400.00"
     cost_variance: "800.00"
-    combined_exposure: "2050.00"
+    combined_exposure: "3200.00"
   whole_dataset:
     discount_leakage: "1500.00"
-    price_leakage: "0.00"
-    freight_leakage: "250.00"
-    billing_leakage: "1750.00"
+    price_leakage: "1000.00"
+    freight_leakage: "400.00"
+    billing_leakage: "2900.00"
     cost_variance: "1200.00"
-    combined_exposure: "2950.00"
-    confirmed_leakage_exceptions: 5
+    combined_exposure: "4100.00"
+    confirmed_leakage_exceptions: 8
+    confirmed_leakage_cases: 7        # FREIGHT-002 is below materiality
     exceptions_on_background_orders: 0
     cases_requiring_human_review: 4  # NEG-08, NEG-09, NEG-10, NEG-11
     legitimate_exceptions: 2         # NEG-01, NEG-02

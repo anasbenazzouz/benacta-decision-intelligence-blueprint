@@ -22,8 +22,8 @@ reconciles every month, loads the governed commercial terms and runs the margin 
 ```text
 reconciliation (FIXTURE_CONTROL_TOTAL): COGS_POSTED, INVOICE_HEADER_LINES, REVENUE_POSTED RECONCILED, 12 period(s) each
 margin basis: RECONCILED_COGS
-reference (FIXTURE_TERMS): customer_segments=21, discount_policies=5, discount_derogations=1, freight_contracts=6, cost_references=17
-margin exceptions: 933 evaluations (... CONFIRMED_LEAKAGE=5 ...); cases created=9 ...
+reference (FIXTURE_TERMS): customer_segments=24, discount_policies=5, discount_derogations=1, freight_contracts=7, contract_prices=1, cost_references=17
+margin exceptions: 948 evaluations (... CONFIRMED_LEAKAGE=8 ...); cases created=11 ...
 ```
 
 Run it again: 0 new record versions, 0 new cases. Stop the embedded database with
@@ -43,7 +43,7 @@ uv run --project apps/api benacta margin-overview --period 2026-07
 
 Point at: revenue, COGS and gross margin for the month with their basis (`RECONCILED_COGS`, so this is a closing
 figure, not a proxy); the goods gross-margin percentage and its move against the previous month; the detected
-leakage (2 050.00 EUR in July), of which 1 250.00 recoverable from customers; the margin bridge from posted margin to
+leakage (3 050.00 EUR in July), of which 2 250.00 recoverable from customers; the margin bridge from posted margin to
 "margin at policy", labelled illustrative; the drivers by cause, customer, product and order.
 
 Line to say: every number here is posted, reconciled and computed by code; the percentage is on goods with a posted
@@ -56,12 +56,14 @@ uv run --project apps/api benacta margin-exceptions
 ```
 
 Point at the ranking: material confirmed leakage first (a 1 000 EUR unauthorised discount, an 800 EUR purchase price
-variance, a 250 EUR freight not recharged), then the cases that need a human because the evidence is insufficient
+variance, a 600 EUR invoice below the contract price, a 400 EUR order priced on the wrong price list, a 250 EUR freight
+not recharged), then the cases that need a human because the evidence is insufficient
 (an expired policy, two conflicting policies, a missing cost, an invoice with no order behind it). Each row carries
 its cause, controllability, confidence, owner, status and age.
 
 Line to say: the queue is the output of published rules and thresholds, not an editorial choice; the two legitimate
-exceptions of the dataset (an approved derogation, a contractual freight waiver) are not in it.
+exceptions of the dataset (an approved derogation, a contractual freight waiver) are not in it, and a confirmed 150 EUR
+partial freight recharge below materiality is counted in the period leakage without occupying the queue.
 
 ### Step 3. Open the most important exception
 

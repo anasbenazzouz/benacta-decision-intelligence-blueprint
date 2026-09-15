@@ -64,10 +64,11 @@ def test_overview_answers_the_first_cfo_questions(built):
     assert overview["waterfall"][0]["step"].startswith("Gross margin") and overview["waterfall"][-1]["step"].startswith("Margin at policy")
     with built["engine"].connect() as conn:
         july = margin_overview(conn, built["snapshot"], "2026-07")
-    assert Decimal(july["kpis"]["detected_leakage"]) == Decimal("2050.00")
-    assert Decimal(july["kpis"]["recoverable_from_customer"]) == Decimal("1250.00")
+    assert Decimal(july["kpis"]["detected_leakage"]) == Decimal("3050.00")
+    assert Decimal(july["kpis"]["recoverable_from_customer"]) == Decimal("2250.00")
     causes = {c["cause"]: Decimal(c["adverse_exposure"]) for c in july["drivers"]["causes"]}
-    assert causes == {"DISCOUNT_ABOVE_CAP": Decimal("1000.00"), "PURCHASE_PRICE_VARIANCE": Decimal("800.00"), "FREIGHT_NOT_INVOICED": Decimal("250.00")}
+    assert causes == {"DISCOUNT_ABOVE_CAP": Decimal("1000.00"), "PURCHASE_PRICE_VARIANCE": Decimal("800.00"), "PRICE_BELOW_CONTRACT": Decimal("600.00"),
+                      "PRICELIST_MISMATCH": Decimal("400.00"), "FREIGHT_NOT_INVOICED": Decimal("250.00")}
     assert july["drivers"]["customers"][0]["customer"] == "Orsay Hydraulics"
     assert july["drivers"]["orders"][0]["order"] == "BD/SO/DISC-001"
 
@@ -81,11 +82,12 @@ def test_queue_ranks_material_confirmed_leakage_first(built):
         assert column in queue[0]
     confirmed = [q for q in queue if q["classification"] == "CONFIRMED_LEAKAGE"]
     review = [q for q in queue if q["classification"] in ("DATA_QUALITY_ISSUE", "INSUFFICIENT_EVIDENCE")]
-    assert len(confirmed) == 5 and len(review) == 4
+    assert len(confirmed) == 7 and len(review) == 4
     assert max(queue.index(q) for q in confirmed) < min(queue.index(q) for q in review)
     with built["engine"].connect() as conn:
         july_only = exception_queue(conn, built["snapshot"], period="2026-07", classification="CONFIRMED_LEAKAGE")
-    assert {q["subject_ref"].split(" / ")[0] for q in july_only} == {"BD/SO/DISC-001", "BD/SO/FREIGHT-001", "BD/SO/COST-001"}
+    assert {q["subject_ref"].split(" / ")[0] for q in july_only} == {"BD/SO/DISC-001", "BD/SO/FREIGHT-001", "BD/SO/COST-001", "BD/SO/PRICE-001",
+                                                                  "BD/SO/PLIST-001"}
 
 
 def test_case_drills_down_to_transactions_rules_and_lineage(built):

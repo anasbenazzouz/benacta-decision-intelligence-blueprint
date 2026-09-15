@@ -11,10 +11,10 @@ controllability.
 | # | Scenario | Dataset case | Rule | Expected class | Status |
 |---|---|---|---|---|---|
 | 1 | Unauthorised discount above the threshold | DISC-001 (1 000 EUR), NEG-12 (500 EUR) | `DISCOUNT_CAP` | confirmed leakage | TESTED_LOCAL |
-| 2 | Customer invoiced below the contractual price | PRICE-001 | `PRICE_BELOW_BASELINE` level 1 | confirmed leakage | planned, milestone 1b |
-| 3 | Incorrect price-list application | PLIST-001 | `PRICE_BELOW_BASELINE`, cause `PRICELIST_MISMATCH` | confirmed leakage | planned, milestone 1b |
+| 2 | Customer invoiced below the contractual price | PRICE-001 (600 EUR) | `PRICE_BELOW_BASELINE` level 1 | confirmed leakage | TESTED_LOCAL |
+| 3 | Incorrect price-list application | PLIST-001 (400 EUR) | `PRICE_BELOW_BASELINE`, cause `PRICELIST_MISMATCH` | confirmed leakage | TESTED_LOCAL |
 | 4 | Freight incurred but not recharged | FREIGHT-001 (250 EUR) | `FREIGHT_REBILL` | confirmed leakage | TESTED_LOCAL |
-| 5 | Partial freight recharge | FREIGHT-002 | `FREIGHT_REBILL`, cause `FREIGHT_PARTIALLY_INVOICED` | confirmed leakage | rule tested on hand-built facts; dataset case planned, milestone 1b |
+| 5 | Partial freight recharge | FREIGHT-002 (150 EUR, below materiality: counted, not queued) | `FREIGHT_REBILL`, cause `FREIGHT_PARTIALLY_INVOICED` | confirmed leakage | TESTED_LOCAL |
 | 6 | Standard-cost drift after supplier price increases | COST-001 (800 EUR) | `COST_REFERENCE_VARIANCE` | confirmed leakage | TESTED_LOCAL |
 | 7 | Purchase-price variance on product margin | NEG-12 (400 EUR) | `COST_REFERENCE_VARIANCE` | confirmed leakage | TESTED_LOCAL |
 | 8 | Margin erosion hidden by volume | VOL-001 | period KPI: goods margin percentage falling while revenue grows | deterioration signal | planned, milestone 3 (demonstration profile) |
@@ -37,11 +37,12 @@ one line counted once per component (NEG-12).
 | Total | Amount (EUR) |
 |---|---|
 | Discount leakage | 1 500.00 |
-| Freight leakage | 250.00 |
-| Billing leakage | 1 750.00 |
+| Price leakage | 1 000.00 |
+| Freight leakage | 400.00 |
+| Billing leakage | 2 900.00 |
 | Cost variance | 1 200.00 |
-| Combined exposure | 2 950.00 |
-| Confirmed leakage exceptions | 5 |
+| Combined exposure | 4 100.00 |
+| Confirmed leakage exceptions | 8 (7 material cases) |
 | Exceptions on background orders | 0 |
 | Cases requiring human review | 4 |
 | Legitimate exceptions, never raised | 2 |
@@ -54,4 +55,4 @@ one line counted once per component (NEG-12).
   `apps/api/tests/unit/test_margin_rules.py` (every outcome of every rule on hand-built facts).
 
 The demonstration profile of milestone 3 gets its own oracle (`data/golden/oracle_demo_full_v1.yml`) with the
-remaining scenarios (2, 3, 5, 8, 10, 12) at realistic volumes.
+remaining scenarios (8, 10, 12) at realistic volumes.

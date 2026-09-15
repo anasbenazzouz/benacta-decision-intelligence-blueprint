@@ -15,15 +15,15 @@ plus the project extension); no Odoo write happened.
 
 | Command | Result |
 |---|---|
-| `uv run pytest -q` in `apps/api` | 219 passed, 7 skipped (live tests are opt-in) |
-| `uv run pytest -q tests/integration/test_margin_engine_oracle.py` | 22 passed: every oracle case (3 golden, 12 negative controls), totals 1 750 / 1 200 / 2 950 EUR, 0 exception on background orders, 9 cases and no duplicate on replay, audit valid, a corrected source closes the case with the reason |
+| `uv run pytest -q` in `apps/api` | 222 passed, 7 skipped (live tests are opt-in) |
+| `uv run pytest -q tests/integration/test_margin_engine_oracle.py` | 25 passed: every oracle case (6 golden, 12 negative controls), totals 2 900 / 1 200 / 4 100 EUR, 0 exception on background orders, 11 cases and no duplicate on replay, a confirmed 150 EUR case below materiality counted but not queued, audit valid, a corrected source closes the case with the reason |
 | `uv run pytest -q tests/unit/test_margin_rules.py` | 30 passed: every outcome of every rule on hand-built facts, the four baseline levels, currency and unit conversions, the comparability guard |
 | `uv run pytest -q tests/integration/test_margin_service_api.py` | 5 passed: overview, queue ranking, case drill-down and lineage, reconciliation report fields, API equals service |
 | `ruff check app tests migrations` | clean |
-| `benacta seed-fixtures` | 12 months `RECONCILED` on `REVENUE_POSTED`, `COGS_POSTED` and `INVOICE_HEADER_LINES`; margin basis `RECONCILED_COGS`; terms loaded (21 segments, 5 policies, 1 derogation, 6 freight contracts, 17 cost references); 933 evaluations: 5 `CONFIRMED_LEAKAGE`, 2 `DATA_QUALITY_ISSUE`, 18 `INSUFFICIENT_EVIDENCE` (2 for review), 2 `LEGITIMATE_EXCEPTION`, 5 `EXPLAINED_VARIANCE`, 699 `COMPLIANT`, 202 `NOT_APPLICABLE`; 9 cases |
-| `benacta seed-fixtures` replayed | 0 new record versions, 0 new cases, 9 updated |
-| `BENACTA_MODE=fixture benacta margin-overview --period 2026-07` | revenue 999 608.20, COGS 160 317.00, gross margin 839 291.20 (goods 112 691.20, goods GM 41.28 % against 41.01 % in June, within threshold); detected leakage 2 050.00, recoverable from customers 1 250.00, realised recovery `NOT_MEASURED` |
-| `BENACTA_MODE=fixture benacta margin-exceptions` | 9 cases: DISC-001 1 000.00, COST-001 800.00, NEG-12 500.00 and 400.00, FREIGHT-001 250.00 (all `CONFIRMED_LEAKAGE`, confidence `HIGH`), then NEG-11, NEG-09, NEG-08, NEG-10 for human review; NEG-01 and NEG-02 (legitimate) absent |
+| `benacta seed-fixtures` | 12 months `RECONCILED` on `REVENUE_POSTED`, `COGS_POSTED` and `INVOICE_HEADER_LINES`; margin basis `RECONCILED_COGS`; terms loaded (24 segments, 5 policies, 1 derogation, 7 freight contracts, 1 contract price, 17 cost references); 948 evaluations: 8 `CONFIRMED_LEAKAGE`, 2 `DATA_QUALITY_ISSUE`, 18 `INSUFFICIENT_EVIDENCE` (2 for review), 2 `LEGITIMATE_EXCEPTION`, 5 `EXPLAINED_VARIANCE`, 707 `COMPLIANT`, 206 `NOT_APPLICABLE`; 11 cases |
+| `benacta seed-fixtures` replayed | 0 new record versions, 0 new cases, 11 updated |
+| `BENACTA_MODE=fixture benacta margin-overview --period 2026-07` | revenue 1 012 008.20, COGS 168 217.00, gross margin 843 791.20 (goods 117 191.20, goods GM 41.06 % against 41.01 % in June, within threshold); detected leakage 3 050.00, recoverable from customers 2 250.00, realised recovery `NOT_MEASURED` |
+| `BENACTA_MODE=fixture benacta margin-exceptions` | 11 cases: DISC-001 1 000.00, COST-001 800.00, PRICE-001 600.00, NEG-12 500.00 and 400.00, PLIST-001 400.00, FREIGHT-001 250.00 (all `CONFIRMED_LEAKAGE`, confidence `HIGH`), then NEG-11, NEG-09, NEG-08, NEG-10 for human review; NEG-01 and NEG-02 (legitimate) absent; FREIGHT-002 (150.00, below materiality) counted in freight leakage, not queued |
 | `BENACTA_MODE=fixture benacta margin-case MC-000001` | rule `DISCOUNT_CAP` v1 with formula, expected 9 500.00 against actual 8 500.00, policy `POL-DISC-STANDARD` cited, 1 order line, 1 invoice line, 1 delivery, 1 cost allocation, 1 source record version, three reconciliation checks `RECONCILED`, suggested follow-up `PENDING_REVIEW` |
 | `BENACTA_MODE=fixture benacta reconciliation-report --period 2026-07` | three checks `RECONCILED`, tolerance 0.01, source timestamp, ingestion timestamp, transformation `marts.2026.09.2` |
 | `BENACTA_MODE=fixture benacta verify-audit --export` | chain `VALID`, 269 events |
@@ -42,7 +42,7 @@ plus the project extension); no Odoo write happened.
 | Margin KPIs and contracts (revenue, COGS, gross margin, percentage, four leakage types, addressable, recoverable, approved and realised recovery) | TESTED_LOCAL (structure) | `app/margin/kpis.py`, `semantic/metrics.yml` |
 | Reconciliation report with tolerance, timestamps, transformation version, invoice header check | TESTED_LOCAL | `app/marts/reconcile.py`, `docs/reconciliation_specification.md` |
 | Read side: overview with deterioration signal and bridge, ranked queue, case with drill-down and lineage; CLI and API | TESTED_LOCAL | `app/margin/service.py`, `app/ops/margin_ops.py`, `app/main.py` |
-| Ground-truth catalogue: 12 of 18 scenarios covered by the oracle, the rest scheduled | IMPLEMENTED | `docs/ground_truth_catalogue.md`, `data/golden/oracle_v1.yml` (v2) |
+| Ground-truth catalogue: 15 of 18 scenarios covered by the oracle (contract price, price-list mismatch and partial freight added), the rest scheduled | TESTED_LOCAL | `docs/ground_truth_catalogue.md`, `data/golden/oracle_v1.yml` (v2) |
 | Demonstration script and local setup | IMPLEMENTED | `docs/margin_control_demo.md` |
 | Rules against the connected Odoo | NOT_VERIFIED | order lines of the connected instance carry no invoice links and no COGS; the engine would report untraceable revenue there; the sandbox seed has not run |
 | Decisions, actions, impact | not started | milestone 2 |

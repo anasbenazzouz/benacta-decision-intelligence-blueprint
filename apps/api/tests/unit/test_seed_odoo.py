@@ -71,7 +71,7 @@ def test_dry_run_plans_every_step_and_flags_shared_configuration(monkeypatch, tm
 
     assert [op["model"] for op in plan["operations"]] == [model for model, _ in seed_odoo.OPERATIONS]
     sale = next(op for op in plan["operations"] if op["model"] == "sale.order")
-    assert sale["objects"] == 120 and sale["detail"] == {"sale": 115, "draft": 4, "cancel": 1}
+    assert sale["objects"] == 123 and sale["detail"] == {"sale": 118, "draft": 4, "cancel": 1}
     decisions = {p["check"] for p in plan["prerequisites"] if p["decision_needed"]}
     assert "sandbox company 'BENACTA DEMO' exists" in decisions
     assert "USD currency active (global setting)" in decisions

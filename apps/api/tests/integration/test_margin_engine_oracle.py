@@ -100,8 +100,8 @@ def _check_expected(row, expected: dict) -> None:
         assert row["requires_human_review"] is expected["requires_human_review"]
 
 
-@pytest.mark.parametrize("case_id", ["DISC-001", "FREIGHT-001", "COST-001", "NEG-01", "NEG-02", "NEG-03", "NEG-04", "NEG-05", "NEG-06",
-                                     "NEG-07", "NEG-08", "NEG-09", "NEG-10", "NEG-11"])
+@pytest.mark.parametrize("case_id", ["DISC-001", "FREIGHT-001", "COST-001", "PRICE-001", "PLIST-001", "FREIGHT-002", "NEG-01", "NEG-02",
+                                     "NEG-03", "NEG-04", "NEG-05", "NEG-06", "NEG-07", "NEG-08", "NEG-09", "NEG-10", "NEG-11"])
 def test_oracle_case(built, oracle, case_id):
     c = case(oracle, case_id)
     expected = c["expected"]
@@ -109,7 +109,10 @@ def test_oracle_case(built, oracle, case_id):
     row = evaluation(built, expected["rule"], subject_type, ref, product)
     _check_expected(row, expected)
     if expected["status"] == "VIOLATION":
-        assert row["exposure_stage"] == "INVOICED" and row["confidence"] == "HIGH" and row["material"]
+        assert row["exposure_stage"] == "INVOICED" and row["confidence"] == "HIGH"
+        assert row["material"] == (row["adverse_exposure"] >= Decimal(200))
+    if "baseline_level" in expected:
+        assert row["evidence"]["baseline"]["level"] == expected["baseline_level"]
 
 
 def test_cancelled_order_lines_are_excluded_by_every_line_rule(built):
@@ -147,7 +150,8 @@ def test_totals_and_no_exception_on_background_orders(built, oracle):
         select e.subject_ref, e.rule_id, e.classification from marts.fact_margin_rule_evaluation e
         where e.snapshot_id = :s and e.classification not in ('COMPLIANT', 'NOT_APPLICABLE', 'EXPLAINED_VARIANCE')
           and e.subject_ref not like 'BD/SO/DISC-%' and e.subject_ref not like 'BD/SO/FREIGHT-%' and e.subject_ref not like 'BD/SO/COST-%'
-          and e.subject_ref not like 'BD/SO/NEG-%' and e.subject_ref not like 'BD/INV/NEG-%'""")
+          and e.subject_ref not like 'BD/SO/NEG-%' and e.subject_ref not like 'BD/INV/NEG-%'
+          and e.subject_ref not like 'BD/SO/PRICE-%' and e.subject_ref not like 'BD/SO/PLIST-%'""")
     assert background == [], background
     assert not q(built, "select 1 from marts.fact_margin_rule_evaluation where snapshot_id = :s and classification = 'PROBABLE_LEAKAGE'"), (
         "every violation on the fixture is backed by reconciled, fully linked evidence"
@@ -161,7 +165,10 @@ def test_cases_are_created_for_actionable_outcomes_only(built, oracle):
     by_class = {}
     for c in cases:
         by_class[c["classification"]] = by_class.get(c["classification"], 0) + 1
-    assert by_class["CONFIRMED_LEAKAGE"] == totals["confirmed_leakage_exceptions"]
+    assert by_class["CONFIRMED_LEAKAGE"] == totals["confirmed_leakage_cases"]
+    below_materiality = q(built, "select subject_ref, material from marts.fact_margin_rule_evaluation where snapshot_id = :s"
+                                 " and classification = 'CONFIRMED_LEAKAGE' and not material")
+    assert [r["subject_ref"] for r in below_materiality] == ["BD/SO/FREIGHT-002"], "confirmed but immaterial: counted, not queued"
     assert by_class.get("DATA_QUALITY_ISSUE", 0) + by_class.get("INSUFFICIENT_EVIDENCE", 0) == totals["cases_requiring_human_review"]
     assert all(c["status"] == "NEW" for c in cases)
     assert all(c["case_ref"].startswith("MC-") for c in cases)
@@ -183,9 +190,12 @@ def test_period_margin_ties_to_reconciled_facts(built):
         assert p["margin_basis"] == "RECONCILED_COGS" and p["margin_status"] == "OK"
         assert p["gross_margin_pct"] == (p["gross_margin"] * 100 / p["revenue"]).quantize(Decimal("0.01"))
     july = next(p for p in periods if p["period"] == "2026-07")
-    assert (july["discount_leakage"], july["freight_leakage"], july["cost_leakage"]) == (Decimal("1000.00"), Decimal("250.00"), Decimal("800.00"))
-    assert july["recoverable_from_customer"] == Decimal("1250.00") and july["total_addressable_leakage"] == Decimal("2050.00")
-    assert sum(p["discount_leakage"] + p["price_leakage"] + p["freight_leakage"] + p["cost_leakage"] for p in periods) == Decimal("2950.00")
+    assert (july["discount_leakage"], july["price_leakage"], july["freight_leakage"], july["cost_leakage"]) == (
+        Decimal("1000.00"), Decimal("1000.00"), Decimal("250.00"), Decimal("800.00"))
+    assert july["recoverable_from_customer"] == Decimal("2250.00") and july["total_addressable_leakage"] == Decimal("3050.00")
+    august = next(p for p in periods if p["period"] == "2026-08")
+    assert (august["discount_leakage"], august["freight_leakage"], august["cost_leakage"]) == (Decimal("500.00"), Decimal("150.00"), Decimal("400.00"))
+    assert sum(p["discount_leakage"] + p["price_leakage"] + p["freight_leakage"] + p["cost_leakage"] for p in periods) == Decimal("4100.00")
     assert sum(p["untraceable_revenue"] for p in periods) == Decimal("650.00")
 
 
