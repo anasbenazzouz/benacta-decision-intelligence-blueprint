@@ -65,6 +65,31 @@ def _margin_case(args: argparse.Namespace) -> int:
     return margin_ops.run_case(get_settings(), args.case)
 
 
+def _margin_decide(args: argparse.Namespace) -> int:
+    from app.ops import margin_ops
+
+    return margin_ops.run_decide(get_settings(), args.case, args.decision, args.actor, args.role, reason=args.reason, comment=args.comment,
+                                 assigned_to=args.assign_to, defer_until=args.defer_until, expected_version=args.expected_version)
+
+
+def _margin_act(args: argparse.Namespace) -> int:
+    from app.ops import margin_ops
+
+    return margin_ops.run_act(get_settings(), args.case, args.actor, args.role, confirm=args.confirm)
+
+
+def _margin_impact(_: argparse.Namespace) -> int:
+    from app.ops import margin_ops
+
+    return margin_ops.run_impact(get_settings())
+
+
+def _margin_audit(args: argparse.Namespace) -> int:
+    from app.ops import margin_ops
+
+    return margin_ops.run_audit(get_settings(), args.case)
+
+
 def _reconciliation_report(args: argparse.Namespace) -> int:
     from app.ops import margin_ops
 
@@ -165,6 +190,27 @@ def main(argv: list[str] | None = None) -> int:
     case = commands.add_parser("margin-case", help="one exception with its evidence, drill-down and lineage")
     case.add_argument("case", help="case reference, e.g. MC-000001")
     case.set_defaults(func=_margin_case)
+    decide = commands.add_parser("margin-decide", help="record a human decision on a case (pilot identity: --actor and --role)")
+    decide.add_argument("case")
+    decide.add_argument("--decision", required=True, choices=["APPROVE", "REJECT", "REQUEST_EVIDENCE", "ASSIGN", "DEFER", "COMMENT", "REOPEN", "CLOSE"])
+    decide.add_argument("--actor", required=True, help="user identifier, e.g. FIN-01")
+    decide.add_argument("--role", action="append", default=[], help="analyst, project_controller, finance_approver, admin (repeatable)")
+    decide.add_argument("--reason", help="required for REJECT, DEFER, REQUEST_EVIDENCE, REOPEN")
+    decide.add_argument("--comment")
+    decide.add_argument("--assign-to")
+    decide.add_argument("--defer-until", help="YYYY-MM-DD")
+    decide.add_argument("--expected-version", type=int, help="the case version the decision was taken on; a stale version is refused")
+    decide.set_defaults(func=_margin_decide)
+    act = commands.add_parser("margin-act", help="create the approved review activity in Odoo (sandbox, guarded); dry run without --confirm")
+    act.add_argument("case")
+    act.add_argument("--actor", required=True)
+    act.add_argument("--role", action="append", default=[])
+    act.add_argument("--confirm", action="store_true")
+    act.set_defaults(func=_margin_act)
+    commands.add_parser("margin-impact", help="estimated against realised recovery per approved case").set_defaults(func=_margin_impact)
+    audit_case = commands.add_parser("margin-audit", help="everything that happened to a case, with audit events")
+    audit_case.add_argument("case")
+    audit_case.set_defaults(func=_margin_audit)
     report = commands.add_parser("reconciliation-report", help="closed-period reconciliation report")
     report.add_argument("--period")
     report.set_defaults(func=_reconciliation_report)

@@ -8,7 +8,9 @@ from typing import Any
 
 from app.config import REPO_ROOT, Mode, Settings
 from app.db.engine import analytics_engine
-from app.margin.service import exception_case, exception_queue, margin_overview
+from app.margin.actions import execute_review_activity, plan_review_activity
+from app.margin.decisions import DecisionError, decide, parse_actor
+from app.margin.service import case_audit, exception_case, exception_queue, impact_register, margin_overview
 from app.marts.reconcile import reconciliation_report
 from app.ops.pipeline import FIXTURE_SOURCE_INSTANCE, latest_snapshot
 
@@ -54,7 +56,9 @@ def run_overview(settings: Settings, period: str | None) -> int:
               f" threshold {k['deterioration_threshold_points']} points)")
     print(f"  detected leakage {_amount(k['detected_leakage'])} | recoverable from customers {_amount(k['recoverable_from_customer'])}"
           f" | addressable {_amount(k['total_addressable_leakage'])} | untraceable revenue {_amount(k['untraceable_revenue'])}")
-    print(f"  realised recovery: {k['recovery_status']}")
+    print(f"  approved recovery {_amount(k['approved_recovery'])} | realised recovery {_amount(k['realised_recovery'])} ({k['recovery_status']})")
+    print(f"  decisions taken {k['decisions_taken']} | acceptance rate {k['recommendation_acceptance_rate_pct'] or 'n/a'}%"
+          f" | detection to decision {k['avg_hours_detection_to_decision'] or 'n/a'} h | decision to action {k['avg_hours_decision_to_action'] or 'n/a'} h")
     print(f"  exceptions: {k['exceptions_material']} material, {k['exceptions_review']} for review")
     if overview["waterfall"]:
         print("  margin bridge:")
@@ -81,11 +85,11 @@ def run_queue(settings: Settings, period: str | None, classification: str | None
     finally:
         engine.dispose()
     print(f"Exception queue ({len(queue)} shown){f' for {period}' if period else ''}")
-    print(f"{'case':10} {'subject':34} {'classification':22} {'cause':30} {'exposure':>12} {'sev':6} {'conf':6} {'ctrl':22} {'status':8} age")
+    print(f"{'case':10} {'subject':30} {'classification':22} {'cause':28} {'exposure':>10} {'sev':6} {'conf':6} {'ctrl':22} {'status':18} {'owner':10} age")
     for q in queue:
         exposure = q["adverse_exposure"] or (f"<= {q['potential_exposure']}" if q["potential_exposure"] else "n/a")
-        print(f"{q['case_ref']:10} {q['subject_ref'][:34]:34} {q['classification']:22} {q['cause']:30} {exposure:>12} {q['severity']:6}"
-              f" {q['confidence']:6} {q['controllability']:22} {q['status']:8} {q['age_days']}d")
+        print(f"{q['case_ref']:10} {q['subject_ref'][:30]:30} {q['classification']:22} {q['cause']:28} {exposure:>10} {q['severity']:6}"
+              f" {q['confidence']:6} {q['controllability']:22} {q['status']:18} {(q['owner'] or '-')[:10]:10} {q['age_days']}d")
     print(f"exported {_export('margin_exceptions.json', queue).relative_to(REPO_ROOT)}")
     return 0
 
@@ -116,8 +120,104 @@ def run_case(settings: Settings, case_ref: str) -> int:
     for r in case["related_evaluations_same_subject"]:
         if r["classification"] not in ("COMPLIANT", "NOT_APPLICABLE"):
             print(f"  also on this subject: {r['rule_id']} {r['classification']} {r['cause']} {r['adverse_exposure']}")
-    print(f"  {case['suggested_follow_up']['label']}: {case['suggested_follow_up']['text']} [{case['suggested_follow_up']['status']}]")
+    rec = case["recommendation"]
+    if rec:
+        print(f"  Recommendation v{rec['version']} [{rec['status']}]: {rec['title']} (estimated recovery {rec['estimated_recovery'] or 'n/a'},"
+              f" basis {rec['recovery_basis']}, requires {rec['requires_role']})")
+    for d in case["decisions"]:
+        print(f"  decision {d['decision_type']:16} by {d['actor']:12} {d['status_before']} -> {d['status_after']} at {d['decided_at'][:19]}"
+              f"{' reason: ' + d['reason'] if d['reason'] else ''}")
+    for a in case["actions"]:
+        print(f"  action {a['action_key']} {a['status']:9} target {a['target_system']} {a['target_model']}#{a['target_res_id']}{' ' + a['error'] if a['error'] else ''}")
+    if case["impact"]:
+        i = case["impact"]
+        print(f"  impact: estimated {i['estimated_recovery'] or 'n/a'} | realised {i['realised_recovery'] or 'n/a'} [{i['realisation_status']}] {i['reason'] or ''}")
     print(f"exported {_export(f'margin_case_{c['case_ref']}.json', case).relative_to(REPO_ROOT)}")
+    return 0
+
+
+def run_decide(settings: Settings, case_ref: str, decision_type: str, actor: str, roles: list[str], *, reason: str | None, comment: str | None,
+               assigned_to: str | None, defer_until: str | None, expected_version: int | None) -> int:
+    from datetime import date
+
+    engine = analytics_engine(settings)
+    try:
+        with engine.begin() as conn:
+            result = decide(conn, parse_actor(actor, roles), case_ref, decision_type.upper(), expected_version=expected_version, reason=reason,
+                            comment=comment, assigned_to=assigned_to, defer_until=date.fromisoformat(defer_until) if defer_until else None)
+    except DecisionError as exc:
+        print(f"refused: {exc}")
+        return 2
+    finally:
+        engine.dispose()
+    print(f"{result.case_ref}: {result.decision_type} by {actor} -> {result.status_before} -> {result.status_after} (version {result.version}, decision {result.decision_id})")
+    return 0
+
+
+def run_act(settings: Settings, case_ref: str, actor: str, roles: list[str], *, confirm: bool) -> int:
+    engine = analytics_engine(settings)
+    try:
+        with engine.begin() as conn:
+            plan = plan_review_activity(conn, case_ref)
+            print(f"{plan.case_ref}: review activity on {plan.target_model}#{plan.target_res_id} (external id {plan.external_id})")
+            print(f"  summary: {plan.vals['summary']}")
+            print(f"  deadline: {plan.vals['date_deadline']}")
+            if not confirm:
+                print("  dry run: nothing recorded, nothing executed. Run again with --confirm.")
+                return 0
+            result = execute_review_activity(conn, settings, parse_actor(actor, roles), case_ref)
+    except DecisionError as exc:
+        print(f"refused: {exc}")
+        return 2
+    finally:
+        engine.dispose()
+    print(f"  {result.status}: {result.detail}" + (f" {result.response}" if result.response else ""))
+    return 0 if result.status in ("EXECUTED", "PLANNED") else 2
+
+
+def run_impact(settings: Settings) -> int:
+    engine = analytics_engine(settings)
+    try:
+        with engine.connect() as conn:
+            rows = impact_register(conn, _instance(settings))
+    finally:
+        engine.dispose()
+    print(f"Impact register ({len(rows)} approved case(s))")
+    print(f"{'case':10} {'subject':30} {'status':10} {'estimated':>11} {'realised':>11} {'variance':>11} {'measurement':14} reason")
+    for r in rows:
+        print(f"{r['case_ref']:10} {r['subject_ref'][:30]:30} {r['status']:10} {_amount(r['estimated_recovery']):>11} {_amount(r['realised_recovery']):>11}"
+              f" {_amount(r['variance']):>11} {r['realisation_status']:14} {r['reason'] or ''}")
+    print(f"exported {_export('margin_impact.json', rows).relative_to(REPO_ROOT)}")
+    return 0
+
+
+def run_audit(settings: Settings, case_ref: str) -> int:
+    engine = analytics_engine(settings)
+    try:
+        with engine.connect() as conn:
+            audit = case_audit(conn, case_ref)
+    finally:
+        engine.dispose()
+    if audit is None:
+        print(f"no case {case_ref}")
+        return 1
+    c = audit["case"]
+    print(f"Audit {c['case_ref']} {c['subject_ref']} | status {c['status']} | version {c['version']} | first detected {c['first_detected_at'][:19]}")
+    for e in audit["evaluations"]:
+        print(f"  evaluation snapshot seq {e['batch_seq']} ({e['transformation_version']}): {e['rule_id']} v{e['rule_version']} {e['thresholds_version']}"
+              f" -> {e['outcome']} {e['classification']} {e['adverse_exposure'] or ''}")
+    for r in audit["recommendations"]:
+        print(f"  recommendation v{r['version']} [{r['status']}] {r['source']}: {r['title']} (hash {r['payload_hash'][:12]})")
+    for d in audit["decisions"]:
+        print(f"  decision {d['decision_type']} by {d['actor']} ({', '.join(d['actor_roles'])}) {d['status_before']} -> {d['status_after']} at {d['decided_at'][:19]}")
+    for a in audit["actions"]:
+        print(f"  action {a['status']} {a['target_system']} {a['target_model']}#{a['target_res_id']} by {a['actor']} at {a['created_at'][:19]}")
+    if audit["impact"]:
+        print(f"  impact {audit['impact']['realisation_status']}: estimated {audit['impact']['estimated_recovery']}, realised {audit['impact']['realised_recovery']}")
+    print(f"  lineage: {len(audit['lineage'])} source record version(s); audit events: {len(audit['audit_events'])}")
+    for ev in audit["audit_events"]:
+        print(f"    #{ev['sequence']} {ev['occurred_at'][:19]} {ev['actor']:28} {ev['action']:28} {ev['event_hash'][:12]}")
+    print(f"exported {_export(f'margin_audit_{c['case_ref']}.json', audit).relative_to(REPO_ROOT)}")
     return 0
 
 

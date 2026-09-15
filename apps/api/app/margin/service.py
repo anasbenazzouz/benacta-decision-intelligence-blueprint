@@ -108,6 +108,7 @@ def margin_overview(conn: Connection, snapshot_id: uuid.UUID, period: str | None
         running = kpis.margin_at_policy(gm, {k.replace("_leakage", ""): v for k, v in leakage.items()})
         steps.append(("Margin at policy (illustrative)", running))
         waterfall = [{"step": s, "amount": decimal_text(a)} for s, a in steps]
+    decisions = _decision_kpis(conn, snapshot_id, latest)
     return {
         "snapshot_id": str(snapshot_id),
         "period": latest,
@@ -125,7 +126,7 @@ def margin_overview(conn: Connection, snapshot_id: uuid.UUID, period: str | None
             "recoverable_from_customer": _s(leakage["recoverable_from_customer"]),
             "total_addressable_leakage": _s(leakage["total_addressable_leakage"]),
             "untraceable_revenue": _s(leakage["untraceable_revenue"]),
-            "approved_recovery": None, "realised_recovery": None, "recovery_status": "NOT_MEASURED: decisions and actions arrive in milestone 2",
+            **decisions,
             "exceptions_material": sum(r["exceptions_material"] for r in current),
             "exceptions_review": sum(r["exceptions_review"] for r in current),
         },
@@ -133,6 +134,38 @@ def margin_overview(conn: Connection, snapshot_id: uuid.UUID, period: str | None
         "periods": [_clean(p) for p in periods],
         "drivers": _drivers(conn, snapshot_id, latest),
         "thresholds": thresholds.as_dict(),
+    }
+
+
+def _decision_kpis(conn: Connection, snapshot_id: uuid.UUID, period: str) -> dict[str, Any]:
+    """Approved and realised recovery, acceptance rate and cycle times for the cases of a period."""
+    row = conn.execute(sa.text("""
+        with cases as (
+            select c.case_id, c.status, c.estimated_recovery, c.first_detected_at, c.decided_at, c.actioned_at, i.realised_recovery, i.realisation_status
+            from decision.exception_case c
+            join marts.fact_margin_rule_evaluation e on e.snapshot_id = :s and e.rule_id = c.rule_id and e.subject_type = c.subject_type
+                 and e.subject_id = c.subject_id and e.period = :p
+            left join decision.case_impact i on i.case_id = c.case_id
+            where c.source_instance = (select source_instance from marts.snapshot where snapshot_id = :s))
+        select coalesce(sum(case when status in ('APPROVED', 'ACTIONED', 'CLOSED') then estimated_recovery end), 0) as approved,
+               coalesce(sum(case when status in ('APPROVED', 'ACTIONED', 'CLOSED') then realised_recovery end), 0) as realised,
+               count(*) filter (where status in ('APPROVED', 'ACTIONED', 'CLOSED')) as approved_n,
+               count(*) filter (where status = 'REJECTED') as rejected_n,
+               count(*) filter (where status in ('APPROVED', 'ACTIONED', 'CLOSED') and realisation_status in ('MEASURED', 'PARTIAL')) as measured_n,
+               avg(extract(epoch from (decided_at - first_detected_at)) / 3600) filter (where decided_at is not null) as hours_to_decision,
+               avg(extract(epoch from (actioned_at - decided_at)) / 3600) filter (where actioned_at is not null) as hours_to_action
+        from cases"""), {"s": snapshot_id, "p": period}).mappings().first()
+    decided = row["approved_n"] + row["rejected_n"]
+    acceptance = None if not decided else (Decimal(row["approved_n"]) * 100 / decided).quantize(Decimal("0.01"))
+    return {
+        "approved_recovery": decimal_text(row["approved"]),
+        "realised_recovery": decimal_text(row["realised"]),
+        "recovery_status": (f"{row['measured_n']} of {row['approved_n']} approved case(s) measured from posted documents"
+                            if row["approved_n"] else "NOT_MEASURED: no approved recommendation in the period"),
+        "recommendation_acceptance_rate_pct": decimal_text(acceptance),
+        "decisions_taken": decided,
+        "avg_hours_detection_to_decision": None if row["hours_to_decision"] is None else str(round(row["hours_to_decision"], 1)),
+        "avg_hours_decision_to_action": None if row["hours_to_action"] is None else str(round(row["hours_to_action"], 1)),
     }
 
 
@@ -166,6 +199,8 @@ def exception_queue(conn: Connection, snapshot_id: uuid.UUID, *, period: str | N
                     include_resolved: bool = False, limit: int = 100) -> list[dict[str, Any]]:
     rows = _rows(conn, """
         select c.case_id, c.case_ref, c.status, c.owner, c.first_detected_at, c.version, c.first_snapshot_id, c.resolved_snapshot_id, c.resolved_note,
+               c.assigned_to, c.defer_until, c.decided_at, c.actioned_at, c.estimated_recovery,
+               r.status as recommendation_status, r.title as recommendation_title, r.version as recommendation_version,
                e.rule_id, e.rule_version, e.subject_type, e.subject_id, e.subject_ref, e.period, e.order_date, e.outcome, e.classification, e.cause,
                e.exposure_type, e.component, e.expected_amount, e.actual_amount, e.adverse_exposure, e.potential_exposure, e.exposure_stage,
                e.currency_code, e.severity, e.confidence, e.controllability, e.material, e.requires_human_review,
@@ -175,6 +210,7 @@ def exception_queue(conn: Connection, snapshot_id: uuid.UUID, *, period: str | N
              and e.subject_id = c.subject_id
         left join marts.dim_partner p on p.snapshot_id = e.snapshot_id and p.partner_id = e.customer_id
         left join marts.dim_product d on d.snapshot_id = e.snapshot_id and d.product_id = e.product_id
+        left join decision.margin_recommendation r on r.case_id = c.case_id and r.status <> 'SUPERSEDED'
         where c.source_instance = (select source_instance from marts.snapshot where snapshot_id = :s)
           and (cast(:p as text) is null or e.period = :p) and (cast(:c as text) is null or e.classification = :c)
           and (:r or c.status <> 'NO_LONGER_RAISED')""", s=snapshot_id, p=period, c=classification, r=include_resolved)
@@ -225,9 +261,51 @@ def exception_case(conn: Connection, snapshot_id: uuid.UUID, case_ref: str) -> d
         "suggested_follow_up": {"label": "Suggested follow-up", "text": SUGGESTED_FOLLOW_UP.get(ev["cause"], "Review the evidence and decide."),
                                 "requires_role": "finance_approver", "status": "PENDING_REVIEW"},
         "investigation": None,
-        "decisions": [],
-        "actions": [],
+        **_workflow(conn, case["case_id"]),
     }
+
+
+def _workflow(conn: Connection, case_id: uuid.UUID) -> dict[str, Any]:
+    recommendation = conn.execute(sa.text("select * from decision.margin_recommendation where case_id = :c and status <> 'SUPERSEDED'"
+                                          " order by version desc limit 1"), {"c": case_id}).mappings().first()
+    impact = conn.execute(sa.text("select * from decision.case_impact where case_id = :c"), {"c": case_id}).mappings().first()
+    return {
+        "recommendation": _clean(dict(recommendation)) if recommendation else None,
+        "decisions": [_clean(r) for r in _rows(conn, "select * from decision.case_decision where case_id = :c order by decided_at, decision_id", c=case_id)],
+        "actions": [_clean(r) for r in _rows(conn, "select * from decision.case_action where case_id = :c order by created_at, action_id", c=case_id)],
+        "impact": _clean(dict(impact)) if impact else None,
+    }
+
+
+def case_audit(conn: Connection, case_ref: str) -> dict[str, Any] | None:
+    """Everything that happened to a case: evaluations across snapshots, recommendations, decisions, actions, impact, audit events."""
+    case = conn.execute(sa.text("select * from decision.exception_case where case_ref = :r or cast(case_id as text) = :r"), {"r": case_ref}).mappings().first()
+    if case is None:
+        return None
+    evaluations = _rows(conn, """
+        select e.snapshot_id, s.batch_seq, s.transformation_version, e.rule_id, e.rule_version, e.thresholds_version, e.outcome, e.classification, e.cause,
+               e.adverse_exposure, e.potential_exposure, e.confidence, e.computed_at
+        from marts.fact_margin_rule_evaluation e join marts.snapshot s on s.snapshot_id = e.snapshot_id
+        where s.source_instance = :i and e.rule_id = :r and e.subject_type = :t and e.subject_id = :sid order by s.batch_seq""",
+        i=case["source_instance"], r=case["rule_id"], t=case["subject_type"], sid=case["subject_id"])
+    events = _rows(conn, "select sequence, occurred_at, actor, action, correlation_id, payload, prev_hash, event_hash from audit.event"
+                         " where object_type = 'exception_case' and object_id = :r order by sequence", r=case["case_ref"])
+    return {
+        "case": _clean(dict(case)),
+        "evaluations": [_clean(r) for r in evaluations],
+        "recommendations": [_clean(r) for r in _rows(conn, "select * from decision.margin_recommendation where case_id = :c order by version", c=case["case_id"])],
+        **_workflow(conn, case["case_id"]),
+        "lineage": _lineage(conn, case["last_snapshot_id"], case["subject_type"], case["subject_id"]),
+        "audit_events": [_clean(r) for r in events],
+    }
+
+
+def impact_register(conn: Connection, source_instance: str) -> list[dict[str, Any]]:
+    return [_clean(r) for r in _rows(conn, """
+        select c.case_ref, c.subject_ref, c.status, c.cause, c.owner, c.decided_at, c.actioned_at, i.estimated_recovery, i.realised_recovery, i.realised_at,
+               i.realisation_status, i.variance, i.reason, i.realisation_evidence, i.measured_at
+        from decision.case_impact i join decision.exception_case c on c.case_id = i.case_id
+        where c.source_instance = :i order by c.decided_at, c.case_ref""", i=source_instance)]
 
 
 def _drill_down(conn: Connection, snapshot_id: uuid.UUID, subject_type: str, subject_id: int) -> dict[str, Any]:

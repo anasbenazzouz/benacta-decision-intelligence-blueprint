@@ -21,6 +21,8 @@ from sqlalchemy.engine import Connection, Engine
 from app.audit.log import append_event, canonical_json
 from app.margin import kpis, rules
 from app.margin.baseline import PricelistItem, resolve_baseline
+from app.margin.decisions import ensure_recommendation
+from app.margin.impact import measure_impacts
 from app.margin.reference import ReferenceData, read_reference
 from app.margin.rules import (
     Allocation,
@@ -76,6 +78,8 @@ class EngineRun:
     cases_resolved: int = 0
     periods: int = 0
     reference_load: dict[str, Any] | None = None
+    recommendations: dict[str, int] = field(default_factory=dict)
+    impacts: dict[str, int] = field(default_factory=dict)
 
     def summary(self) -> dict[str, Any]:
         by_class: dict[str, int] = defaultdict(int)
@@ -89,6 +93,8 @@ class EngineRun:
             "cases_updated": self.cases_updated,
             "cases_resolved": self.cases_resolved,
             "periods": self.periods,
+            "recommendations": dict(sorted(self.recommendations.items())),
+            "impacts": dict(sorted(self.impacts.items())),
             "thresholds": self.thresholds.stamp,
             "engine_version": ENGINE_VERSION,
         }
@@ -298,7 +304,9 @@ def store_run(conn: Connection, run: EngineRun, *, actor: str = "service:margin-
             values (:s, :rule, :rv, :st, :sid, :sref, :co, :cu, :pr, :so, :od, :pe, :out, :cl, :ca, :et, :cp, :ex, :ac, :ad, :po, :es, :cc,
                 :sev, :conf, :ctl, :mat, :rev, :og, cast(:ev as jsonb), :f, :tv)"""), rows)
     _upsert_cases(conn, run)
+    _ensure_recommendations(conn, run)
     run.periods = _store_periods(conn, run)
+    run.impacts = measure_impacts(conn, s, run.source_instance, freight_codes=run.thresholds.freight_product_codes)
     append_event(conn, actor=actor, action="margin.exceptions_computed", object_type="snapshot", object_id=str(s), run_id=str(s),
                  payload={**run.summary(), "reference_load": run.reference_load})
 
@@ -350,6 +358,23 @@ def _upsert_cases(conn: Connection, run: EngineRun) -> None:
             conn.execute(sa.text("update decision.exception_case set status = 'NO_LONGER_RAISED', resolved_snapshot_id = :s, resolved_note = :n"
                                  " where case_id = :c"), {"s": s, "n": note, "c": case["case_id"]})
         run.cases_resolved = len(stale)
+
+
+def _ensure_recommendations(conn: Connection, run: EngineRun) -> None:
+    """Every open case carries one pending recommendation built from its latest evaluation."""
+    for e in run.evaluations:
+        r = e.result
+        if not r.creates_case:
+            continue
+        case = conn.execute(sa.text("select * from decision.exception_case where source_instance = :i and exception_key = :k"),
+                            {"i": run.source_instance, "k": f"{r.rule_id}:{e.subject_type}:{e.subject_id}"}).mappings().first()
+        if case is None:
+            continue
+        evaluation = {"cause": r.cause, "classification": r.classification, "adverse_exposure": r.adverse_exposure,
+                      "potential_exposure": r.potential_exposure, "exposure_stage": r.exposure_stage, "rule_id": r.rule_id,
+                      "rule_version": r.rule_version, "subject_type": e.subject_type, "subject_id": e.subject_id}
+        outcome = ensure_recommendation(conn, dict(case), evaluation, snapshot_id=run.snapshot_id, thresholds_version=run.thresholds.stamp)
+        run.recommendations[outcome] = run.recommendations.get(outcome, 0) + 1
 
 
 def _store_periods(conn: Connection, run: EngineRun) -> int:

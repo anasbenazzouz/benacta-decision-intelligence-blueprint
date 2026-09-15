@@ -18,8 +18,9 @@ A working reference implementation showing how governed enterprise data moves th
 ---
 
 > **V2 in progress: BENACTA Margin Control.** Next to this V1 blueprint, `apps/api` builds a Finance decision system on
-> Odoo 19 that detects, investigates, decides and acts on gross-margin leakage at transaction level. Milestone 1
-> (governed data, reconciled margin, deterministic exception engine with evidence) runs locally without any credential:
+> Odoo 19 that detects, investigates, decides and acts on gross-margin leakage at transaction level. Milestones 1 and 2
+> (governed data, reconciled margin, deterministic exception engine with evidence, decisions, controlled action, impact,
+> audit) run locally without any credential:
 > `docs/margin_control_demo.md`. Audit and roadmap: `docs/repository_audit.md`, `docs/product_backlog.md`.
 
 ## The problem

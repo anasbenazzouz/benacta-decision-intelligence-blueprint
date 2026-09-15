@@ -2,7 +2,7 @@
 
 Database: BENACTA analytics PostgreSQL (`benacta_analytics`), never the Odoo database. Migrations:
 `apps/api/migrations/versions/0001_foundation.py`, `0002_planning_and_reports.py`, `0003_project_marts.py`,
-`0004_margin_control.py`. Money and quantities are `numeric`, handled as `Decimal` in code, never as floats.
+`0004_margin_control.py`, `0005_decision_workflow.py`. Money and quantities are `numeric`, handled as `Decimal` in code, never as floats.
 
 ## Schemas
 
@@ -13,7 +13,7 @@ Database: BENACTA analytics PostgreSQL (`benacta_analytics`), never the Odoo dat
 | `marts` | Snapshot-scoped dimensions, facts, bridges, data quality, reconciliation | `benacta marts`, `benacta reconcile` |
 | `semantic` | Governed commercial terms (segments, discount policies, derogations, freight contracts, contract prices, cost references) with provenance | `benacta load-policies`, `benacta seed-fixtures` |
 | `planning` | Budget and forecast versions, lines, assignments, assumptions, imports | `benacta seed-fixtures` (step plans), CSV import |
-| `decision` | Exception cases, status reports, investigations, recommendations; later approvals and actions | `benacta exceptions`, `benacta psr --save`, `benacta investigate --save` |
+| `decision` | Exception cases, recommendations, decisions, actions, impact; project status reports and investigations | `benacta exceptions`, `benacta margin-decide`, `benacta margin-act`, `benacta psr --save`, `benacta investigate --save` |
 | `audit` | Append-only hash-chained journal | every command |
 
 ## raw
@@ -107,7 +107,11 @@ Owned by BENACTA (ADR-0004). Odoo has no equivalent for versioned project plans.
 
 | Table | Grain | Notes |
 |---|---|---|
-| `exception_case` | the stable identity of one exception (rule and subject) across snapshots | `case_ref` (`MC-000001`), first and last snapshot, latest classification, cause, severity and exposures; status `NEW` until milestone 2 adds the workflow; `NO_LONGER_RAISED` with `resolved_note` when the newest snapshot stops raising it; never deleted |
+| `exception_case` | the stable identity of one exception (rule and subject) across snapshots | `case_ref` (`MC-000001`), first and last snapshot, latest classification, cause, severity and exposures; workflow status (`NEW`, `OPEN`, `UNDER_REVIEW`, `EVIDENCE_REQUESTED`, `DEFERRED`, `APPROVED`, `REJECTED`, `ACTIONED`, `CLOSED`, `NO_LONGER_RAISED` with `resolved_note`), owner, `version` for optimistic concurrency, estimated recovery, decision and action timestamps; never deleted |
+| `margin_recommendation` | one recommendation version per case | source `DETERMINISTIC_TEMPLATE` or `LLM_DRAFT`, action key, title, rationale, required role, estimated recovery and basis (`BILLING_EXPOSURE`, `NOT_RECEIVABLE`, `UNKNOWN`), expected impact, evidence references, rule and threshold versions, payload hash; superseded when the evidence changes while the case is open |
+| `case_decision` | one human decision, append-only | type, actor and declared roles, status and case version before and after, reason (required to reject, defer, request evidence, reopen), comment, assignee, deferral date |
+| `case_action` | one attempt to execute the approved action, append-only | target system and document, external identifier (one `EXECUTED` row per identifier), request, response, guard report, error |
+| `case_impact` | estimated against realised recovery per approved case | realised only from posted invoice lines dated after the decision; `NOT_MEASURED`, `NOT_MEASURABLE`, `PARTIAL` or `MEASURED`, with the evidence lines and the variance |
 | `project_status_report` | one revision of a project status report per period | content JSON and its hash, plan versions and snapshot used; `DRAFT` or `PUBLISHED`; a published revision is immutable (trigger); publisher differs from preparer; a correction is a new revision |
 | `investigation` | one investigation run | question, mode `DETERMINISTIC_NO_LLM` or `LLM`, status `COMPLETED`, `ABSTAINED` or `FAILED`, full report |
 | `recommendation` | one proposed action of an investigation | `action_key` and version; created `PENDING_REVIEW`, never executed without approval |

@@ -7,9 +7,11 @@ every surface. The API opens the analytics database lazily and never talks to Od
 from __future__ import annotations
 
 import uuid
+from datetime import date
 from functools import lru_cache
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, Header, HTTPException, Query
+from pydantic import BaseModel, Field
 from sqlalchemy.engine import Engine
 
 from app.config import Mode, get_settings
@@ -93,6 +95,85 @@ def margin_case_route(case_ref: str, snapshot: str | None = None) -> dict:
     if case is None:
         raise HTTPException(404, f"no case {case_ref}")
     return case
+
+
+class DecisionBody(BaseModel):
+    decision_type: str = Field(pattern="^(APPROVE|REJECT|REQUEST_EVIDENCE|ASSIGN|DEFER|COMMENT|REOPEN|CLOSE)$")
+    expected_version: int | None = None
+    reason: str | None = None
+    comment: str | None = None
+    assigned_to: str | None = None
+    defer_until: date | None = None
+
+
+class ActionBody(BaseModel):
+    confirm: bool = False
+
+
+def _actor(actor: str | None, roles: str | None):
+    """Pilot identity from headers `X-Benacta-Actor` and `X-Benacta-Roles`; not an authentication system (see docs/security_notes.md)."""
+    from app.margin.decisions import parse_actor
+
+    if not actor:
+        raise HTTPException(401, "X-Benacta-Actor header required")
+    try:
+        return parse_actor(actor, (roles or "").split(","))
+    except ValueError as exc:
+        raise HTTPException(400, f"unknown role: {exc}") from exc
+
+
+@app.post("/api/v1/margin/exceptions/{case_ref}/decisions", status_code=201)
+def margin_decision_route(case_ref: str, body: DecisionBody, x_benacta_actor: str | None = Header(default=None),
+                          x_benacta_roles: str | None = Header(default=None)) -> dict:
+    from app.margin.decisions import DecisionError, decide
+
+    actor = _actor(x_benacta_actor, x_benacta_roles)
+    try:
+        with _engine().begin() as conn:
+            result = decide(conn, actor, case_ref, body.decision_type, expected_version=body.expected_version, reason=body.reason,
+                            comment=body.comment, assigned_to=body.assigned_to, defer_until=body.defer_until)
+    except DecisionError as exc:
+        raise HTTPException(exc.http_status, str(exc)) from exc
+    return {"decision_id": str(result.decision_id), "case_ref": result.case_ref, "decision_type": result.decision_type,
+            "status_before": result.status_before, "status_after": result.status_after, "version": result.version}
+
+
+@app.post("/api/v1/margin/exceptions/{case_ref}/actions")
+def margin_action_route(case_ref: str, body: ActionBody, x_benacta_actor: str | None = Header(default=None),
+                        x_benacta_roles: str | None = Header(default=None)) -> dict:
+    from app.margin.actions import execute_review_activity, plan_review_activity
+    from app.margin.decisions import DecisionError
+
+    actor = _actor(x_benacta_actor, x_benacta_roles)
+    try:
+        with _engine().begin() as conn:
+            plan = plan_review_activity(conn, case_ref)
+            if not body.confirm:
+                return {"status": "DRY_RUN", "case_ref": plan.case_ref, "target_model": plan.target_model, "target_res_id": plan.target_res_id,
+                        "external_id": plan.external_id, "request": plan.vals}
+            result = execute_review_activity(conn, get_settings(), actor, case_ref)
+    except DecisionError as exc:
+        raise HTTPException(exc.http_status, str(exc)) from exc
+    return {"action_id": str(result.action_id), "status": result.status, "detail": result.detail, "response": result.response}
+
+
+@app.get("/api/v1/margin/impact")
+def margin_impact_route() -> list[dict]:
+    from app.margin.service import impact_register
+
+    with _engine().connect() as conn:
+        return impact_register(conn, _instance())
+
+
+@app.get("/api/v1/margin/exceptions/{case_ref}/audit")
+def margin_audit_route(case_ref: str) -> dict:
+    from app.margin.service import case_audit
+
+    with _engine().connect() as conn:
+        audit = case_audit(conn, case_ref)
+    if audit is None:
+        raise HTTPException(404, f"no case {case_ref}")
+    return audit
 
 
 @app.get("/api/v1/margin/rules")

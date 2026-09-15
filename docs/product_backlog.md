@@ -13,7 +13,7 @@ Odoo transaction -> governed analytical data -> reconciled financial metric -> d
 -> controlled action -> audit trail -> realised financial impact
 ```
 
-## Milestone 1: margin truth and deterministic exceptions
+## Milestone 1: margin truth and deterministic exceptions (delivered 2026-09-15)
 
 | # | Item | Done when |
 |---|---|---|
@@ -26,7 +26,7 @@ Odoo transaction -> governed analytical data -> reconciled financial metric -> d
 | 1.7 | CLI `margin-overview`, `margin-exceptions`, `margin-case`, `reconciliation-report`; API `/api/v1/margin/*` and `/api/v1/reconciliation` | same numbers through CLI and API for the same snapshot |
 | 1.8 | Documents: rule and KPI catalogue, reconciliation specification, ground-truth catalogue mapping the 18 scenarios, metric contracts in `semantic/metrics.yml` | catalogue tests pass |
 
-## Milestone 2: decision, action, impact
+## Milestone 2: decision, action, impact (delivered on fixtures 2026-09-15; Odoo execution NOT_VERIFIED)
 
 | # | Item | Done when |
 |---|---|---|

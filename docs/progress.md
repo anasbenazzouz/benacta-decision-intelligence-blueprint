@@ -5,6 +5,56 @@ Status vocabulary: `IMPLEMENTED` (code exists) · `TESTED_LOCAL` (automated test
 real read-only run against the connected Odoo) · `NOT_VERIFIED` · `BLOCKED`.
 A fixture test never proves an Odoo integration. Plan: `docs/implementation_plan.md`.
 
+## Milestone 2: decisions, controlled action and impact (delivered on fixtures)
+
+Every figure below comes from the synthetic dataset `demo_v2`; the Odoo side of the action was exercised against a
+fake JSON-2 transport only. No Odoo write happened; the executor stays `NOT_VERIFIED` against the connected instance.
+
+### Evidence (2026-09-15)
+
+| Command | Result |
+|---|---|
+| `uv run pytest -q` in `apps/api` | 236 passed, 7 skipped (live tests are opt-in) |
+| `uv run pytest -q tests/integration/test_margin_workflow.py` | 8 passed: every case carries one pending recommendation; assign, refused approval by an analyst, stale version refused, approval with impact `NOT_MEASURED`, illegal re-approval refused; decisions append-only (update and delete refused by the database); reject, reopen, request evidence, defer, comment; fixture-mode action `PLANNED` never `EXECUTED`; against a fake Odoo: guard blocked before any write, `EXECUTED` with `mail.activity` and external identifier, duplicate refused before any call, case `ACTIONED`, audit chain valid; realised recovery measured from a complementary invoice posted after the decision (1 000.00, variance 0.00); API `401`, `403`, `404`, `409`, `422`, `201`, dry run and planned action, audit and impact routes |
+| `uv run pytest -q tests/unit/test_margin_decisions.py` | 6 passed: state machine, preconditions refused before any database access, actor parsing, recommendation templates and hashes |
+| `ruff check app tests migrations` | clean |
+| `benacta seed-fixtures` | 11 cases, 11 recommendations `CREATED` (`DETERMINISTIC_TEMPLATE`), impacts none yet |
+| `benacta margin-decide MC-000001 --decision ASSIGN --actor AN-01 --role analyst --assign-to AN-02 --expected-version 1` | `NEW -> OPEN`, version 2 |
+| `... --decision APPROVE --actor AN-01 --role analyst` | refused: requires the finance_approver role |
+| `... --decision APPROVE --actor FIN-01 --role finance_approver --expected-version 1` | refused: case at version 2 |
+| `... --decision APPROVE --actor FIN-01 --role finance_approver --expected-version 2` | `OPEN -> APPROVED`, version 3, estimated recovery 1 000.00 |
+| `benacta margin-decide MC-000007 --decision REJECT --actor FIN-01 --role finance_approver --reason ...` | `NEW -> REJECTED` with the reason recorded |
+| `benacta margin-act MC-000001 --actor FIN-01 --role finance_approver` | dry run: review activity on `sale.order#35`, external id `margin_action__MC-000001__REVIEW_ACTIVITY`, nothing recorded |
+| `benacta margin-act MC-000001 ... --confirm` (fixture mode) | `PLANNED / FIXTURE_MODE`: request recorded, nothing executed, case stays `APPROVED` |
+| `benacta margin-impact` | 1 approved case, estimated 1 000.00, realised `NOT_MEASURED` (no posted document after the decision yet) |
+| `benacta margin-audit MC-000001` | evaluation (rule v1, thresholds demo/v1), recommendation v1 `APPROVED`, decisions ASSIGN and APPROVE with actors and roles, action `PLANNED`, impact, 1 source record version, 4 hash-chained audit events |
+| `benacta margin-overview --period 2026-07` | approved recovery 1 000.00, realised 0.00 (0 of 1 measured), 1 decision, acceptance rate 100 %, detection to decision 0.0 h |
+| V1 suite at repository root | 155 passed (unchanged) |
+
+### Items
+
+| Item | Status | Where |
+|---|---|---|
+| Recommendation per case: deterministic template by cause, estimated recovery only for the billing component, versioned and superseded when the evidence changes, frozen once decided | TESTED_LOCAL | `app/margin/decisions.py`, `decision.margin_recommendation` |
+| Decision state machine: approve, reject, request evidence, assign, defer, comment, reopen, close; reasons required; approver role for approve, reject, close; company scope; optimistic concurrency on the case version; append-only record; audit events | TESTED_LOCAL | `app/margin/decisions.py`, migration `0005_decision_workflow` |
+| Controlled action: review activity (`mail.activity`) on the source document, guarded, idempotent by external identifier, dry run by default, every attempt recorded with the guard report | TESTED_LOCAL (fake Odoo) | `app/margin/actions.py` |
+| Controlled action against the connected Odoo | NOT_VERIFIED | needs `ODOO_WRITES_ENABLED=true` and an attested backup; nothing executed |
+| Impact: estimated at approval, realised only from posted invoice lines dated after the decision, variance, evidence; cost variances `NOT_MEASURABLE` | TESTED_LOCAL | `app/margin/impact.py`, `decision.case_impact` |
+| Overview KPIs: approved and realised recovery, acceptance rate, detection to decision and decision to action times | TESTED_LOCAL | `app/margin/service.py` |
+| Audit view per case: evaluations across snapshots with rule and threshold versions, recommendation versions, decisions, actions, impact, lineage, hash-chained events; JSON export | TESTED_LOCAL | `benacta margin-audit`, `GET /api/v1/margin/exceptions/{case_ref}/audit` |
+| API write routes with pilot identity headers; contracts documented | TESTED_LOCAL | `app/main.py`, `docs/api_contracts.md` |
+| Security and permissions notes | IMPLEMENTED | `docs/security_notes.md` |
+
+### Known limits
+
+- Identity is declared by the caller (command line flags, API headers): enough for maker-checker on a laptop, not
+  authentication (`docs/security_notes.md`).
+- Realised recovery is measured from complementary invoice lines linked to the subject; a correction of the order
+  before invoicing (avoidance) is not yet measured as recovery.
+- The activity is created for the API user; per-owner Odoo users are not mapped.
+- The recommendation is a template per cause; the AI-assisted investigation of milestone 3 will draft richer ones
+  through the same table and approval path.
+
 ## Milestone 1: BENACTA Margin Control, margin truth and deterministic exceptions (delivered on fixtures)
 
 Refocus of 2026-09-15: the active product is BENACTA Margin Control (`docs/repository_audit.md`,

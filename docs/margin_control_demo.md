@@ -1,8 +1,8 @@
 # BENACTA Margin Control: local setup and demonstration script
 
-State on 2026-09-15: milestone 1 delivered (governed data, deterministic rules, evidence, reconciliation report,
-command line and API). Decisions, actions and impact arrive in milestone 2; the AI-assisted investigation and the
-cockpit in milestone 3. Every figure below comes from the synthetic company `demo_v2` (fictional customers,
+State on 2026-09-15: milestones 1 and 2 delivered (governed data, deterministic rules, evidence, reconciliation
+report, decisions, controlled action, impact, audit; command line and API). The AI-assisted investigation and the
+cockpit arrive in milestone 3. Every figure below comes from the synthetic company `demo_v2` (fictional customers,
 products, people and contracts). No Odoo access and no language model are needed.
 
 ## 1. Setup (fixture mode, no credential)
@@ -87,11 +87,46 @@ uv run --project apps/api benacta verify-audit --export
 Point at: source totals against analytical totals, tolerance, timestamps and transformation version; the invoice
 headers against their lines; the audit chain `VALID`.
 
-### Step 5. What comes next
+### Step 5. Decide, as a named person
 
-Milestone 2: approve or refuse the suggested follow-up, assign an owner, create a review activity in Odoo through
-the write guard, and measure the realised recovery from later reconciled documents. Milestone 3: the AI-assisted
-investigation on the same evidence, the cockpit, and the three-year demonstration company.
+```bash
+uv run --project apps/api benacta margin-decide MC-000001 --decision ASSIGN --actor AN-01 --role analyst --assign-to AN-02 --expected-version 1
+uv run --project apps/api benacta margin-decide MC-000001 --decision APPROVE --actor AN-01 --role analyst
+uv run --project apps/api benacta margin-decide MC-000001 --decision APPROVE --actor FIN-01 --role finance_approver --expected-version 2 --comment "recover through a complementary invoice"
+uv run --project apps/api benacta margin-decide MC-000007 --decision REJECT --actor FIN-01 --role finance_approver --reason "policy renewal in progress; discount accepted for this order"
+```
+
+Point at: the analyst can assign but not approve; the approval names the approver and the version it was taken on
+(a stale version is refused); a refusal needs a reason; every decision is appended, never edited.
+
+### Step 6. Act, in a controlled way
+
+```bash
+uv run --project apps/api benacta margin-act MC-000001 --actor FIN-01 --role finance_approver
+uv run --project apps/api benacta margin-act MC-000001 --actor FIN-01 --role finance_approver --confirm
+```
+
+Point at: the dry run shows exactly what would be written (a review activity on the sale order, with the case, the
+rule, the amounts and the reason) and its external identifier. In fixture mode the request is recorded as
+`PLANNED`; on the connected sandbox the same command passes the write guard, creates the activity once, and refuses
+any duplicate.
+
+### Step 7. Track the result
+
+```bash
+uv run --project apps/api benacta margin-impact
+uv run --project apps/api benacta margin-audit MC-000001
+uv run --project apps/api benacta margin-overview --period 2026-07
+```
+
+Point at: estimated recovery against realised recovery, measured only from posted documents after the decision
+(`NOT_MEASURED` until one exists); the audit of the case from the rule version to the approver and the action, every
+event hash-chained; the overview's approved and realised recovery, acceptance rate and cycle times.
+
+### Step 8. What comes next
+
+Milestone 3: the AI-assisted investigation on the same evidence (drafts that follow the same approval path), the
+cockpit, and the three-year demonstration company.
 
 ## 3. What this demonstration does not claim
 
@@ -99,4 +134,7 @@ investigation on the same evidence, the cockpit, and the three-year demonstratio
   against server aggregates), never seeded with these orders; order-level exceptions are `NOT_VERIFIED` against
   Odoo until the sandbox seed runs.
 - Thresholds are demonstration settings, not financial standards.
-- No recovery is measured yet; the overview says `NOT_MEASURED`.
+- Recovery is measured only from posted documents dated after a decision; on the demonstration data it stays
+  `NOT_MEASURED` until such a document exists.
+- The controlled action has never run against the connected Odoo: `NOT_VERIFIED` until the owner enables writes
+  and attests a backup.

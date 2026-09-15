@@ -60,7 +60,7 @@ def test_overview_answers_the_first_cfo_questions(built):
     assert k["gross_margin_pct"] is not None and k["previous_goods_gross_margin_pct"] is not None
     assert Decimal(k["goods_gross_margin"]) == Decimal(k["revenue_goods"]) - Decimal(k["cogs"])
     assert Decimal(k["revenue_goods"]) + Decimal(k["revenue_services"]) == Decimal(k["revenue"])
-    assert isinstance(k["deteriorating"], bool) and k["realised_recovery"] is None and "NOT_MEASURED" in k["recovery_status"]
+    assert isinstance(k["deteriorating"], bool) and k["realised_recovery"] == "0.00" and "NOT_MEASURED" in k["recovery_status"]
     assert overview["waterfall"][0]["step"].startswith("Gross margin") and overview["waterfall"][-1]["step"].startswith("Margin at policy")
     with built["engine"].connect() as conn:
         july = margin_overview(conn, built["snapshot"], "2026-07")
