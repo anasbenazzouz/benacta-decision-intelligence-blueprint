@@ -1,0 +1,1031 @@
+# BENACTA Decision System Lab: PROPOSED CATALOGUE V2.
+#
+# No historical 50-case catalogue exists in the BENACTA repositories or working folders (searched 2026-09-14:
+# the public website lists 6 finance use cases, the finance blueprint PDF a short list). This file is therefore the
+# proposed V2 catalogue, not a restitution of an earlier list. Identifiers are stable from now on.
+#
+# Status: Build (in the implementation plan) · Extend (built on top of a Build case later) · Conference (explained
+# and illustrated, not built) · Hold (not planned). No case is Live without a recorded demonstration and passing tests.
+# ai_role "none" means the case stays deterministic.
+catalogue_version: 2
+statuses: [Build, Extend, Conference, Hold]
+sprints: [S4, S5, S6, S7, A, B, C, D, E, F, later]
+website_use_cases_mapping:
+  financial-close: [46, 47, 48]
+  variance-analysis: [5, 22, 23]
+  cfo-copilot: [25]
+  reconciliation: [31, 48]
+  working-capital: [26, 29, 30]
+  finance-reporting: [21, 49]
+
+use_cases:
+  # ------------------------------------------------------------------ A. Margin and financial performance
+  - id: UC01
+    domain: margin
+    title: Unauthorised discount detection
+    problem: Discounts above the applicable policy erode margin without approval
+    persona: Sales finance controller
+    decision: Recover, accept with derogation or change the policy
+    cadence: daily
+    source: Odoo sale and invoice lines, discount policies
+    grain: sale order line
+    metrics: [price_exposure, billing_leakage]
+    deterministic_logic: discount above the valid cap without a valid derogation
+    ai_role: explain the context from policy clauses; never decide compliance
+    evidence: order line, invoice line, policy clause, derogation register
+    approval: finance_approver
+    action: review activity in Odoo, draft complementary invoice
+    outcome_kpi: realised recovery on reconciled documents
+    dependencies: [UC48]
+    status: Build
+    sprint: S4
+    acceptance_test: golden DISC-001 gives 1000.00 EUR; approved derogation not flagged
+  - id: UC02
+    domain: margin
+    title: Contract, order and invoice price mismatches
+    problem: The price billed differs from the contracted or ordered price
+    persona: Sales finance controller
+    decision: Correct the invoice or confirm the contractual change
+    cadence: daily
+    source: contract price list, Odoo order and invoice lines
+    grain: invoice line linked to order line
+    metrics: [price_exposure]
+    deterministic_logic: unit price difference beyond rounding on linked lines, weighted by bridge
+    ai_role: none
+    evidence: price list item, order line, invoice line
+    approval: finance_approver
+    action: review activity, draft correction
+    outcome_kpi: mismatches closed within 30 days
+    dependencies: [UC48]
+    status: Build
+    sprint: S4
+    acceptance_test: many-to-many linked lines never double counted
+  - id: UC03
+    domain: margin
+    title: Rebillable freight omitted
+    problem: Contractual freight is not invoiced after delivery
+    persona: Billing controller
+    decision: Invoice freight or confirm a waiver
+    cadence: weekly
+    source: delivery, contract terms, invoice lines
+    grain: sale order
+    metrics: [billing_leakage]
+    deterministic_logic: full delivery and full invoicing without a freight line under a rebill clause
+    ai_role: cite the contract clause
+    evidence: delivery, invoices, contract clause
+    approval: finance_approver
+    action: draft complementary invoice
+    outcome_kpi: freight recovered
+    dependencies: []
+    status: Build
+    sprint: S4
+    acceptance_test: golden FREIGHT-001 gives 250.00 EUR; partial delivery not due
+  - id: UC04
+    domain: margin
+    title: Purchase cost drift and attributable margin impact
+    problem: Realised cost exceeds the reference cost on delivered goods
+    persona: Product controller
+    decision: Renegotiate, reprice or accept
+    cadence: monthly
+    source: receipts, valued stock moves, reference costs
+    grain: sale order line
+    metrics: [cost_variance]
+    deterministic_logic: FIFO-attributed unit cost vs frozen reference; UNDETERMINED without attribution
+    ai_role: summarise supplier context
+    evidence: receipt, delivery move, allocation rows
+    approval: finance_approver
+    action: supplier review task
+    outcome_kpi: variance trend after action
+    dependencies: [UC31]
+    status: Build
+    sprint: S4
+    acceptance_test: golden COST-001 gives 800.00 EUR; missing cost stays UNDETERMINED
+  - id: UC05
+    domain: margin
+    title: Margin variation investigation with calculated decomposition
+    problem: Management asks why margin moved between two periods
+    persona: CFO
+    decision: Which driver to act on
+    cadence: monthly
+    source: marts margin facts
+    grain: company, BU, period
+    metrics: [gross_margin_amount, gross_margin_pct]
+    deterministic_logic: price, volume, mix and cost bridge with explicit residual
+    ai_role: draft the narrative from the computed bridge with citations
+    evidence: bridge rows, underlying transactions
+    approval: CFO
+    action: decision log entry
+    outcome_kpi: share of variance explained without residual
+    dependencies: [UC01, UC04]
+    status: Build
+    sprint: S5
+    acceptance_test: bridge components sum to the total variance
+  # ------------------------------------------------------------------ B. Project controlling and PSR
+  - id: UC06
+    domain: project_controlling
+    title: Versioned project status report with evidence
+    problem: Status reports are static documents without history or traceable figures
+    persona: Project controller, project manager
+    decision: Publish the period status and its actions
+    cadence: monthly
+    source: marts project facts, planning versions, milestones
+    grain: project, reporting period
+    metrics: [approved_budget, actual_cost, open_commitments, ETC, EAC, forecast_margin_amount, billed_amount, collected_amount, overdue_amount]
+    deterministic_logic: all figures from metric contracts at a cutoff and snapshot
+    ai_role: draft commentary from computed facts; human validates
+    evidence: metric values with snapshot, versions, transactions
+    approval: project manager or finance approver (maker-checker)
+    action: publish immutable PSR
+    outcome_kpi: PSR published on time, no retroactive change
+    dependencies: [UC41, UC42]
+    status: Build
+    sprint: D
+    acceptance_test: published PSR unchanged after new data; figures equal metric service
+  - id: UC07
+    domain: project_controlling
+    title: Forecast budget overrun detection
+    problem: Estimate at completion exceeds the approved budget
+    persona: Project controller
+    decision: Recovery plan, change order or budget revision
+    cadence: monthly
+    source: planning versions, marts
+    grain: project, cutoff
+    metrics: [EAC, approved_budget, cost_variance_at_completion]
+    deterministic_logic: EAC - approved budget above materiality
+    ai_role: explain drivers from decomposition
+    evidence: forecast lines, commitments, actuals
+    approval: finance_approver
+    action: recovery plan task
+    outcome_kpi: overrun reduced at next forecast
+    dependencies: [UC08]
+    status: Build
+    sprint: C
+    acceptance_test: variance sign unfavourable when EAC above budget
+  - id: UC08
+    domain: project_controlling
+    title: ETC and EAC reforecast with explanation of changes
+    problem: New forecasts change EAC without a traceable reason
+    persona: Project controller
+    decision: Approve the forecast
+    cadence: monthly
+    source: planning versions, actuals, commitments
+    grain: project, work package, cost category
+    metrics: [ETC, EAC]
+    deterministic_logic: EAC = actual cost to cutoff + ETC after cutoff; ETC covers open commitments
+    ai_role: summarise assumption changes
+    evidence: version diff, assumptions, commitments
+    approval: finance_approver
+    action: approve and lock forecast
+    outcome_kpi: forecasts approved with explained deltas
+    dependencies: [UC41]
+    status: Build
+    sprint: C
+    acceptance_test: commitment already in ETC not added twice
+  - id: UC09
+    domain: project_controlling
+    title: Margin at completion erosion
+    problem: Forecast margin at completion decreases between forecasts
+    persona: Project director, CFO
+    decision: Act on cost, scope or claims
+    cadence: monthly
+    source: planning versions, marts, milestones
+    grain: project, forecast version pair
+    metrics: [forecast_margin_amount, forecast_margin_pct]
+    deterministic_logic: previous locked forecast margin - current forecast margin above threshold, decomposed by revenue and cost category
+    ai_role: investigate with evidence and abstain when unsupported
+    evidence: version lines, timesheets, purchase lines, assumptions
+    approval: finance_approver
+    action: recommendation reviewed, action tracked
+    outcome_kpi: erosion recovered or explained
+    dependencies: [UC08, UC06]
+    status: Build
+    sprint: D
+    acceptance_test: golden MARGIN-EROSION-001 decomposition sums to the erosion
+  - id: UC10
+    domain: project_controlling
+    title: Unapproved or unbilled change orders
+    problem: Scope changes are executed without approval or billing
+    persona: Project manager
+    decision: Chase approval or stop work
+    cadence: weekly
+    source: Odoo quotations on projects, timesheets, invoices
+    grain: change order
+    metrics: [pending_change_order_amount]
+    deterministic_logic: quotation not confirmed with costs booked on its work package; confirmed but not billed after milestone
+    ai_role: none
+    evidence: quotation, timesheets, milestone
+    approval: project director
+    action: client follow-up task
+    outcome_kpi: pending change order value
+    dependencies: [UC06]
+    status: Build
+    sprint: D
+    acceptance_test: pending change order only in PENDING_CO scenario
+  # ------------------------------------------------------------------ C. Resources and capacity
+  - id: UC11
+    domain: resources
+    title: Load versus capacity by team, role and period
+    problem: Managers cannot see where demand exceeds capacity
+    persona: Resource coordinator
+    decision: Rebalance staffing
+    cadence: weekly
+    source: planning hours, employees, calendars
+    grain: resource, month
+    metrics: [planned_hours, available_capacity]
+    deterministic_logic: planned hours / capacity by resource and rollups
+    ai_role: none
+    evidence: plan lines, calendar
+    approval: department head
+    action: staffing change request
+    outcome_kpi: months above 110 percent load
+    dependencies: [UC44]
+    status: Build
+    sprint: E
+    acceptance_test: team load equals sum of members
+  - id: UC12
+    domain: resources
+    title: Over-allocated resources
+    problem: People are planned beyond capacity
+    persona: Resource coordinator
+    decision: Reassign or delay work
+    cadence: weekly
+    source: planning hours, capacity
+    grain: resource, month
+    metrics: [planned_hours, available_capacity]
+    deterministic_logic: planned hours above capacity by more than threshold
+    ai_role: none
+    evidence: assignments by project
+    approval: department head
+    action: reassignment task
+    outcome_kpi: over-allocations resolved
+    dependencies: [UC11]
+    status: Build
+    sprint: E
+    acceptance_test: resource at 120 percent flagged, at 100 percent not
+  - id: UC13
+    domain: resources
+    title: Under-load and reassignable capacity
+    problem: Available hours are not used
+    persona: Department head
+    decision: Assign to backlog or proposals
+    cadence: monthly
+    source: planning hours, capacity, timesheets
+    grain: resource, month
+    metrics: [available_capacity, actual_hours]
+    deterministic_logic: capacity minus planned hours above threshold
+    ai_role: none
+    evidence: plan and timesheets
+    approval: department head
+    action: assignment proposal
+    outcome_kpi: chargeable ratio
+    dependencies: [UC11]
+    status: Extend
+    sprint: E
+    acceptance_test: bench hours equal capacity minus planned
+  - id: UC14
+    domain: resources
+    title: Planned versus consumed hours
+    problem: Hours drift from plan without early warning
+    persona: Project manager
+    decision: Correct the plan or the execution
+    cadence: weekly
+    source: planning versions, timesheets
+    grain: project, work package, month
+    metrics: [planned_hours, actual_hours]
+    deterministic_logic: actual minus planned hours to cutoff by version
+    ai_role: none
+    evidence: timesheet lines
+    approval: project manager
+    action: reforecast request
+    outcome_kpi: hours variance at completion
+    dependencies: [UC08]
+    status: Build
+    sprint: E
+    acceptance_test: hours overrun scenario visible in PSR and resource view with equal values
+  - id: UC15
+    domain: resources
+    title: Assignment simulation by skill, availability and cost
+    problem: Staffing choices ignore cost and skills
+    persona: Resource coordinator
+    decision: Choose an assignment
+    cadence: on demand
+    source: skills, capacity, rates
+    grain: resource, work package
+    metrics: [planned_cost, available_capacity]
+    deterministic_logic: filter by skill and availability, rank by cost
+    ai_role: explain trade-offs of the ranked options
+    evidence: skills, capacity, rates
+    approval: department head
+    action: scenario saved as draft version
+    outcome_kpi: adoption of proposed assignments
+    dependencies: [UC11, UC44]
+    status: Extend
+    sprint: later
+    acceptance_test: simulation never alters an approved version
+  # ------------------------------------------------------------------ D. Project execution
+  - id: UC16
+    domain: execution
+    title: Late milestones and billing and cash impact
+    problem: Milestone slippage delays invoicing and cash
+    persona: Project manager, treasury
+    decision: Recover the milestone or renegotiate billing
+    cadence: weekly
+    source: Odoo milestones, planned billing, invoices
+    grain: milestone
+    metrics: [delayed_billing_amount, planned_billing]
+    deterministic_logic: deadline before cutoff and not reached; billing shifted to forecast date
+    ai_role: none
+    evidence: milestone, sale order line, forecast billing lines
+    approval: project director
+    action: recovery task
+    outcome_kpi: days of billing delay
+    dependencies: [UC06]
+    status: Build
+    sprint: D
+    acceptance_test: delayed milestone shifts billing and cash in the same amounts
+  - id: UC17
+    domain: execution
+    title: Blocked tasks and dependencies
+    problem: Blocked tasks stall downstream work
+    persona: Project manager
+    decision: Unblock or resequence
+    cadence: weekly
+    source: Odoo tasks and dependencies
+    grain: task
+    metrics: [blocked_task_count]
+    deterministic_logic: tasks with unfinished predecessors past planned start
+    ai_role: none
+    evidence: task graph
+    approval: project manager
+    action: task update
+    outcome_kpi: blocked task count
+    dependencies: []
+    status: Hold
+    sprint: later
+    acceptance_test: dependency cycle detected
+  - id: UC18
+    domain: execution
+    title: Declared progress versus evidence
+    problem: Declared physical progress contradicts costs, hours or milestones
+    persona: Project controller
+    decision: Challenge the declaration
+    cadence: monthly
+    source: progress declarations, cost consumption, milestones
+    grain: project, work package
+    metrics: [physical_progress_pct, cost_consumption_ratio]
+    deterministic_logic: declared progress outside a band around evidence ratios; flagged, never replaced
+    ai_role: formulate questions to the project manager
+    evidence: declaration, milestones, costs
+    approval: project controller
+    action: clarification request
+    outcome_kpi: unresolved inconsistencies
+    dependencies: [UC06]
+    status: Build
+    sprint: D
+    acceptance_test: cost ratio never overwrites declared progress
+  - id: UC19
+    domain: execution
+    title: Uncovered scope creep
+    problem: Work outside contract scope is executed without a change order
+    persona: Project director
+    decision: Issue a change order or absorb
+    cadence: monthly
+    source: timesheets on out-of-scope work packages, quotations
+    grain: work package
+    metrics: [out_of_scope_cost]
+    deterministic_logic: costs on work packages flagged out of scope without confirmed change order
+    ai_role: summarise evidence for negotiation
+    evidence: timesheets, work package definition
+    approval: project director
+    action: change order draft in Odoo
+    outcome_kpi: out-of-scope cost recovered
+    dependencies: [UC10]
+    status: Extend
+    sprint: later
+    acceptance_test: confirmed change order clears the flag
+  - id: UC20
+    domain: execution
+    title: Portfolio risk and action prioritisation
+    problem: Risks and actions are not ranked by impact
+    persona: Operations director
+    decision: Where to intervene first
+    cadence: monthly
+    source: risk registers, exposures, open actions
+    grain: portfolio
+    metrics: [risk_exposure]
+    deterministic_logic: exposure = threats - opportunities vs contingency, ranked
+    ai_role: none
+    evidence: risk entries
+    approval: operations director
+    action: action owner assignment
+    outcome_kpi: exposure above contingency
+    dependencies: [UC06]
+    status: Extend
+    sprint: later
+    acceptance_test: ranking stable for equal inputs
+  # ------------------------------------------------------------------ E. Operations controlling and flash
+  - id: UC21
+    domain: operations_controlling
+    title: Periodic flash report by business unit
+    problem: Monthly flash is assembled by hand
+    persona: Head of operations controlling
+    decision: Validate the month and its commentary
+    cadence: monthly
+    source: marts, locked planning versions
+    grain: BU, period
+    metrics: [revenue, project_gross_margin, pgm_ratio, to_go]
+    deterministic_logic: month, YTD, full-year columns from the same facts as PSRs
+    ai_role: draft commentary; owner validates
+    evidence: BU rollups, versions
+    approval: finance_approver
+    action: publish flash
+    outcome_kpi: flash published by working day 3
+    dependencies: [UC06, UC42]
+    status: Build
+    sprint: E
+    acceptance_test: BU flash equals sum of project PSR values
+  - id: UC22
+    domain: operations_controlling
+    title: Actual versus budget versus forecast
+    problem: Variances are not comparable across versions
+    persona: FP&A analyst
+    decision: Explain or reforecast
+    cadence: monthly
+    source: marts, planning
+    grain: BU, project, cost category, period
+    metrics: [actual_cost, approved_budget, EAC]
+    deterministic_logic: declared sign conventions per contract
+    ai_role: none
+    evidence: version lines, actuals
+    approval: none
+    action: none
+    outcome_kpi: variances explained
+    dependencies: [UC21]
+    status: Build
+    sprint: E
+    acceptance_test: favourable direction follows contract, not the sign
+  - id: UC23
+    domain: operations_controlling
+    title: Explanation of changes between two forecasts
+    problem: Forecast changes lack drivers
+    persona: FP&A analyst
+    decision: Accept the forecast
+    cadence: monthly
+    source: planning versions
+    grain: project, cost category
+    metrics: [EAC, forecast_margin_amount]
+    deterministic_logic: version diff by dimension with residual
+    ai_role: summarise assumption notes
+    evidence: version lines, assumptions
+    approval: finance_approver
+    action: approve forecast
+    outcome_kpi: residual share
+    dependencies: [UC08]
+    status: Build
+    sprint: C
+    acceptance_test: diff components sum to total change
+  - id: UC24
+    domain: operations_controlling
+    title: Executive queue of material portfolio exceptions
+    problem: Executives see lists, not priorities
+    persona: CFO, operations director
+    decision: What to review this week
+    cadence: weekly
+    source: exceptions
+    grain: exception
+    metrics: [adverse_exposure]
+    deterministic_logic: materiality, severity and status ordering without double counting
+    ai_role: none
+    evidence: exception evidence bundles
+    approval: none
+    action: assign owner
+    outcome_kpi: exceptions older than 30 days
+    dependencies: [UC09, UC07]
+    status: Build
+    sprint: E
+    acceptance_test: overlapping exceptions counted once in totals
+  - id: UC25
+    domain: operations_controlling
+    title: Sourced monthly performance commentary
+    problem: Commentary is written from memory
+    persona: Head of operations controlling
+    decision: Validate commentary
+    cadence: monthly
+    source: computed facts, validated PSR comments
+    grain: BU, period
+    metrics: []
+    deterministic_logic: none beyond referenced facts
+    ai_role: draft with numeric claim references; abstain on missing evidence
+    evidence: metric references, PSR comments
+    approval: finance_approver
+    action: publish validated commentary
+    outcome_kpi: claims with valid references
+    dependencies: [UC21]
+    status: Extend
+    sprint: S5
+    acceptance_test: every amount in the draft maps to a computed value
+  # ------------------------------------------------------------------ F. Receivables and treasury
+  - id: UC26
+    domain: treasury
+    title: Receivables ageing and overdue identification
+    problem: Overdues are reported late from spreadsheets
+    persona: Treasury, project manager
+    decision: Who to chase
+    cadence: monthly
+    source: Odoo invoices, due dates, residuals
+    grain: invoice
+    metrics: [overdue_amount, not_yet_due_amount, overdue_share]
+    deterministic_logic: residual with due date before cutoff, ageing buckets
+    ai_role: none
+    evidence: invoice, payments
+    approval: none
+    action: collection task
+    outcome_kpi: overdue share
+    dependencies: []
+    status: Build
+    sprint: F
+    acceptance_test: partially paid invoice counts its residual only
+  - id: UC27
+    domain: treasury
+    title: Collection prioritisation with explicit reasons
+    problem: Collection effort is not ranked
+    persona: Treasury
+    decision: Order of follow-up
+    cadence: weekly
+    source: ageing, dispute flags, project status
+    grain: customer
+    metrics: [overdue_amount]
+    deterministic_logic: score from amount, age, dispute, milestone status with visible reasons
+    ai_role: draft reminder rationale
+    evidence: invoices, disputes
+    approval: treasury lead
+    action: reminder task
+    outcome_kpi: days sales outstanding
+    dependencies: [UC26]
+    status: Extend
+    sprint: F
+    acceptance_test: disputed invoice ranked with reason shown
+  - id: UC28
+    domain: treasury
+    title: Disputes and collection blockers
+    problem: Unpaid invoices hide operational disputes
+    persona: Project manager, treasury
+    decision: Resolve dispute or escalate
+    cadence: monthly
+    source: dispute register, milestones, invoices
+    grain: invoice
+    metrics: [disputed_amount]
+    deterministic_logic: flagged invoices with linked milestone status
+    ai_role: summarise dispute history with citations
+    evidence: dispute notes, milestone
+    approval: project director
+    action: resolution task
+    outcome_kpi: disputed amount
+    dependencies: [UC26]
+    status: Extend
+    sprint: F
+    acceptance_test: dispute flag changes status never amounts
+  - id: UC29
+    domain: treasury
+    title: Collection forecast from due dates and assumptions
+    problem: Cash-in forecasts ignore payment behaviour
+    persona: Treasury
+    decision: Funding and follow-up
+    cadence: weekly
+    source: open invoices, planned billing, payment delay assumptions
+    grain: customer, week
+    metrics: [planned_cash_collection]
+    deterministic_logic: due date plus observed delay; planned billing plus terms
+    ai_role: none
+    evidence: invoices, plan lines
+    approval: treasury lead
+    action: forecast version
+    outcome_kpi: forecast accuracy
+    dependencies: [UC26, UC42]
+    status: Extend
+    sprint: F
+    acceptance_test: delayed milestone moves collection week
+  - id: UC30
+    domain: treasury
+    title: Thirteen-week cash projection and scenarios
+    problem: Cash position surprises management
+    persona: CFO, treasury
+    decision: Funding actions
+    cadence: weekly
+    source: collections, disbursements, commitments
+    grain: company, week
+    metrics: [cash_position_forecast]
+    deterministic_logic: opening cash plus scheduled flows by scenario
+    ai_role: none
+    evidence: flows by source
+    approval: CFO
+    action: scenario decision
+    outcome_kpi: forecast error at 4 weeks
+    dependencies: [UC29]
+    status: Conference
+    sprint: later
+    acceptance_test: scenario totals reconcile to flows
+  # ------------------------------------------------------------------ G. Purchasing and suppliers
+  - id: UC31
+    domain: purchasing
+    title: Order, receipt and vendor bill matching
+    problem: Bills paid without matching receipts
+    persona: Accounts payable controller
+    decision: Block or release payment
+    cadence: daily
+    source: purchase lines, receipts, vendor bills
+    grain: purchase order line
+    metrics: [unmatched_amount]
+    deterministic_logic: billed quantity above received quantity beyond tolerance
+    ai_role: none
+    evidence: lines and receipts
+    approval: ap_approver
+    action: hold task
+    outcome_kpi: unmatched bills
+    dependencies: []
+    status: Extend
+    sprint: later
+    acceptance_test: service lines with manual receipt handled
+  - id: UC32
+    domain: purchasing
+    title: Potentially duplicated vendor bills
+    problem: The same bill is posted twice
+    persona: Accounts payable controller
+    decision: Reverse or confirm
+    cadence: daily
+    source: vendor bills
+    grain: vendor bill
+    metrics: [duplicate_candidate_amount]
+    deterministic_logic: same supplier, amount and reference within window
+    ai_role: none
+    evidence: bill pairs
+    approval: ap_approver
+    action: review task
+    outcome_kpi: duplicates prevented
+    dependencies: []
+    status: Extend
+    sprint: later
+    acceptance_test: credit note pair not flagged
+  - id: UC33
+    domain: purchasing
+    title: Supplier delays affecting projects
+    problem: Late deliveries delay milestones
+    persona: Procurement manager
+    decision: Expedite or replan
+    cadence: weekly
+    source: purchase lines, receipts, milestones
+    grain: purchase order line
+    metrics: [late_receipt_count]
+    deterministic_logic: planned date before cutoff without receipt, linked work package milestone
+    ai_role: none
+    evidence: purchase line, milestone
+    approval: procurement manager
+    action: expedite task
+    outcome_kpi: late receipts
+    dependencies: [UC16]
+    status: Hold
+    sprint: later
+    acceptance_test: received line not flagged
+  - id: UC34
+    domain: purchasing
+    title: Stale or inconsistent purchase commitments
+    problem: Open commitments no longer reflect the plan
+    persona: Project controller
+    decision: Close or reforecast commitments
+    cadence: monthly
+    source: purchase lines, forecast versions
+    grain: purchase order line
+    metrics: [open_commitments]
+    deterministic_logic: open lines without activity beyond age, or above ETC of their work package
+    ai_role: none
+    evidence: purchase lines, forecast lines
+    approval: project controller
+    action: closure request
+    outcome_kpi: stale commitment value
+    dependencies: [UC08]
+    status: Extend
+    sprint: C
+    acceptance_test: ETC below commitments flagged per work package
+  - id: UC35
+    domain: purchasing
+    title: Supplier concentration on critical projects
+    problem: Critical projects depend on one supplier
+    persona: Procurement manager
+    decision: Qualify alternatives
+    cadence: quarterly
+    source: purchase lines by project
+    grain: project, supplier
+    metrics: [supplier_share]
+    deterministic_logic: share of committed spend by supplier
+    ai_role: none
+    evidence: purchase lines
+    approval: none
+    action: sourcing task
+    outcome_kpi: concentration index
+    dependencies: []
+    status: Conference
+    sprint: later
+    acceptance_test: shares sum to 100 percent
+  # ------------------------------------------------------------------ H. Stock and logistics
+  - id: UC36
+    domain: stock
+    title: Dormant stock
+    problem: Inventory without movement ties up cash
+    persona: Supply chain controller
+    decision: Scrap, sell or reallocate
+    cadence: monthly
+    source: stock moves
+    grain: product
+    metrics: [dormant_stock_value]
+    deterministic_logic: no outgoing move beyond threshold days
+    ai_role: none
+    evidence: moves
+    approval: none
+    action: review task
+    outcome_kpi: dormant value
+    dependencies: []
+    status: Hold
+    sprint: later
+    acceptance_test: threshold boundary tested
+  - id: UC37
+    domain: stock
+    title: Stock-out risk affecting project execution
+    problem: Missing components stop site work
+    persona: Project manager
+    decision: Expedite supply
+    cadence: weekly
+    source: stock, reservations, plans
+    grain: product, project
+    metrics: [shortage_quantity]
+    deterministic_logic: planned consumption above available and incoming
+    ai_role: none
+    evidence: stock and plans
+    approval: none
+    action: purchase request
+    outcome_kpi: shortages
+    dependencies: []
+    status: Hold
+    sprint: later
+    acceptance_test: incoming receipt reduces shortage
+  - id: UC38
+    domain: stock
+    title: Overstock and reallocation between projects
+    problem: Surplus on one project while another buys
+    persona: Supply chain controller
+    decision: Transfer stock
+    cadence: monthly
+    source: project stock
+    grain: product
+    metrics: [surplus_value]
+    deterministic_logic: surplus vs other project demand
+    ai_role: none
+    evidence: stock and demand
+    approval: none
+    action: transfer proposal
+    outcome_kpi: avoided purchases
+    dependencies: []
+    status: Hold
+    sprint: later
+    acceptance_test: transfer never below reserved quantity
+  - id: UC39
+    domain: stock
+    title: Lead time deviations and planning impact
+    problem: Supplier lead times drift
+    persona: Procurement manager
+    decision: Update planning lead times
+    cadence: quarterly
+    source: purchase lines, receipts
+    grain: supplier, product
+    metrics: [lead_time_days]
+    deterministic_logic: actual vs planned lead time distribution
+    ai_role: none
+    evidence: lines
+    approval: none
+    action: parameter update
+    outcome_kpi: lead time error
+    dependencies: []
+    status: Hold
+    sprint: later
+    acceptance_test: median computed on received lines only
+  - id: UC40
+    domain: stock
+    title: Logistics cost by project or customer
+    problem: Freight cost is not attributed
+    persona: Controller
+    decision: Pricing of logistics
+    cadence: quarterly
+    source: freight bills, deliveries
+    grain: project, customer
+    metrics: [logistics_cost]
+    deterministic_logic: attribution by delivery allocation key
+    ai_role: none
+    evidence: bills and deliveries
+    approval: none
+    action: none
+    outcome_kpi: attributed share
+    dependencies: [UC03]
+    status: Conference
+    sprint: later
+    acceptance_test: allocations sum to bill amount
+  # ------------------------------------------------------------------ I. EPM and planning
+  - id: UC41
+    domain: planning
+    title: Project budget construction and approval
+    problem: Budgets live in spreadsheets without approval trail
+    persona: Project controller, finance approver
+    decision: Approve the baseline
+    cadence: per project and revision
+    source: planning import, rates, Odoo contract
+    grain: project, work package, cost category, resource or role, period
+    metrics: [planned_cost, planned_hours, planned_revenue]
+    deterministic_logic: staging validation, totals check, maker-checker, lock
+    ai_role: none
+    evidence: import file hash, validation report
+    approval: finance_approver
+    action: lock version
+    outcome_kpi: budgets approved before project start
+    dependencies: []
+    status: Build
+    sprint: C
+    acceptance_test: locked version rejects edits; empty cell never zero
+  - id: UC42
+    domain: planning
+    title: Rolling forecast of costs, revenue and margin
+    problem: Forecasts are not comparable month to month
+    persona: Project controller
+    decision: Approve the monthly forecast
+    cadence: monthly
+    source: planning versions, actuals
+    grain: project, period
+    metrics: [ETC, EAC, forecast_margin_amount]
+    deterministic_logic: forecast version per cutoff referencing previous version
+    ai_role: none
+    evidence: version lineage
+    approval: finance_approver
+    action: lock forecast
+    outcome_kpi: forecast submitted by cutoff plus 5 days
+    dependencies: [UC41]
+    status: Build
+    sprint: C
+    acceptance_test: revision creates a new version with parent reference
+  - id: UC43
+    domain: planning
+    title: Price, cost and delay sensitivity scenarios
+    problem: Decisions ignore downside cases
+    persona: Project director
+    decision: Mitigation choice
+    cadence: quarterly
+    source: forecast versions
+    grain: project, scenario
+    metrics: [forecast_margin_amount]
+    deterministic_logic: scenario versions BASE, FAVOURABLE, UNFAVOURABLE derived from base with declared drivers
+    ai_role: explain scenario drivers
+    evidence: scenario assumptions
+    approval: project director
+    action: decision log
+    outcome_kpi: none
+    dependencies: [UC42]
+    status: Extend
+    sprint: C
+    acceptance_test: scenarios never replace the base forecast
+  - id: UC44
+    domain: planning
+    title: Workforce and resource cost planning
+    problem: Staffing plans are disconnected from cost
+    persona: Department head
+    decision: Hiring and subcontracting
+    cadence: quarterly
+    source: planning hours, rates, capacity
+    grain: department, role, month
+    metrics: [planned_hours, planned_cost, available_capacity]
+    deterministic_logic: hours x rate by role; capacity gap
+    ai_role: none
+    evidence: plan lines
+    approval: finance_approver
+    action: headcount request
+    outcome_kpi: capacity gap
+    dependencies: [UC11]
+    status: Extend
+    sprint: E
+    acceptance_test: planned cost equals hours x rate where both are given
+  - id: UC45
+    domain: planning
+    title: Portfolio arbitration under cash and capacity constraints
+    problem: Too many projects for the available cash and people
+    persona: Executive committee
+    decision: Which projects to accelerate or defer
+    cadence: quarterly
+    source: portfolio forecasts, capacity, cash
+    grain: portfolio, scenario
+    metrics: [forecast_margin_amount, available_capacity, cash_position_forecast]
+    deterministic_logic: constraint check of scenario combinations
+    ai_role: explain trade-offs
+    evidence: scenarios
+    approval: executive committee
+    action: decision log
+    outcome_kpi: none
+    dependencies: [UC43, UC30]
+    status: Conference
+    sprint: later
+    acceptance_test: infeasible combinations rejected
+  # ------------------------------------------------------------------ J. Close and cross-cutting controls
+  - id: UC46
+    domain: controls
+    title: Cost and time completeness before reporting
+    problem: Reports are published with missing timesheets or bills
+    persona: Project controller
+    decision: Delay publication or estimate
+    cadence: monthly
+    source: timesheets, calendars, purchase receipts
+    grain: resource and project, period
+    metrics: [missing_timesheet_hours]
+    deterministic_logic: working days without timesheet; receipts without bill; missing forecast
+    ai_role: none
+    evidence: calendar and records
+    approval: project controller
+    action: completion request
+    outcome_kpi: PSRs published with complete data
+    dependencies: []
+    status: Build
+    sprint: D
+    acceptance_test: missing data yields UNKNOWN, never zero
+  - id: UC47
+    domain: controls
+    title: Receipts and services to review for accruals
+    problem: Received but unbilled costs are forgotten at close
+    persona: Accountant
+    decision: Book accruals
+    cadence: monthly
+    source: purchase lines received not billed
+    grain: purchase order line
+    metrics: [received_not_billed_amount]
+    deterministic_logic: received quantity minus billed quantity valued at order price
+    ai_role: none
+    evidence: receipts
+    approval: accounting manager
+    action: accrual review list
+    outcome_kpi: accrual adjustments
+    dependencies: []
+    status: Extend
+    sprint: C
+    acceptance_test: service lines without receipt method flagged as not measurable
+  - id: UC48
+    domain: controls
+    title: ERP versus analytical facts reconciliation
+    problem: Reports do not tie back to the ledger
+    persona: Controller
+    decision: Trust or block a report
+    cadence: each ingestion
+    source: marts, server aggregates
+    grain: company, check, month
+    metrics: [reconciliation_status]
+    deterministic_logic: control totals with explicit independence
+    ai_role: none
+    evidence: reconciliation rows
+    approval: none
+    action: block publication on UNRECONCILED
+    outcome_kpi: months reconciled
+    dependencies: []
+    status: Build
+    sprint: S7
+    acceptance_test: live revenue reconciled against server aggregates (verified read-only)
+  - id: UC49
+    domain: controls
+    title: Consistency between PSR, flash report and forecast
+    problem: The same number differs across reports
+    persona: Head of operations controlling
+    decision: Publish or correct
+    cadence: monthly
+    source: PSRs, flash, planning versions
+    grain: project, BU, period
+    metrics: [EAC, forecast_margin_amount, billed_amount]
+    deterministic_logic: same metric id, snapshot and version give equal values; differences listed
+    ai_role: none
+    evidence: metric references
+    approval: finance_approver
+    action: correction task
+    outcome_kpi: inconsistencies at publication
+    dependencies: [UC06, UC21]
+    status: Build
+    sprint: F
+    acceptance_test: PSR, flash and resource views return identical values
+  - id: UC50
+    domain: controls
+    title: Decisions, actions and measured financial outcomes
+    problem: Decisions are not followed to their results
+    persona: CFO
+    decision: Close or reopen decisions
+    cadence: monthly
+    source: decision memory, reconciled documents
+    grain: decision
+    metrics: [realised_recovery]
+    deterministic_logic: outcome measured only from reconciled documents; otherwise not measured
+    ai_role: none
+    evidence: decision, action, documents
+    approval: CFO
+    action: close decision
+    outcome_kpi: share of decisions with measured outcome
+    dependencies: [UC06]
+    status: Build
+    sprint: S6
+    acceptance_test: successful action without document stays not measured

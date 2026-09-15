@@ -1,0 +1,3324 @@
+{
+  "accounting": {
+    "journals": {
+      "status": "OK",
+      "value": [
+        {
+          "code": "BILL",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "currency_id": false,
+          "id": 10,
+          "name": "Purchases",
+          "type": "purchase"
+        },
+        {
+          "code": "BNK1",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "currency_id": false,
+          "id": 14,
+          "name": "Bank",
+          "type": "bank"
+        },
+        {
+          "code": "CABA",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "currency_id": false,
+          "id": 13,
+          "name": "Cash Basis Taxes",
+          "type": "general"
+        },
+        {
+          "code": "EXCH",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "currency_id": false,
+          "id": 12,
+          "name": "Exchange Difference",
+          "type": "general"
+        },
+        {
+          "code": "INV",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "currency_id": false,
+          "id": 9,
+          "name": "Sales",
+          "type": "sale"
+        },
+        {
+          "code": "MISC",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "currency_id": false,
+          "id": 11,
+          "name": "Miscellaneous Operations",
+          "type": "general"
+        },
+        {
+          "code": "STJ",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "currency_id": false,
+          "id": 16,
+          "name": "Inventory Valuation",
+          "type": "general"
+        },
+        {
+          "code": "TAX",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "currency_id": false,
+          "id": 15,
+          "name": "Tax Returns",
+          "type": "general"
+        }
+      ]
+    },
+    "payment_method_lines": {
+      "status": "OK",
+      "value": [
+        {
+          "id": 5,
+          "journal_id": [
+            14,
+            "Bank"
+          ],
+          "name": "Batch Deposit",
+          "payment_account_id": false,
+          "payment_type": "inbound"
+        },
+        {
+          "id": 3,
+          "journal_id": [
+            14,
+            "Bank"
+          ],
+          "name": "Manual Payment",
+          "payment_account_id": false,
+          "payment_type": "inbound"
+        },
+        {
+          "id": 6,
+          "journal_id": [
+            14,
+            "Bank"
+          ],
+          "name": "SEPA Credit Transfer",
+          "payment_account_id": false,
+          "payment_type": "outbound"
+        },
+        {
+          "id": 4,
+          "journal_id": [
+            14,
+            "Bank"
+          ],
+          "name": "Manual Payment",
+          "payment_account_id": false,
+          "payment_type": "outbound"
+        }
+      ]
+    },
+    "product_categories": {
+      "status": "OK",
+      "value": [
+        {
+          "complete_name": "Goods",
+          "id": 1,
+          "property_cost_method": "standard",
+          "property_valuation": "periodic"
+        },
+        {
+          "complete_name": "Expenses",
+          "id": 2,
+          "property_cost_method": "standard",
+          "property_valuation": "periodic"
+        },
+        {
+          "complete_name": "Services",
+          "id": 3,
+          "property_cost_method": "standard",
+          "property_valuation": "periodic"
+        },
+        {
+          "complete_name": "Process Vessels & Tanks",
+          "id": 4,
+          "property_cost_method": "standard",
+          "property_valuation": "periodic"
+        },
+        {
+          "complete_name": "Material Handling Systems",
+          "id": 5,
+          "property_cost_method": "standard",
+          "property_valuation": "periodic"
+        },
+        {
+          "complete_name": "Automated Production Lines",
+          "id": 6,
+          "property_cost_method": "standard",
+          "property_valuation": "periodic"
+        },
+        {
+          "complete_name": "Industrial Thermal Systems",
+          "id": 7,
+          "property_cost_method": "standard",
+          "property_valuation": "periodic"
+        },
+        {
+          "complete_name": "Control & Automation Systems",
+          "id": 8,
+          "property_cost_method": "standard",
+          "property_valuation": "periodic"
+        },
+        {
+          "complete_name": "Spare Parts & Maintenance Kits",
+          "id": 9,
+          "property_cost_method": "standard",
+          "property_valuation": "periodic"
+        }
+      ]
+    },
+    "sale_purchase_taxes": {
+      "status": "OK",
+      "value": [
+        {
+          "amount": 0.0,
+          "amount_type": "percent",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "id": 24,
+          "name": "0% EX",
+          "type_tax_use": "purchase"
+        },
+        {
+          "amount": 2.1,
+          "amount_type": "percent",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "id": 9,
+          "name": "2.1% G",
+          "type_tax_use": "purchase"
+        },
+        {
+          "amount": 5.5,
+          "amount_type": "percent",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "id": 8,
+          "name": "5.5% G",
+          "type_tax_use": "purchase"
+        },
+        {
+          "amount": 8.5,
+          "amount_type": "percent",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "id": 6,
+          "name": "8.5% G",
+          "type_tax_use": "purchase"
+        },
+        {
+          "amount": 10.0,
+          "amount_type": "percent",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "id": 7,
+          "name": "10% G",
+          "type_tax_use": "purchase"
+        },
+        {
+          "amount": 20.0,
+          "amount_type": "percent",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "id": 22,
+          "name": "20% EU S",
+          "type_tax_use": "purchase"
+        },
+        {
+          "amount": 20.0,
+          "amount_type": "percent",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "id": 11,
+          "name": "20% R E G",
+          "type_tax_use": "purchase"
+        },
+        {
+          "amount": 20.0,
+          "amount_type": "percent",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "id": 21,
+          "name": "20% EU G",
+          "type_tax_use": "purchase"
+        },
+        {
+          "amount": 20.0,
+          "amount_type": "percent",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "id": 25,
+          "name": "20% S",
+          "type_tax_use": "purchase"
+        },
+        {
+          "amount": 20.0,
+          "amount_type": "percent",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "id": 29,
+          "name": "20% R E S",
+          "type_tax_use": "purchase"
+        },
+        {
+          "amount": 20.0,
+          "amount_type": "percent",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "id": 23,
+          "name": "20% EX",
+          "type_tax_use": "purchase"
+        },
+        {
+          "amount": 20.0,
+          "amount_type": "percent",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "id": 10,
+          "name": "20% F",
+          "type_tax_use": "purchase"
+        },
+        {
+          "amount": 20.0,
+          "amount_type": "percent",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "id": 16,
+          "name": "20% EX O EU",
+          "type_tax_use": "purchase"
+        },
+        {
+          "amount": 20.0,
+          "amount_type": "percent",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "id": 5,
+          "name": "20% G",
+          "type_tax_use": "purchase"
+        },
+        {
+          "amount": 0.0,
+          "amount_type": "percent",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "id": 44,
+          "name": "0% EU S",
+          "type_tax_use": "sale"
+        },
+        {
+          "amount": 0.0,
+          "amount_type": "percent",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "id": 35,
+          "name": "0% EXEMPT G",
+          "type_tax_use": "sale"
+        },
+        {
+          "amount": 0.0,
+          "amount_type": "percent",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "id": 42,
+          "name": "0% EXEMPT S",
+          "type_tax_use": "sale"
+        },
+        {
+          "amount": 0.0,
+          "amount_type": "percent",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "id": 37,
+          "name": "0% EU G",
+          "type_tax_use": "sale"
+        },
+        {
+          "amount": 0.0,
+          "amount_type": "percent",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "id": 43,
+          "name": "0% EX S",
+          "type_tax_use": "sale"
+        },
+        {
+          "amount": 0.0,
+          "amount_type": "percent",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "id": 36,
+          "name": "0% EX G",
+          "type_tax_use": "sale"
+        },
+        {
+          "amount": 20.0,
+          "amount_type": "percent",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "id": 38,
+          "name": "20% S",
+          "type_tax_use": "sale"
+        },
+        {
+          "amount": 20.0,
+          "amount_type": "percent",
+          "company_id": [
+            1,
+            "Benacta"
+          ],
+          "id": 30,
+          "name": "20% G",
+          "type_tax_use": "sale"
+        }
+      ]
+    }
+  },
+  "api_user": {
+    "company_id": [
+      1,
+      "Benacta"
+    ],
+    "company_ids": [
+      1
+    ],
+    "groups": [
+      "Accounting / Administrator",
+      "Accounting / Bookkeeper",
+      "Appointment / Administrator",
+      "Dashboard / Admin",
+      "Documents / Administrator",
+      "Documents / System Administrator",
+      "Employees / Administrator",
+      "Expenses / Administrator",
+      "Inventory / Administrator",
+      "Planning / Administrator",
+      "Products / Create",
+      "Project / Administrator",
+      "Purchase / Administrator",
+      "Role / Administrator",
+      "Sales / Administrator",
+      "Sign / Administrator",
+      "Surveys / Administrator"
+    ],
+    "lang": "en_US",
+    "share": false,
+    "status": "OK",
+    "tz": "Europe/Paris",
+    "user_id": 2
+  },
+  "companies": {
+    "status": "OK",
+    "value": [
+      {
+        "account_peppol_proxy_state": "not_registered",
+        "country_id": [
+          75,
+          "France"
+        ],
+        "currency_id": [
+          126,
+          "EUR"
+        ],
+        "fiscalyear_lock_date": false,
+        "hard_lock_date": false,
+        "id": 1,
+        "name": "Benacta",
+        "parent_id": false,
+        "purchase_lock_date": false,
+        "sale_lock_date": false,
+        "tax_lock_date": false,
+        "user_fiscalyear_lock_date": "0001-01-01",
+        "user_hard_lock_date": "0001-01-01",
+        "user_purchase_lock_date": "0001-01-01",
+        "user_sale_lock_date": "0001-01-01",
+        "user_tax_lock_date": "0001-01-01"
+      }
+    ]
+  },
+  "currencies": {
+    "status": "OK",
+    "value": [
+      {
+        "decimal_places": 2,
+        "id": 126,
+        "name": "EUR",
+        "rounding": 0.01
+      }
+    ]
+  },
+  "generated_at": "2026-09-14T10:10:56+00:00",
+  "method": "Odoo JSON-2 external API, read-only allowlist",
+  "models": {
+    "account.move": {
+      "access": {
+        "create": true,
+        "read": true,
+        "unlink": true,
+        "write": true
+      },
+      "field_count": 278,
+      "fields": {
+        "amount_untaxed_signed": {
+          "cardinality": "attribute",
+          "label": "Untaxed Amount Signed",
+          "relation": null,
+          "role": "measure",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "monetary"
+        },
+        "company_id": {
+          "cardinality": "N:1",
+          "label": "Company",
+          "relation": "res.company",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "currency_id": {
+          "cardinality": "N:1",
+          "label": "Currency",
+          "relation": "res.currency",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "date": {
+          "cardinality": "attribute",
+          "label": "Date",
+          "meaning": "Accounting date",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "date"
+        },
+        "id": {
+          "cardinality": "attribute",
+          "label": "ID",
+          "relation": null,
+          "role": "pk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "integer"
+        },
+        "invoice_date": {
+          "cardinality": "attribute",
+          "label": "Invoice/Bill Date",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "date"
+        },
+        "invoice_origin": {
+          "cardinality": "attribute",
+          "label": "Origin",
+          "meaning": "Free-text origin",
+          "not a key": null,
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "char"
+        },
+        "move_type": {
+          "cardinality": "attribute",
+          "entry": null,
+          "in_invoice": null,
+          "in_refund": null,
+          "label": "Type",
+          "meaning": "out_invoice",
+          "out_refund": null,
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "selection"
+        },
+        "name": {
+          "cardinality": "attribute",
+          "label": "Number",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "char"
+        },
+        "partner_id": {
+          "cardinality": "N:1",
+          "label": "Partner",
+          "relation": "res.partner",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "payment_state": {
+          "cardinality": "attribute",
+          "label": "Payment Status",
+          "relation": null,
+          "role": "state",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "selection"
+        },
+        "reversed_entry_id": {
+          "cardinality": "N:1",
+          "label": "Reversal of",
+          "meaning": "Invoice reversed by this credit note",
+          "needed_for": [
+            "refund_control"
+          ],
+          "relation": "account.move",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "state": {
+          "cardinality": "attribute",
+          "label": "Status",
+          "meaning": "draft",
+          "posted or cancel": null,
+          "relation": null,
+          "role": "state",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "selection"
+        },
+        "write_date": {
+          "cardinality": "attribute",
+          "label": "Last Updated on",
+          "relation": null,
+          "role": "watermark",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "datetime"
+        }
+      },
+      "meaning": "Journal entry, invoice or credit note header",
+      "record_count": 52,
+      "status": "OK",
+      "write_date_range": {
+        "max": "2026-08-09 20:42:51",
+        "min": "2026-08-09 18:51:36"
+      }
+    },
+    "account.move.line": {
+      "access": {
+        "create": true,
+        "read": true,
+        "unlink": true,
+        "write": true
+      },
+      "field_count": 136,
+      "fields": {
+        "account_id": {
+          "cardinality": "N:1",
+          "label": "Account",
+          "relation": "account.account",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "amount_currency": {
+          "cardinality": "attribute",
+          "label": "Amount in Currency",
+          "meaning": "Signed transaction-currency amount",
+          "relation": null,
+          "role": "measure",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "monetary"
+        },
+        "balance": {
+          "cardinality": "attribute",
+          "label": "Balance",
+          "meaning": "Signed company-currency amount",
+          "relation": null,
+          "role": "measure",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "monetary"
+        },
+        "company_id": {
+          "cardinality": "N:1",
+          "label": "Company",
+          "relation": "res.company",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "currency_id": {
+          "cardinality": "N:1",
+          "label": "Currency",
+          "relation": "res.currency",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "date": {
+          "cardinality": "attribute",
+          "label": "Date",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "date"
+        },
+        "discount": {
+          "cardinality": "attribute",
+          "label": "Discount (%)",
+          "relation": null,
+          "role": "measure",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "float"
+        },
+        "display_type": {
+          "cardinality": "attribute",
+          "cogs": null,
+          "label": "Display Type",
+          "meaning": "product",
+          "payment_term and others": null,
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "tax": null,
+          "type": "selection"
+        },
+        "id": {
+          "cardinality": "attribute",
+          "label": "ID",
+          "relation": null,
+          "role": "pk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "integer"
+        },
+        "move_id": {
+          "cardinality": "N:1",
+          "label": "Journal Entry",
+          "relation": "account.move",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "parent_state": {
+          "cardinality": "attribute",
+          "label": "Status",
+          "relation": null,
+          "role": "state",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "selection"
+        },
+        "price_subtotal": {
+          "cardinality": "attribute",
+          "label": "Subtotal",
+          "relation": null,
+          "role": "measure",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "monetary"
+        },
+        "price_unit": {
+          "cardinality": "attribute",
+          "label": "Unit Price",
+          "relation": null,
+          "role": "measure",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "float"
+        },
+        "product_id": {
+          "cardinality": "N:1",
+          "label": "Product",
+          "relation": "product.product",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "product_uom_id": {
+          "cardinality": "N:1",
+          "label": "Unit",
+          "relation": "uom.uom",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "quantity": {
+          "cardinality": "attribute",
+          "label": "Quantity",
+          "relation": null,
+          "role": "measure",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "float"
+        },
+        "sale_line_ids": {
+          "cardinality": "M:N",
+          "label": "Sales Order Lines",
+          "meaning": "Many-to-many link back to order lines",
+          "relation": "sale.order.line",
+          "role": "bridge",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2many"
+        },
+        "write_date": {
+          "cardinality": "attribute",
+          "label": "Last Updated on",
+          "relation": null,
+          "role": "watermark",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "datetime"
+        }
+      },
+      "meaning": "Journal item, the grain of billed revenue and posted cost",
+      "record_count": 193,
+      "status": "OK",
+      "write_date_range": {
+        "max": "2026-08-09 20:42:51",
+        "min": "2026-08-09 18:51:25"
+      }
+    },
+    "delivery.carrier": {
+      "fields": {
+        "id": {
+          "role": "pk",
+          "status": "MODEL_MISSING"
+        },
+        "name": {
+          "role": "attribute",
+          "status": "MODEL_MISSING"
+        },
+        "product_id": {
+          "needed_for": [
+            "FREIGHT-001"
+          ],
+          "role": "fk",
+          "status": "MODEL_MISSING"
+        }
+      },
+      "meaning": "Shipping method from the delivery module",
+      "status": "MODEL_MISSING"
+    },
+    "mail.activity": {
+      "access": {
+        "create": true,
+        "read": true,
+        "unlink": true,
+        "write": true
+      },
+      "field_count": 36,
+      "fields": {
+        "activity_type_id": {
+          "cardinality": "N:1",
+          "label": "Activity Type",
+          "relation": "mail.activity.type",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "date_deadline": {
+          "cardinality": "attribute",
+          "label": "Due Date",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "date"
+        },
+        "id": {
+          "cardinality": "attribute",
+          "label": "ID",
+          "relation": null,
+          "role": "pk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "integer"
+        },
+        "res_id": {
+          "cardinality": "attribute",
+          "label": "Related Document ID",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one_reference"
+        },
+        "res_model": {
+          "cardinality": "attribute",
+          "label": "Related Document Model",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "char"
+        },
+        "summary": {
+          "cardinality": "attribute",
+          "label": "Summary",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "char"
+        },
+        "user_id": {
+          "cardinality": "N:1",
+          "label": "Assigned to",
+          "relation": "res.users",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        }
+      },
+      "meaning": "Review activity, the first allowed write-back action",
+      "record_count": 0,
+      "status": "OK",
+      "write_date_range": {
+        "max": null,
+        "min": null
+      }
+    },
+    "product.category": {
+      "access": {
+        "create": true,
+        "read": true,
+        "unlink": true,
+        "write": true
+      },
+      "field_count": 45,
+      "fields": {
+        "id": {
+          "cardinality": "attribute",
+          "label": "ID",
+          "relation": null,
+          "role": "pk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "integer"
+        },
+        "name": {
+          "cardinality": "attribute",
+          "label": "Name",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "char"
+        },
+        "property_cost_method": {
+          "cardinality": "attribute",
+          "fifo or average": null,
+          "label": "Costing Method",
+          "meaning": "standard",
+          "needed_for": [
+            "COST-001"
+          ],
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "selection"
+        },
+        "property_valuation": {
+          "cardinality": "attribute",
+          "label": "Inventory Valuation",
+          "meaning": "manual or real_time",
+          "needed_for": [
+            "COST-001"
+          ],
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "selection"
+        }
+      },
+      "meaning": "Product category carrying the costing policy",
+      "record_count": 9,
+      "status": "OK",
+      "write_date_range": {
+        "max": "2026-08-09 18:40:19",
+        "min": "2026-08-09 17:06:04"
+      }
+    },
+    "product.pricelist": {
+      "access": {
+        "create": true,
+        "read": true,
+        "unlink": true,
+        "write": true
+      },
+      "field_count": 37,
+      "fields": {
+        "company_id": {
+          "cardinality": "N:1",
+          "label": "Company",
+          "relation": "res.company",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "currency_id": {
+          "cardinality": "N:1",
+          "label": "Currency",
+          "relation": "res.currency",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "id": {
+          "cardinality": "attribute",
+          "label": "ID",
+          "relation": null,
+          "role": "pk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "integer"
+        },
+        "item_ids": {
+          "cardinality": "1:N",
+          "label": "Pricelist Rules",
+          "relation": "product.pricelist.item",
+          "role": "bridge",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "one2many"
+        },
+        "name": {
+          "cardinality": "attribute",
+          "label": "Pricelist Name",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "char"
+        }
+      },
+      "meaning": "Price list header",
+      "record_count": 0,
+      "status": "OK",
+      "write_date_range": {
+        "max": null,
+        "min": null
+      }
+    },
+    "product.pricelist.item": {
+      "access": {
+        "create": true,
+        "read": true,
+        "unlink": true,
+        "write": true
+      },
+      "field_count": 36,
+      "fields": {
+        "compute_price": {
+          "cardinality": "attribute",
+          "label": "Compute Price",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "selection"
+        },
+        "date_end": {
+          "cardinality": "attribute",
+          "label": "End Date",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "datetime"
+        },
+        "date_start": {
+          "cardinality": "attribute",
+          "label": "Start Date",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "datetime"
+        },
+        "fixed_price": {
+          "cardinality": "attribute",
+          "label": "Fixed Price",
+          "relation": null,
+          "role": "measure",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "float"
+        },
+        "id": {
+          "cardinality": "attribute",
+          "label": "ID",
+          "relation": null,
+          "role": "pk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "integer"
+        },
+        "percent_price": {
+          "cardinality": "attribute",
+          "label": "Percentage Price",
+          "relation": null,
+          "role": "measure",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "float"
+        },
+        "pricelist_id": {
+          "cardinality": "N:1",
+          "label": "Pricelist",
+          "relation": "product.pricelist",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "product_tmpl_id": {
+          "cardinality": "N:1",
+          "label": "Product",
+          "relation": "product.template",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        }
+      },
+      "meaning": "Price rule with validity dates",
+      "record_count": 0,
+      "status": "OK",
+      "write_date_range": {
+        "max": null,
+        "min": null
+      }
+    },
+    "product.product": {
+      "access": {
+        "create": true,
+        "read": true,
+        "unlink": true,
+        "write": true
+      },
+      "field_count": 186,
+      "fields": {
+        "default_code": {
+          "cardinality": "attribute",
+          "label": "Internal Reference",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "char"
+        },
+        "id": {
+          "cardinality": "attribute",
+          "label": "ID",
+          "relation": null,
+          "role": "pk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "integer"
+        },
+        "product_tmpl_id": {
+          "cardinality": "N:1",
+          "label": "Product Template",
+          "relation": "product.template",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "standard_price": {
+          "cardinality": "attribute",
+          "label": "Cost",
+          "meaning": "CURRENT cost only",
+          "never a historical cost": null,
+          "relation": null,
+          "role": "measure",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "float"
+        },
+        "write_date": {
+          "cardinality": "attribute",
+          "label": "Write Date",
+          "relation": null,
+          "role": "watermark",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "datetime"
+        }
+      },
+      "meaning": "Product variant, the key used on transaction lines",
+      "record_count": 27,
+      "status": "OK",
+      "write_date_range": {
+        "max": "2026-08-09 18:40:26",
+        "min": "2026-08-09 17:06:04"
+      }
+    },
+    "product.template": {
+      "access": {
+        "create": true,
+        "read": true,
+        "unlink": true,
+        "write": true
+      },
+      "field_count": 148,
+      "fields": {
+        "categ_id": {
+          "cardinality": "N:1",
+          "label": "Product Category",
+          "relation": "product.category",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "company_id": {
+          "cardinality": "N:1",
+          "label": "Company",
+          "relation": "res.company",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "id": {
+          "cardinality": "attribute",
+          "label": "ID",
+          "relation": null,
+          "role": "pk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "integer"
+        },
+        "list_price": {
+          "cardinality": "attribute",
+          "label": "Sales Price",
+          "relation": null,
+          "role": "measure",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "float"
+        },
+        "name": {
+          "cardinality": "attribute",
+          "label": "Name",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "char"
+        },
+        "seller_ids": {
+          "cardinality": "1:N",
+          "label": "Vendors",
+          "meaning": "Supplier price lists",
+          "relation": "product.supplierinfo",
+          "role": "bridge",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "one2many"
+        },
+        "type": {
+          "cardinality": "attribute",
+          "label": "Product Type",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "selection"
+        },
+        "uom_id": {
+          "cardinality": "N:1",
+          "label": "Unit",
+          "relation": "uom.uom",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "write_date": {
+          "cardinality": "attribute",
+          "label": "Last Updated on",
+          "relation": null,
+          "role": "watermark",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "datetime"
+        }
+      },
+      "meaning": "Product definition shared by variants",
+      "record_count": 27,
+      "status": "OK",
+      "write_date_range": {
+        "max": "2026-08-09 18:40:26",
+        "min": "2026-08-09 17:06:04"
+      }
+    },
+    "purchase.order": {
+      "access": {
+        "create": true,
+        "read": true,
+        "unlink": true,
+        "write": true
+      },
+      "field_count": 94,
+      "fields": {
+        "company_id": {
+          "cardinality": "N:1",
+          "label": "Company",
+          "relation": "res.company",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "currency_id": {
+          "cardinality": "N:1",
+          "label": "Currency",
+          "relation": "res.currency",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "date_order": {
+          "cardinality": "attribute",
+          "label": "Order Deadline",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "datetime"
+        },
+        "id": {
+          "cardinality": "attribute",
+          "label": "ID",
+          "relation": null,
+          "role": "pk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "integer"
+        },
+        "name": {
+          "cardinality": "attribute",
+          "label": "Order Reference",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "char"
+        },
+        "partner_id": {
+          "cardinality": "N:1",
+          "label": "Vendor",
+          "relation": "res.partner",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "state": {
+          "cardinality": "attribute",
+          "label": "Status",
+          "relation": null,
+          "role": "state",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "selection"
+        },
+        "write_date": {
+          "cardinality": "attribute",
+          "label": "Last Updated on",
+          "relation": null,
+          "role": "watermark",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "datetime"
+        }
+      },
+      "meaning": "Supplier order header",
+      "record_count": 21,
+      "status": "OK",
+      "write_date_range": {
+        "max": "2026-08-09 20:42:50",
+        "min": "2026-08-09 18:51:55"
+      }
+    },
+    "purchase.order.line": {
+      "access": {
+        "create": true,
+        "read": true,
+        "unlink": true,
+        "write": true
+      },
+      "field_count": 73,
+      "fields": {
+        "id": {
+          "cardinality": "attribute",
+          "label": "ID",
+          "relation": null,
+          "role": "pk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "integer"
+        },
+        "move_ids": {
+          "cardinality": "1:N",
+          "label": "Reservation",
+          "relation": "stock.move",
+          "role": "bridge",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "one2many"
+        },
+        "order_id": {
+          "cardinality": "N:1",
+          "label": "Order Reference",
+          "relation": "purchase.order",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "price_unit": {
+          "cardinality": "attribute",
+          "label": "Unit Price",
+          "needed_for": [
+            "COST-001"
+          ],
+          "relation": null,
+          "role": "measure",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "float"
+        },
+        "product_id": {
+          "cardinality": "N:1",
+          "label": "Product",
+          "relation": "product.product",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "product_qty": {
+          "cardinality": "attribute",
+          "label": "Quantity",
+          "relation": null,
+          "role": "measure",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "float"
+        },
+        "qty_invoiced": {
+          "cardinality": "attribute",
+          "label": "Billed Qty",
+          "relation": null,
+          "role": "measure",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "float"
+        },
+        "qty_received": {
+          "cardinality": "attribute",
+          "label": "Received Qty",
+          "relation": null,
+          "role": "measure",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "float"
+        },
+        "uom_id": {
+          "cardinality": "N:1",
+          "label": "Unit",
+          "relation": "uom.uom",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "write_date": {
+          "cardinality": "attribute",
+          "label": "Last Updated on",
+          "relation": null,
+          "role": "watermark",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "datetime"
+        }
+      },
+      "meaning": "Supplier order line, the origin of received cost",
+      "record_count": 27,
+      "status": "OK",
+      "write_date_range": {
+        "max": "2026-08-09 20:42:50",
+        "min": "2026-08-09 18:51:55"
+      }
+    },
+    "res.currency.rate": {
+      "access": {
+        "create": true,
+        "read": true,
+        "unlink": true,
+        "write": true
+      },
+      "field_count": 13,
+      "fields": {
+        "company_id": {
+          "cardinality": "N:1",
+          "label": "Company",
+          "relation": "res.company",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "currency_id": {
+          "cardinality": "N:1",
+          "label": "Currency",
+          "relation": "res.currency",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "id": {
+          "cardinality": "attribute",
+          "label": "ID",
+          "relation": null,
+          "role": "pk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "integer"
+        },
+        "name": {
+          "cardinality": "attribute",
+          "label": "Date",
+          "meaning": "Rate date",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "date"
+        },
+        "rate": {
+          "cardinality": "attribute",
+          "label": "Technical Rate",
+          "relation": null,
+          "role": "measure",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "float"
+        }
+      },
+      "meaning": "Dated exchange rate per company",
+      "record_count": 0,
+      "status": "OK",
+      "write_date_range": {
+        "max": null,
+        "min": null
+      }
+    },
+    "res.partner": {
+      "access": {
+        "create": true,
+        "read": true,
+        "unlink": true,
+        "write": true
+      },
+      "field_count": 241,
+      "fields": {
+        "commercial_partner_id": {
+          "cardinality": "N:1",
+          "label": "Commercial Entity",
+          "meaning": "Legal entity behind a contact",
+          "relation": "res.partner",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "company_id": {
+          "cardinality": "N:1",
+          "label": "Company",
+          "meaning": "Empty when shared across companies",
+          "relation": "res.company",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "customer_rank": {
+          "cardinality": "attribute",
+          "label": "Customer Rank",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "integer"
+        },
+        "id": {
+          "cardinality": "attribute",
+          "label": "ID",
+          "relation": null,
+          "role": "pk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "integer"
+        },
+        "is_company": {
+          "cardinality": "attribute",
+          "label": "Is a Company",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "boolean"
+        },
+        "name": {
+          "cardinality": "attribute",
+          "label": "Name",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "char"
+        },
+        "supplier_rank": {
+          "cardinality": "attribute",
+          "label": "Supplier Rank",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "integer"
+        },
+        "write_date": {
+          "cardinality": "attribute",
+          "label": "Last Updated on",
+          "relation": null,
+          "role": "watermark",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "datetime"
+        }
+      },
+      "meaning": "Customer, supplier or contact",
+      "record_count": 50,
+      "status": "OK",
+      "write_date_range": {
+        "max": "2026-08-09 20:42:51",
+        "min": "2026-08-09 17:06:13"
+      }
+    },
+    "sale.order": {
+      "access": {
+        "create": true,
+        "read": true,
+        "unlink": true,
+        "write": true
+      },
+      "field_count": 146,
+      "fields": {
+        "company_id": {
+          "cardinality": "N:1",
+          "label": "Company",
+          "meaning": "Owning company",
+          "needed_for": [
+            "isolation"
+          ],
+          "relation": "res.company",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "currency_id": {
+          "cardinality": "N:1",
+          "label": "Currency",
+          "meaning": "Order currency",
+          "relation": "res.currency",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "date_order": {
+          "cardinality": "attribute",
+          "label": "Order Date",
+          "meaning": "Order date",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "datetime"
+        },
+        "id": {
+          "cardinality": "attribute",
+          "label": "ID",
+          "relation": null,
+          "role": "pk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "integer"
+        },
+        "invoice_ids": {
+          "cardinality": "M:N",
+          "label": "Invoices",
+          "meaning": "Invoices derived from the order",
+          "relation": "account.move",
+          "role": "bridge",
+          "status": "AVAILABLE",
+          "stored": false,
+          "type": "many2many"
+        },
+        "name": {
+          "cardinality": "attribute",
+          "label": "Order Reference",
+          "meaning": "Order reference",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "char"
+        },
+        "order_line": {
+          "cardinality": "1:N",
+          "label": "Order Lines",
+          "meaning": "Order lines",
+          "relation": "sale.order.line",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "one2many"
+        },
+        "partner_id": {
+          "cardinality": "N:1",
+          "label": "Customer",
+          "meaning": "Ordering customer",
+          "relation": "res.partner",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "picking_ids": {
+          "cardinality": "1:N",
+          "label": "Transfers",
+          "meaning": "Deliveries derived from the order",
+          "needed_for": [
+            "FREIGHT-001"
+          ],
+          "relation": "stock.picking",
+          "role": "bridge",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "one2many"
+        },
+        "pricelist_id": {
+          "cardinality": "N:1",
+          "label": "Pricelist",
+          "meaning": "Pricelist applied at order time",
+          "needed_for": [
+            "DISC-001"
+          ],
+          "relation": "product.pricelist",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "state": {
+          "cardinality": "attribute",
+          "label": "Status",
+          "meaning": "Quotation",
+          "relation": null,
+          "role": "state",
+          "sale or cancelled": null,
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "selection"
+        },
+        "write_date": {
+          "cardinality": "attribute",
+          "label": "Last Updated on",
+          "relation": null,
+          "role": "watermark",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "datetime"
+        }
+      },
+      "meaning": "Customer order header",
+      "record_count": 31,
+      "status": "OK",
+      "write_date_range": {
+        "max": "2026-08-09 18:53:10",
+        "min": "2026-08-09 18:51:04"
+      }
+    },
+    "sale.order.line": {
+      "access": {
+        "create": true,
+        "read": true,
+        "unlink": true,
+        "write": true
+      },
+      "field_count": 111,
+      "fields": {
+        "company_id": {
+          "cardinality": "N:1",
+          "label": "Company",
+          "relation": "res.company",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "currency_id": {
+          "cardinality": "N:1",
+          "label": "Currency",
+          "relation": "res.currency",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "discount": {
+          "cardinality": "attribute",
+          "label": "Discount (%)",
+          "meaning": "Discount percentage applied",
+          "needed_for": [
+            "DISC-001"
+          ],
+          "relation": null,
+          "role": "measure",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "float"
+        },
+        "display_type": {
+          "cardinality": "attribute",
+          "label": "Display Type",
+          "meaning": "Section or note lines carry no amount",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "selection"
+        },
+        "id": {
+          "cardinality": "attribute",
+          "label": "ID",
+          "relation": null,
+          "role": "pk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "integer"
+        },
+        "invoice_lines": {
+          "cardinality": "M:N",
+          "label": "Invoice Lines",
+          "meaning": "Many-to-many link to invoice lines",
+          "relation": "account.move.line",
+          "role": "bridge",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2many"
+        },
+        "move_ids": {
+          "cardinality": "1:N",
+          "label": "Stock Moves",
+          "meaning": "Stock moves fulfilling the line",
+          "needed_for": [
+            "COST-001"
+          ],
+          "relation": "stock.move",
+          "role": "bridge",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "one2many"
+        },
+        "order_id": {
+          "cardinality": "N:1",
+          "label": "Order Reference",
+          "relation": "sale.order",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "price_subtotal": {
+          "cardinality": "attribute",
+          "label": "Subtotal",
+          "meaning": "Amount excluding taxes after discount",
+          "relation": null,
+          "role": "measure",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "monetary"
+        },
+        "price_unit": {
+          "cardinality": "attribute",
+          "label": "Unit Price",
+          "meaning": "Unit price before discount",
+          "needed_for": [
+            "DISC-001"
+          ],
+          "relation": null,
+          "role": "measure",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "float"
+        },
+        "product_id": {
+          "cardinality": "N:1",
+          "label": "Product",
+          "relation": "product.product",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "product_uom_id": {
+          "cardinality": "N:1",
+          "label": "Unit",
+          "meaning": "Unit of measure of the ordered quantity",
+          "needed_for": [
+            "uom_control"
+          ],
+          "relation": "uom.uom",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "product_uom_qty": {
+          "cardinality": "attribute",
+          "label": "Quantity",
+          "meaning": "Ordered quantity",
+          "relation": null,
+          "role": "measure",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "float"
+        },
+        "purchase_price": {
+          "meaning": "Cost captured on the line by the sale_margin module",
+          "needed_for": [
+            "COST-001"
+          ],
+          "role": "measure",
+          "status": "MISSING"
+        },
+        "qty_delivered": {
+          "cardinality": "attribute",
+          "label": "Delivery Quantity",
+          "needed_for": [
+            "partial_delivery_control"
+          ],
+          "relation": null,
+          "role": "measure",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "float"
+        },
+        "qty_invoiced": {
+          "cardinality": "attribute",
+          "label": "Invoiced Quantity",
+          "needed_for": [
+            "partial_invoice_control"
+          ],
+          "relation": null,
+          "role": "measure",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "float"
+        },
+        "tax_ids": {
+          "cardinality": "M:N",
+          "label": "Taxes",
+          "relation": "account.tax",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2many"
+        },
+        "write_date": {
+          "cardinality": "attribute",
+          "label": "Last Updated on",
+          "relation": null,
+          "role": "watermark",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "datetime"
+        }
+      },
+      "meaning": "Ordered product line, the grain of price and discount exceptions",
+      "record_count": 69,
+      "status": "OK",
+      "write_date_range": {
+        "max": "2026-08-09 18:53:10",
+        "min": "2026-08-09 18:51:04"
+      }
+    },
+    "stock.move": {
+      "access": {
+        "create": true,
+        "read": true,
+        "unlink": true,
+        "write": true
+      },
+      "field_count": 102,
+      "fields": {
+        "account_move_id": {
+          "cardinality": "N:1",
+          "label": "stock_move_id",
+          "meaning": "Valuation journal entry when valuation is perpetual",
+          "needed_for": [
+            "COST-001"
+          ],
+          "relation": "account.move",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "company_id": {
+          "cardinality": "N:1",
+          "label": "Company",
+          "relation": "res.company",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "date": {
+          "cardinality": "attribute",
+          "label": "Date Scheduled",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "datetime"
+        },
+        "id": {
+          "cardinality": "attribute",
+          "label": "ID",
+          "relation": null,
+          "role": "pk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "integer"
+        },
+        "is_valued": {
+          "cardinality": "attribute",
+          "label": "Is Valued",
+          "needed_for": [
+            "COST-001"
+          ],
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": false,
+          "type": "boolean"
+        },
+        "location_dest_id": {
+          "cardinality": "N:1",
+          "label": "Intermediate Location",
+          "relation": "stock.location",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "location_id": {
+          "cardinality": "N:1",
+          "label": "Source Location",
+          "relation": "stock.location",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "picking_id": {
+          "cardinality": "N:1",
+          "label": "Transfer",
+          "relation": "stock.picking",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "price_unit": {
+          "cardinality": "attribute",
+          "label": "Price Unit",
+          "meaning": "Unit cost recorded on the move",
+          "needed_for": [
+            "COST-001"
+          ],
+          "relation": null,
+          "role": "measure",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "float"
+        },
+        "product_id": {
+          "cardinality": "N:1",
+          "label": "Product",
+          "relation": "product.product",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "product_uom_qty": {
+          "cardinality": "attribute",
+          "label": "Demand",
+          "relation": null,
+          "role": "measure",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "float"
+        },
+        "purchase_line_id": {
+          "cardinality": "N:1",
+          "label": "Purchase Order Line",
+          "needed_for": [
+            "COST-001"
+          ],
+          "relation": "purchase.order.line",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "quantity": {
+          "cardinality": "attribute",
+          "label": "Quantity",
+          "relation": null,
+          "role": "measure",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "float"
+        },
+        "remaining_value": {
+          "cardinality": "attribute",
+          "label": "Remaining Value",
+          "relation": null,
+          "role": "measure",
+          "status": "AVAILABLE",
+          "stored": false,
+          "type": "monetary"
+        },
+        "sale_line_id": {
+          "cardinality": "N:1",
+          "label": "Sale Line",
+          "needed_for": [
+            "COST-001"
+          ],
+          "relation": "sale.order.line",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "state": {
+          "cardinality": "attribute",
+          "label": "Status",
+          "relation": null,
+          "role": "state",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "selection"
+        },
+        "uom_id": {
+          "cardinality": "N:1",
+          "label": "Unit",
+          "meaning": "Unit of measure of the move",
+          "relation": "uom.uom",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "value": {
+          "cardinality": "attribute",
+          "label": "Value",
+          "meaning": "Valuation of the move",
+          "needed_for": [
+            "COST-001"
+          ],
+          "relation": null,
+          "role": "measure",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "monetary"
+        },
+        "write_date": {
+          "cardinality": "attribute",
+          "label": "Last Updated on",
+          "relation": null,
+          "role": "watermark",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "datetime"
+        }
+      },
+      "meaning": "Goods movement; on Odoo 19 it also carries valuation",
+      "record_count": 83,
+      "status": "OK",
+      "write_date_range": {
+        "max": "2026-08-09 20:42:50",
+        "min": "2026-08-09 18:51:04"
+      }
+    },
+    "stock.picking": {
+      "access": {
+        "create": true,
+        "read": true,
+        "unlink": true,
+        "write": true
+      },
+      "field_count": 96,
+      "fields": {
+        "company_id": {
+          "cardinality": "N:1",
+          "label": "Company",
+          "relation": "res.company",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "date_done": {
+          "cardinality": "attribute",
+          "label": "Date of Transfer",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "datetime"
+        },
+        "id": {
+          "cardinality": "attribute",
+          "label": "ID",
+          "relation": null,
+          "role": "pk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "integer"
+        },
+        "name": {
+          "cardinality": "attribute",
+          "label": "Reference",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "char"
+        },
+        "origin": {
+          "cardinality": "attribute",
+          "label": "Source Document",
+          "meaning": "Free-text origin",
+          "not a key": null,
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "char"
+        },
+        "partner_id": {
+          "cardinality": "N:1",
+          "label": "Contact",
+          "relation": "res.partner",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "picking_type_code": {
+          "cardinality": "attribute",
+          "label": "Type of Operation",
+          "relation": null,
+          "role": "attribute",
+          "status": "AVAILABLE",
+          "stored": false,
+          "type": "selection"
+        },
+        "sale_id": {
+          "cardinality": "N:1",
+          "label": "Sales Order",
+          "needed_for": [
+            "FREIGHT-001"
+          ],
+          "relation": "sale.order",
+          "role": "fk",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "many2one"
+        },
+        "state": {
+          "cardinality": "attribute",
+          "label": "Status",
+          "relation": null,
+          "role": "state",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "selection"
+        },
+        "write_date": {
+          "cardinality": "attribute",
+          "label": "Last Updated on",
+          "relation": null,
+          "role": "watermark",
+          "status": "AVAILABLE",
+          "stored": true,
+          "type": "datetime"
+        }
+      },
+      "meaning": "Delivery or receipt document",
+      "record_count": 44,
+      "status": "OK",
+      "write_date_range": {
+        "max": "2026-08-09 20:42:50",
+        "min": "2026-08-09 18:51:04"
+      }
+    },
+    "stock.valuation.layer": {
+      "fields": {
+        "id": {
+          "role": "pk",
+          "status": "MODEL_MISSING"
+        },
+        "stock_move_id": {
+          "needed_for": [
+            "COST-001"
+          ],
+          "role": "fk",
+          "status": "MODEL_MISSING"
+        },
+        "unit_cost": {
+          "role": "measure",
+          "status": "MODEL_MISSING"
+        },
+        "value": {
+          "role": "measure",
+          "status": "MODEL_MISSING"
+        }
+      },
+      "meaning": "Valuation layer model of Odoo 13 to 18",
+      "status": "MODEL_MISSING"
+    }
+  },
+  "modules": {
+    "installed": [
+      "account",
+      "account_accountant",
+      "account_asset",
+      "account_bank_statement_extract",
+      "account_bank_statement_import",
+      "account_bank_statement_import_camt",
+      "account_bank_statement_import_csv",
+      "account_bank_statement_import_ofx",
+      "account_base_import",
+      "account_batch_payment",
+      "account_edi_proxy_client",
+      "account_edi_ubl_cii",
+      "account_extract",
+      "account_fiscal_categories",
+      "account_followup",
+      "account_invoice_extract",
+      "account_invoice_extract_purchase",
+      "account_iso20022",
+      "account_loans",
+      "account_loans_extract",
+      "account_online_payment",
+      "account_online_synchronization",
+      "account_payment",
+      "account_peppol",
+      "account_qr_code_sepa",
+      "account_reports",
+      "account_reports_cash_basis",
+      "accountant",
+      "accountant_hr_expense",
+      "accountant_knowledge",
+      "ai",
+      "ai_account",
+      "ai_auto_install",
+      "ai_calendar",
+      "ai_documents_source",
+      "ai_fields",
+      "ai_knowledge",
+      "ai_mcp",
+      "ai_product",
+      "ai_project",
+      "ai_purchase",
+      "ai_sale",
+      "ai_sale_stock",
+      "ai_server_actions",
+      "ai_stock",
+      "analytic",
+      "analytic_enterprise",
+      "api_doc",
+      "appointment",
+      "appointment_account_payment",
+      "appointment_crm",
+      "appointment_google_calendar",
+      "appointment_hr",
+      "appointment_sms",
+      "attachment_indexation",
+      "auth_passkey",
+      "auth_passkey_portal",
+      "auth_signup",
+      "auth_totp",
+      "auth_totp_mail",
+      "auth_totp_portal",
+      "barcodes",
+      "barcodes_gs1_nomenclature",
+      "base",
+      "base_address_extended",
+      "base_import",
+      "base_import_module",
+      "base_install_request",
+      "base_report_wkhtmltox",
+      "base_setup",
+      "base_vat",
+      "bus",
+      "calendar",
+      "calendar_sms",
+      "certificate",
+      "contacts",
+      "contacts_enterprise",
+      "crm",
+      "crm_enterprise",
+      "crm_iap_enrich",
+      "crm_iap_mine",
+      "crm_mail_plugin",
+      "crm_sale_project",
+      "crm_sms",
+      "currency_rate_live",
+      "digest",
+      "digest_enterprise",
+      "documents",
+      "documents_account",
+      "documents_account_peppol",
+      "documents_hr",
+      "documents_hr_expense",
+      "documents_hr_sign",
+      "documents_hr_skills",
+      "documents_product",
+      "documents_project",
+      "documents_project_sale",
+      "documents_project_sign",
+      "documents_sign",
+      "documents_spreadsheet",
+      "documents_spreadsheet_sign",
+      "documents_spreadsheet_survey",
+      "gamification",
+      "gamification_sale_crm",
+      "google_account",
+      "google_calendar",
+      "google_gmail",
+      "hr",
+      "hr_calendar",
+      "hr_calendar_google",
+      "hr_expense",
+      "hr_expense_extract",
+      "hr_expense_predict_product",
+      "hr_gamification",
+      "hr_gantt",
+      "hr_mobile",
+      "hr_sign",
+      "hr_skills",
+      "hr_skills_survey",
+      "html_editor",
+      "http_routing",
+      "iap",
+      "iap_crm",
+      "iap_extract",
+      "iap_mail",
+      "knowledge",
+      "l10n_fr",
+      "l10n_fr_account",
+      "l10n_fr_account_loans",
+      "l10n_fr_payment",
+      "l10n_fr_pdp",
+      "l10n_fr_reports",
+      "mail",
+      "mail_bot",
+      "mail_bot_hr",
+      "mail_enterprise",
+      "mail_mobile",
+      "mail_plugin",
+      "microsoft_outlook",
+      "onboarding",
+      "partner_autocomplete",
+      "payment",
+      "phone_validation",
+      "planning",
+      "planning_hr_skills",
+      "portal",
+      "portal_rating",
+      "privacy_lookup",
+      "product",
+      "product_barcodelookup",
+      "project",
+      "project_account",
+      "project_account_asset",
+      "project_enterprise",
+      "project_enterprise_hr",
+      "project_enterprise_hr_skills",
+      "project_enterprise_hr_todo",
+      "project_hr_expense",
+      "project_hr_skills",
+      "project_mail_plugin",
+      "project_purchase",
+      "project_purchase_stock",
+      "project_sale_expense",
+      "project_sms",
+      "project_stock",
+      "project_stock_account",
+      "project_todo",
+      "purchase",
+      "purchase_accountant",
+      "purchase_edi_ubl_bis3",
+      "purchase_stock",
+      "rating",
+      "resource",
+      "resource_mail",
+      "rpc",
+      "saas_ai",
+      "saas_base_import",
+      "saas_dashboard_activities",
+      "saas_google_account",
+      "saas_product_barcodelookup",
+      "saas_trial",
+      "saas_unsplash",
+      "sale",
+      "sale_account_accountant",
+      "sale_crm",
+      "sale_edi_ubl",
+      "sale_enterprise",
+      "sale_expense",
+      "sale_management",
+      "sale_pdf_quote_builder",
+      "sale_planning",
+      "sale_project",
+      "sale_project_enterprise",
+      "sale_project_stock",
+      "sale_purchase",
+      "sale_purchase_project",
+      "sale_purchase_stock",
+      "sale_service",
+      "sale_sms",
+      "sale_stock",
+      "sales_team",
+      "sign",
+      "sign_ai",
+      "sms",
+      "snailmail",
+      "snailmail_account",
+      "snailmail_account_followup",
+      "spreadsheet",
+      "spreadsheet_account",
+      "spreadsheet_dashboard",
+      "spreadsheet_dashboard_account",
+      "spreadsheet_dashboard_account_accountant",
+      "spreadsheet_dashboard_crm",
+      "spreadsheet_dashboard_documents",
+      "spreadsheet_dashboard_edition",
+      "spreadsheet_dashboard_hr_expense",
+      "spreadsheet_dashboard_purchase_stock",
+      "spreadsheet_dashboard_sale",
+      "spreadsheet_dashboard_stock",
+      "spreadsheet_dashboard_stock_account",
+      "spreadsheet_edition",
+      "spreadsheet_edition_account",
+      "spreadsheet_sale_management",
+      "stock",
+      "stock_account",
+      "stock_accountant",
+      "stock_barcode",
+      "stock_enterprise",
+      "stock_sms",
+      "survey",
+      "survey_crm",
+      "uom",
+      "utm",
+      "web",
+      "web_cohort",
+      "web_enterprise",
+      "web_gantt",
+      "web_grid",
+      "web_hierarchy",
+      "web_map",
+      "web_mobile",
+      "web_tour",
+      "web_unsplash"
+    ],
+    "installed_count": 243,
+    "relevant": {
+      "account": true,
+      "account_accountant": true,
+      "account_edi_ubl_cii": true,
+      "account_peppol": true,
+      "ai": true,
+      "ai_mcp": true,
+      "analytic": true,
+      "base_automation": false,
+      "currency_rate_live": true,
+      "delivery": false,
+      "l10n_fr_pdp": true,
+      "mrp": false,
+      "purchase": true,
+      "purchase_stock": true,
+      "saas_trial": true,
+      "sale": true,
+      "sale_management": true,
+      "sale_margin": false,
+      "sale_stock": true,
+      "stock": true,
+      "stock_account": true,
+      "uom": true
+    },
+    "status": "OK"
+  },
+  "relation_tables": {
+    "status": "OK",
+    "value": [
+      {
+        "column1": "adjusting_entry_move_id",
+        "column2": "move_id",
+        "id": 10592,
+        "model": "account.move",
+        "name": "adjusting_entries_move_ids",
+        "relation": "account.move",
+        "relation_table": "adjusting_entries__account_move"
+      },
+      {
+        "column1": "move_id",
+        "column2": "adjusting_entry_move_id",
+        "id": 10589,
+        "model": "account.move",
+        "name": "adjusting_entry_origin_move_ids",
+        "relation": "account.move",
+        "relation_table": "adjusting_entries__account_move"
+      },
+      {
+        "column1": "original_move_id",
+        "column2": "deferred_move_id",
+        "id": 14305,
+        "model": "account.move",
+        "name": "deferred_move_ids",
+        "relation": "account.move",
+        "relation_table": "account_move_deferred_rel"
+      },
+      {
+        "column1": "deferred_move_id",
+        "column2": "original_move_id",
+        "id": 14306,
+        "model": "account.move",
+        "name": "deferred_original_move_ids",
+        "relation": "account.move",
+        "relation_table": "account_move_deferred_rel"
+      },
+      {
+        "column1": "move_id",
+        "column2": "flow_id",
+        "id": 19872,
+        "model": "account.move",
+        "name": "l10n_fr_pdp_sent_in_flow_ids",
+        "relation": "l10n.fr.pdp.reports.flow",
+        "relation_table": "sent_account_move__pdp_flow"
+      },
+      {
+        "column1": "invoice_id",
+        "column2": "payment_id",
+        "id": 10584,
+        "model": "account.move",
+        "name": "matched_payment_ids",
+        "relation": "account.payment",
+        "relation_table": "account_move__account_payment"
+      },
+      {
+        "column1": "invoice_id",
+        "column2": "transaction_id",
+        "id": 14521,
+        "model": "account.move",
+        "name": "transaction_ids",
+        "relation": "payment.transaction",
+        "relation_table": "account_invoice_transaction_rel"
+      },
+      {
+        "column1": "line_id",
+        "column2": "asset_id",
+        "id": 18236,
+        "model": "account.move.line",
+        "name": "asset_ids",
+        "relation": "account.asset",
+        "relation_table": "asset_move_line_rel"
+      },
+      {
+        "column1": "account_move_line_id",
+        "column2": "account_payment_id",
+        "id": 20161,
+        "model": "account.move.line",
+        "name": "payment_lines_ids",
+        "relation": "account.payment",
+        "relation_table": "account_move_line_account_payment_rel"
+      },
+      {
+        "column1": "invoice_line_id",
+        "column2": "order_line_id",
+        "id": 17586,
+        "model": "account.move.line",
+        "name": "sale_line_ids",
+        "relation": "sale.order.line",
+        "relation_table": "sale_order_line_invoice_rel"
+      },
+      {
+        "column1": "account_move_line_id",
+        "column2": "account_tax_id",
+        "id": 11398,
+        "model": "account.move.line",
+        "name": "tax_ids",
+        "relation": "account.tax",
+        "relation_table": "account_move_line_account_tax_rel"
+      },
+      {
+        "column1": "account_move_line_id",
+        "column2": "account_account_tag_id",
+        "id": 11404,
+        "model": "account.move.line",
+        "name": "tax_tag_ids",
+        "relation": "account.account.tag",
+        "relation_table": "account_account_tag_account_move_line_rel"
+      },
+      {
+        "column1": "activity_id",
+        "column2": "attachment_id",
+        "id": 2269,
+        "model": "mail.activity",
+        "name": "attachment_ids",
+        "relation": "ir.attachment",
+        "relation_table": "activity_attachment_rel"
+      },
+      {
+        "column1": "categ_id",
+        "column2": "route_id",
+        "id": 16659,
+        "model": "product.category",
+        "name": "route_ids",
+        "relation": "stock.route",
+        "relation_table": "stock_route_categ"
+      },
+      {
+        "column1": "pricelist_id",
+        "column2": "res_country_group_id",
+        "id": 9636,
+        "model": "product.pricelist",
+        "name": "country_group_ids",
+        "relation": "res.country.group",
+        "relation_table": "res_country_group_pricelist_rel"
+      },
+      {
+        "column1": "product_product_id",
+        "column2": "product_tag_id",
+        "id": 9405,
+        "model": "product.product",
+        "name": "additional_product_tag_ids",
+        "relation": "product.tag",
+        "relation_table": "product_tag_product_product_rel"
+      },
+      {
+        "column1": "product_product_id",
+        "column2": "uom_uom_id",
+        "id": 9393,
+        "model": "product.product",
+        "name": "extra_uom_ids",
+        "relation": "uom.uom",
+        "relation_table": "product_product_uom_uom_rel"
+      },
+      {
+        "column1": "product_product_id",
+        "column2": "product_template_attribute_value_id",
+        "id": 9388,
+        "model": "product.product",
+        "name": "product_template_attribute_value_ids",
+        "relation": "product.template.attribute.value",
+        "relation_table": "product_variant_combination"
+      },
+      {
+        "column1": "product_product_id",
+        "column2": "product_template_attribute_value_id",
+        "id": 9389,
+        "model": "product.product",
+        "name": "product_template_variant_value_ids",
+        "relation": "product.template.attribute.value",
+        "relation_table": "product_variant_combination"
+      },
+      {
+        "column1": "product_template_id",
+        "column2": "account_account_tag_id",
+        "id": 11051,
+        "model": "product.template",
+        "name": "account_tag_ids",
+        "relation": "account.account.tag",
+        "relation_table": "account_account_tag_product_template_rel"
+      },
+      {
+        "column1": "product_template_id",
+        "column2": "product_combo_id",
+        "id": 9297,
+        "model": "product.template",
+        "name": "combo_ids",
+        "relation": "product.combo",
+        "relation_table": "product_combo_product_template_rel"
+      },
+      {
+        "column1": "src_id",
+        "column2": "dest_id",
+        "id": 17622,
+        "model": "product.template",
+        "name": "optional_product_ids",
+        "relation": "product.template",
+        "relation_table": "product_optional_rel"
+      },
+      {
+        "column1": "product_template_id",
+        "column2": "product_tag_id",
+        "id": 9343,
+        "model": "product.template",
+        "name": "product_tag_ids",
+        "relation": "product.tag",
+        "relation_table": "product_tag_product_template_rel"
+      },
+      {
+        "column1": "product_id",
+        "column2": "route_id",
+        "id": 16650,
+        "model": "product.template",
+        "name": "route_ids",
+        "relation": "stock.route",
+        "relation_table": "stock_route_product"
+      },
+      {
+        "column1": "prod_id",
+        "column2": "tax_id",
+        "id": 11046,
+        "model": "product.template",
+        "name": "supplier_taxes_id",
+        "relation": "account.tax",
+        "relation_table": "product_supplier_taxes_rel"
+      },
+      {
+        "column1": "prod_id",
+        "column2": "tax_id",
+        "id": 11044,
+        "model": "product.template",
+        "name": "taxes_id",
+        "relation": "account.tax",
+        "relation_table": "product_taxes_rel"
+      },
+      {
+        "column1": "product_template_id",
+        "column2": "uom_uom_id",
+        "id": 9317,
+        "model": "product.template",
+        "name": "uom_ids",
+        "relation": "uom.uom",
+        "relation_table": "product_template_uom_uom_rel"
+      },
+      {
+        "column1": "purchase_order_id",
+        "column2": "account_move_id",
+        "id": 17106,
+        "model": "purchase.order",
+        "name": "invoice_ids",
+        "relation": "account.move",
+        "relation_table": "account_move_purchase_order_rel"
+      },
+      {
+        "column1": "purchase_order_id",
+        "column2": "stock_picking_id",
+        "id": 17507,
+        "model": "purchase.order",
+        "name": "picking_ids",
+        "relation": "stock.picking",
+        "relation_table": "purchase_order_stock_picking_rel"
+      },
+      {
+        "column1": "purchase_id",
+        "column2": "reference_id",
+        "id": 17510,
+        "model": "purchase.order",
+        "name": "reference_ids",
+        "relation": "stock.reference",
+        "relation_table": "stock_reference_purchase_rel"
+      },
+      {
+        "column1": "created_purchase_line_id",
+        "column2": "move_id",
+        "id": 17517,
+        "model": "purchase.order.line",
+        "name": "move_dest_ids",
+        "relation": "stock.move",
+        "relation_table": "stock_move_created_purchase_line_rel"
+      },
+      {
+        "column1": "purchase_order_line_id",
+        "column2": "product_template_attribute_value_id",
+        "id": 17192,
+        "model": "purchase.order.line",
+        "name": "product_no_variant_attribute_value_ids",
+        "relation": "product.template.attribute.value",
+        "relation_table": "product_template_attribute_value_purchase_order_line_rel"
+      },
+      {
+        "column1": "purchase_order_line_id",
+        "column2": "account_tax_id",
+        "id": 17155,
+        "model": "purchase.order.line",
+        "name": "tax_ids",
+        "relation": "account.tax",
+        "relation_table": "account_tax_purchase_order_line_rel"
+      },
+      {
+        "column1": "partner_id",
+        "column2": "category_id",
+        "id": 1039,
+        "model": "res.partner",
+        "name": "category_id",
+        "relation": "res.partner.category",
+        "relation_table": "res_partner_res_partner_category_rel"
+      },
+      {
+        "column1": "partner_id",
+        "column2": "channel_id",
+        "id": 3041,
+        "model": "res.partner",
+        "name": "channel_ids",
+        "relation": "discuss.channel",
+        "relation_table": "discuss_channel_member"
+      },
+      {
+        "column1": "res_partner_id",
+        "column2": "calendar_event_id",
+        "id": 9038,
+        "model": "res.partner",
+        "name": "meeting_ids",
+        "relation": "calendar.event",
+        "relation_table": "calendar_event_res_partner_rel"
+      },
+      {
+        "column1": "sale_order_id",
+        "column2": "quotation_document_id",
+        "id": 18363,
+        "model": "sale.order",
+        "name": "quotation_document_ids",
+        "relation": "quotation.document",
+        "relation_table": "quotation_document_sale_order_rel"
+      },
+      {
+        "column1": "sale_id",
+        "column2": "reference_id",
+        "id": 18052,
+        "model": "sale.order",
+        "name": "stock_reference_ids",
+        "relation": "stock.reference",
+        "relation_table": "stock_reference_sale_rel"
+      },
+      {
+        "column1": "order_id",
+        "column2": "tag_id",
+        "id": 17714,
+        "model": "sale.order",
+        "name": "tag_ids",
+        "relation": "crm.tag",
+        "relation_table": "sale_order_tag_rel"
+      },
+      {
+        "column1": "sale_order_id",
+        "column2": "transaction_id",
+        "id": 17710,
+        "model": "sale.order",
+        "name": "transaction_ids",
+        "relation": "payment.transaction",
+        "relation_table": "sale_order_transaction_rel"
+      },
+      {
+        "column1": "order_line_id",
+        "column2": "invoice_line_id",
+        "id": 17800,
+        "model": "sale.order.line",
+        "name": "invoice_lines",
+        "relation": "account.move.line",
+        "relation_table": "sale_order_line_invoice_rel"
+      },
+      {
+        "column1": "sale_order_line_id",
+        "column2": "product_document_id",
+        "id": 18366,
+        "model": "sale.order.line",
+        "name": "product_document_ids",
+        "relation": "product.document",
+        "relation_table": "sale_order_line_product_document_rel"
+      },
+      {
+        "column1": "sale_order_line_id",
+        "column2": "product_template_attribute_value_id",
+        "id": 17760,
+        "model": "sale.order.line",
+        "name": "product_no_variant_attribute_value_ids",
+        "relation": "product.template.attribute.value",
+        "relation_table": "product_template_attribute_value_sale_order_line_rel"
+      },
+      {
+        "column1": "sale_order_line_id",
+        "column2": "stock_route_id",
+        "id": 18056,
+        "model": "sale.order.line",
+        "name": "route_ids",
+        "relation": "stock.route",
+        "relation_table": "sale_order_line_stock_route_rel"
+      },
+      {
+        "column1": "sale_order_line_id",
+        "column2": "account_tax_id",
+        "id": 17779,
+        "model": "sale.order.line",
+        "name": "tax_ids",
+        "relation": "account.tax",
+        "relation_table": "account_tax_sale_order_line_rel"
+      },
+      {
+        "column1": "stock_move_id",
+        "column2": "account_analytic_line_id",
+        "id": 17362,
+        "model": "stock.move",
+        "name": "analytic_account_line_ids",
+        "relation": "account.analytic.line",
+        "relation_table": "account_analytic_line_stock_move_rel"
+      },
+      {
+        "column1": "move_id",
+        "column2": "created_purchase_line_id",
+        "id": 17548,
+        "model": "stock.move",
+        "name": "created_purchase_line_ids",
+        "relation": "purchase.order.line",
+        "relation_table": "stock_move_created_purchase_line_rel"
+      },
+      {
+        "column1": "move_orig_id",
+        "column2": "move_dest_id",
+        "id": 16153,
+        "model": "stock.move",
+        "name": "move_dest_ids",
+        "relation": "stock.move",
+        "relation_table": "stock_move_move_rel"
+      },
+      {
+        "column1": "move_dest_id",
+        "column2": "move_orig_id",
+        "id": 16154,
+        "model": "stock.move",
+        "name": "move_orig_ids",
+        "relation": "stock.move",
+        "relation_table": "stock_move_move_rel"
+      },
+      {
+        "column1": "move_id",
+        "column2": "template_attribute_value_id",
+        "id": 16139,
+        "model": "stock.move",
+        "name": "never_product_template_attribute_value_ids",
+        "relation": "product.template.attribute.value",
+        "relation_table": "template_attribute_value_stock_move_rel"
+      },
+      {
+        "column1": "move_id",
+        "column2": "reference_id",
+        "id": 16163,
+        "model": "stock.move",
+        "name": "reference_ids",
+        "relation": "stock.reference",
+        "relation_table": "stock_reference_move_rel"
+      },
+      {
+        "column1": "move_id",
+        "column2": "route_id",
+        "id": 16176,
+        "model": "stock.move",
+        "name": "route_ids",
+        "relation": "stock.route",
+        "relation_table": "stock_route_move"
+      },
+      {
+        "column1": "stock_move_id",
+        "column2": "stock_scrap_reason_tag_id",
+        "id": 16207,
+        "model": "stock.move",
+        "name": "scrap_reason_tag_ids",
+        "relation": "stock.scrap.reason.tag",
+        "relation_table": "stock_move_stock_scrap_reason_tag_rel"
+      },
+      {
+        "column1": "stock_picking_id",
+        "column2": "stock_package_history_id",
+        "id": 16491,
+        "model": "stock.picking",
+        "name": "package_history_ids",
+        "relation": "stock.package.history",
+        "relation_table": "stock_package_history_stock_picking_rel"
+      }
+    ]
+  },
+  "schema_version": 1,
+  "server": {
+    "edition": "enterprise",
+    "version": "saas~19.4+e",
+    "version_info": [
+      "saas~19",
+      4,
+      0,
+      "final",
+      0,
+      "e"
+    ]
+  },
+  "side_effects": {
+    "active_crons": {
+      "status": "OK",
+      "value": [
+        "AI Agent Sources: Process Sources",
+        "AI Embedding: Generate Embeddings",
+        "AI Fields: Compute AI fields",
+        "Account: Journal online sync",
+        "Account: Journal online sync cleanup unused connections",
+        "Account: Journal online sync reminder",
+        "Account: Post draft entries with auto_post enabled and accounting date up to today",
+        "Account: Update payment status",
+        "Base VAT: Sync updates from IAP VIES",
+        "Base: Auto-vacuum internal data",
+        "Base: Portal Users Deletion",
+        "CRM: enrich leads (IAP)",
+        "Calendar: Event Reminder",
+        "Create snapshots of accounting reports",
+        "Currency: rate update",
+        "Digest Emails",
+        "Discuss: channel member unmute",
+        "Discuss: sync channel last interest",
+        "Documents: Access Tracking",
+        "Expense OCR: Update All Status",
+        "Expense OCR: Validate Expenses",
+        "Gamification: Goal Challenge Check",
+        "Gamification: Karma tracking consolidation",
+        "Garbage-collect snapshots of accounting reports",
+        "Generate or refresh account return for every companies",
+        "Google Calendar: synchronization",
+        "HR Calendar Google: sync working locations",
+        "HR Employee: Notify Expiring Contract or Work Permit",
+        "HR Employee: Update Current Version",
+        "HR: Apply employee departures",
+        "Invoice OCR: Update All Status",
+        "Invoice OCR: Validate Invoices",
+        "Mail: Email Queue Manager",
+        "Mail: End polls",
+        "Mail: Post scheduled messages",
+        "Mail: send web push notification",
+        "Notification: Delete Notifications older than 6 Months",
+        "Notification: Notify scheduled messages",
+        "PDP Generate Flux 10 Flows",
+        "PDP: Retrieve new regulatory documents",
+        "PDP: Send lifecycles",
+        "Payment: Run Processing",
+        "Peppol: auto register services",
+        "Peppol: retrieve new documents",
+        "Peppol: update message status",
+        "Peppol: update participant status",
+        "Peppol: webhook keep alive",
+        "Planning: generate next recurring shifts",
+        "Process the pending async exports",
+        "Procurement: run scheduler",
+        "Product Images: Get product images from Barcode Lookup",
+        "Project Stage: Send rating",
+        "Publisher: Update Notification",
+        "Purchase reminder",
+        "Resource: Clean up calendar attendances",
+        "SMS: SMS Queue Manager",
+        "Sale Pdf Quote Builder: assign form fields to documents post upgrade",
+        "Send account reports automatically",
+        "Send invoices automatically",
+        "Sign: Send mail reminder",
+        "Sign: Update requests state",
+        "Skills: Add an activity to employees with missing or expiring certifications",
+        "Snailmail: process letters queue",
+        "Stock Account: Inventory Valuation Closing",
+        "Try to reconcile automatically your statement lines",
+        "Users: Notify About Unregistered Users"
+      ]
+    },
+    "base_automation_installed": false,
+    "e_invoicing_modules_installed": {
+      "account_edi_ubl_cii": true,
+      "account_peppol": true,
+      "l10n_fr_pdp": true
+    },
+    "outgoing_mail_servers": {
+      "status": "OK",
+      "value": 0
+    }
+  },
+  "source_instance": "benacta_odoo_online",
+  "volumes": {
+    "account_move_by_type_state": {
+      "entry": {
+        "cancel": 0,
+        "draft": 0,
+        "posted": 0
+      },
+      "in_invoice": {
+        "cancel": 0,
+        "draft": 0,
+        "posted": 18
+      },
+      "in_refund": {
+        "cancel": 0,
+        "draft": 0,
+        "posted": 3
+      },
+      "out_invoice": {
+        "cancel": 0,
+        "draft": 0,
+        "posted": 26
+      },
+      "out_refund": {
+        "cancel": 0,
+        "draft": 0,
+        "posted": 5
+      }
+    },
+    "invoice_date_range": {
+      "max": "2026-08-04",
+      "min": "2023-09-05"
+    },
+    "posted_cogs_lines": 0,
+    "sale_order_by_state": {
+      "cancel": 0,
+      "draft": 5,
+      "sale": 26,
+      "sent": 0
+    },
+    "sale_order_date_range": {
+      "max": "2026-08-09 18:53:10",
+      "min": "2024-01-29 00:00:00"
+    },
+    "stock_move_by_state": {
+      "assigned": 83,
+      "cancel": 0,
+      "confirmed": 0,
+      "done": 0,
+      "draft": 0
+    },
+    "stock_move_with_value": 83,
+    "storable_products": 0
+  }
+}

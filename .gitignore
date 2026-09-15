@@ -26,3 +26,6 @@ Thumbs.db
 .env.local
 .env.*
 !.env.example
+
+# V2 local runtime state (embedded PostgreSQL data, local exports)
+.benacta/

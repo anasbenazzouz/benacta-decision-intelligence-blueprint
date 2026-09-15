@@ -1,0 +1,41 @@
+# Typed relationships. `basis` states where the link comes from; `status` is OBSERVED (read from records) or
+# HYPOTHETICAL (proposed by an investigation, never stored as a fact). No causal relationship is OBSERVED.
+schema_version: 1
+relationships:
+  - {type: PROJECT_BELONGS_TO_BU, from: Project, to: BusinessUnit, cardinality: "N:1", basis: "project.tags BU/<code> (mapping)", status: OBSERVED}
+  - {type: CUSTOMER_CONTRACTS_PROJECT, from: Customer, to: Project, cardinality: "1:N", basis: project.project.partner_id (native), status: OBSERVED}
+  - {type: PROJECT_HAS_WORK_PACKAGE, from: Project, to: WorkPackage, cardinality: "1:N", basis: project.task.project_id (native), status: OBSERVED}
+  - {type: PROJECT_HAS_MILESTONE, from: Project, to: Milestone, cardinality: "1:N", basis: project.milestone.project_id (native), status: OBSERVED}
+  - {type: CHANGE_ORDER_AMENDS_PROJECT, from: ChangeOrder, to: Project, cardinality: "N:1", basis: "project.sale_line_id / sale.order.line.project_id (native)", status: OBSERVED}
+  - {type: WORK_PACKAGE_HAS_ASSIGNMENT, from: WorkPackage, to: Assignment, cardinality: "1:N", basis: planning.assignment.work_package (BENACTA), status: OBSERVED}
+  - {type: ASSIGNMENT_OF_RESOURCE, from: Assignment, to: Resource, cardinality: "N:1", basis: planning.assignment.employee_code (BENACTA), status: OBSERVED}
+  - {type: RESOURCE_HAS_SKILL, from: Resource, to: Skill, cardinality: "N:M", basis: hr.employee.skill (native), status: OBSERVED}
+  - {type: TIMESHEET_BY_RESOURCE, from: TimesheetEntry, to: Resource, cardinality: "N:1", basis: account.analytic.line.employee_id (hr_timesheet), status: OBSERVED}
+  - {type: TIMESHEET_ON_WORK_PACKAGE, from: TimesheetEntry, to: WorkPackage, cardinality: "N:1", basis: account.analytic.line.task_id (hr_timesheet), status: OBSERVED}
+  - {type: PROJECT_HAS_BUDGET, from: Project, to: BudgetVersion, cardinality: "1:N", basis: planning.plan_version.project_code (BENACTA), status: OBSERVED}
+  - {type: PROJECT_HAS_FORECAST, from: Project, to: ForecastVersion, cardinality: "1:N", basis: planning.plan_version.project_code (BENACTA), status: OBSERVED}
+  - {type: VERSION_REVISES_VERSION, from: ForecastVersion, to: ForecastVersion, cardinality: "N:1", basis: planning.plan_version.parent_version_id (BENACTA), status: OBSERVED}
+  - {type: FORECAST_RESTS_ON_ASSUMPTION, from: ForecastVersion, to: PlanningAssumption, cardinality: "1:N", basis: planning.assumption.version_id (BENACTA), status: OBSERVED}
+  - {type: PROJECT_COMMITS_PURCHASE, from: Project, to: PurchaseCommitment, cardinality: "1:N", basis: purchase.order.line.analytic_distribution (native), status: OBSERVED}
+  - {type: COMMITMENT_BILLED_BY, from: PurchaseCommitment, to: VendorBillLine, cardinality: "1:N", basis: account.move.line.purchase_line_id (native), status: OBSERVED}
+  - {type: MILESTONE_BILLED_BY, from: Milestone, to: Invoice, cardinality: "1:N", basis: "milestone.sale_line_id -> invoice line sale_line_ids (native)", status: OBSERVED}
+  - {type: INVOICE_SETTLED_BY, from: Invoice, to: Payment, cardinality: "1:N", basis: account.payment.reconciled_invoice_ids (native), status: OBSERVED}
+  - {type: EXCEPTION_AFFECTS_PROJECT, from: Exception, to: Project, cardinality: "N:1", basis: exception rule output, status: OBSERVED}
+  - {type: EXCEPTION_MEASURED_BY, from: Exception, to: MetricDefinition, cardinality: "N:1", basis: exception metric_id, status: OBSERVED}
+  - {type: EVIDENCE_SUPPORTS, from: Evidence, to: Exception, cardinality: "N:M", basis: investigation evidence_refs, status: OBSERVED}
+  - {type: HYPOTHESIS_EXPLAINS, from: PlanningAssumption, to: Exception, cardinality: "N:M", basis: investigation hypotheses, status: HYPOTHETICAL}
+  - {type: RECOMMENDATION_ADDRESSES, from: Recommendation, to: Exception, cardinality: "N:1", basis: decision.recommendation.investigation_id, status: OBSERVED}
+  - {type: REPORT_TAKEN_AT, from: ProjectStatusReport, to: ReportingSnapshot, cardinality: "N:1", basis: decision.project_status_report.snapshot_id, status: OBSERVED}
+  - {type: DECISION_REVIEWS, from: Decision, to: Recommendation, cardinality: "1:1", basis: S6, status: OBSERVED}
+  - {type: ACTION_TARGETS, from: Action, to: Project, cardinality: "N:1", basis: S6, status: OBSERVED}
+
+bounded_paths:
+  margin_erosion: [Exception, Project, ForecastVersion, PlanningAssumption]
+  labour_drivers: [Project, WorkPackage, TimesheetEntry, Resource]
+  cost_drivers: [Project, PurchaseCommitment, VendorBillLine]
+  cash_impact: [Project, Milestone, Invoice, Payment]
+
+constraints:
+  - Traversals never cross company_id.
+  - Amounts are read from the metric service, not computed in the graph.
+  - HYPOTHETICAL relationships are displayed with their evidence and never become OBSERVED without human validation.

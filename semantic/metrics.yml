@@ -1,0 +1,475 @@
+# BENACTA semantic layer: metric contracts (project controlling scope).
+# The metric service computes each metric through `calculation`; status reports, views and tools read the same
+# service, so no formula is copied elsewhere. Conventions: docs/project_controlling_model.md.
+# certification: CERTIFIED (tests and approval), CANDIDATE (implemented, formula to validate), UNCERTIFIED.
+schema_version: 1
+required_keys: [metric_id, version, name, definition, owner, steward, grain, formula, calculation, unit, period, version_rule, null_handling, exclusions, sources, certification, tests]
+
+metrics:
+  - metric_id: actual_cost
+    version: 1
+    name: Actual cost to cutoff
+    definition: Costs recognised on the project up to the cutoff date
+    owner: Head of project controlling
+    steward: Project controller
+    grain: project, cost category, cutoff
+    formula: sum(timesheet hours x hourly cost, entry date <= cutoff) + sum(posted vendor bill lines, accounting date <= cutoff)
+    calculation: app.controlling.metrics:compute_project_metrics
+    unit: EUR excluding taxes
+    period: cumulative from project start to cutoff
+    version_rule: independent of plan versions
+    null_handling: no timesheet or bill gives 0 with the completeness check reporting missing time
+    exclusions: payments (cash, not cost); unposted bills; bills of other projects
+    sources: [marts.fact_timesheet, marts.fact_vendor_bill_line]
+    certification: CANDIDATE
+    tests: [test_projects_oracle_actual_cost]
+
+  - metric_id: open_commitments
+    version: 1
+    name: Open commitments
+    definition: Ordered amounts not yet recognised as cost
+    owner: Head of project controlling
+    steward: Project controller
+    grain: purchase order line, rolled up by project and cost category
+    formula: sum over confirmed lines ordered on or before cutoff of max(ordered amount - posted billed amount at cutoff, 0)
+    calculation: app.controlling.metrics:open_commitment
+    unit: EUR excluding taxes
+    period: position at cutoff
+    version_rule: independent of plan versions
+    null_handling: over-billed line counts 0 and raises PURCHASE_LINE_OVER_BILLED
+    exclusions: payment status; lines without project attribution
+    sources: [marts.fact_purchase_commitment, marts.fact_vendor_bill_line]
+    certification: CANDIDATE
+    tests: [test_open_commitment_floors_over_billing, test_projects_oracle_commitments]
+
+  - metric_id: received_not_billed
+    version: 1
+    name: Received not billed
+    definition: Received quantities not yet billed, valued at order price, for accrual review
+    owner: Accounting manager
+    steward: Project controller
+    grain: purchase order line
+    formula: max(received quantity x price unit - billed amount at cutoff, 0)
+    calculation: app.controlling.metrics:compute_project_metrics
+    unit: EUR excluding taxes
+    period: position at extraction (received quantity is not historised)
+    version_rule: independent of plan versions
+    null_handling: service lines without receipt method report 0 and are listed as not measurable
+    exclusions: none
+    sources: [marts.fact_purchase_commitment]
+    certification: UNCERTIFIED
+    tests: []
+
+  - metric_id: etc
+    version: 1
+    name: Estimate to complete
+    definition: Remaining cost after the cutoff in the BASE forecast in force, including open commitments
+    owner: Project director
+    steward: Project controller
+    grain: project, cost category, cutoff
+    formula: sum(planned_cost of BASE forecast approved or locked with cutoff_date = cutoff, periods after the cutoff month)
+    calculation: app.controlling.metrics:plan_totals
+    unit: EUR excluding taxes
+    period: from the month after cutoff to completion
+    version_rule: FORECAST, scenario BASE, status APPROVED or LOCKED, cutoff equal to the report cutoff
+    null_handling: no such version gives UNKNOWN with reason, never zero
+    exclusions: draft and submitted versions; other scenarios
+    sources: [planning.plan_version, planning.plan_line]
+    certification: CANDIDATE
+    tests: [test_projects_oracle_etc, test_missing_forecast_is_unknown]
+
+  - metric_id: uncommitted_etc
+    version: 1
+    name: Uncommitted estimate to complete
+    definition: Part of ETC not yet covered by purchase commitments
+    owner: Project director
+    steward: Project controller
+    grain: project, cutoff
+    formula: ETC - open commitments; a negative value by category raises ETC_BELOW_OPEN_COMMITMENTS
+    calculation: app.controlling.metrics:uncommitted_etc
+    unit: EUR excluding taxes
+    period: from the month after cutoff to completion
+    version_rule: as etc
+    null_handling: UNKNOWN when ETC is UNKNOWN
+    exclusions: none
+    sources: [planning.plan_line, marts.fact_purchase_commitment]
+    certification: CANDIDATE
+    tests: [test_commitment_already_in_etc_is_not_added_twice]
+
+  - metric_id: eac
+    version: 1
+    name: Estimate at completion
+    definition: Expected total cost of the project at completion
+    owner: Project director
+    steward: Project controller
+    grain: project, cost category, cutoff
+    formula: actual_cost + etc (ETC includes open commitments; they are never added again)
+    calculation: app.controlling.metrics:eac
+    unit: EUR excluding taxes
+    period: whole project life
+    version_rule: as etc
+    null_handling: UNKNOWN when ETC is UNKNOWN
+    exclusions: pending change order scenario
+    sources: [marts.fact_timesheet, marts.fact_vendor_bill_line, planning.plan_line]
+    certification: CANDIDATE
+    tests: [test_eac_convention, test_projects_oracle_eac]
+
+  - metric_id: approved_budget
+    version: 1
+    name: Approved budget
+    definition: Cost budget in force at the cutoff
+    owner: Head of project controlling
+    steward: Project controller
+    grain: project, cost category
+    formula: total planned_cost of the latest BUDGET_REVISED approved or locked effective on or before cutoff, else the locked BUDGET_BASELINE
+    calculation: app.controlling.metrics:resolve_versions
+    unit: EUR excluding taxes
+    period: whole project life
+    version_rule: effective date stored in cutoff_date of budget versions
+    null_handling: UNKNOWN when no approved budget is effective
+    exclusions: draft budgets
+    sources: [planning.plan_version, planning.plan_line]
+    certification: CANDIDATE
+    tests: [test_projects_oracle_budget]
+
+  - metric_id: cost_variance_at_completion
+    version: 1
+    name: Cost variance at completion
+    definition: Expected overrun against the approved budget
+    owner: Head of project controlling
+    steward: Project controller
+    grain: project, cutoff
+    formula: eac - approved_budget; positive is unfavourable
+    calculation: app.controlling.metrics:cost_variance_at_completion
+    unit: EUR excluding taxes
+    period: whole project life
+    version_rule: as eac and approved_budget
+    null_handling: UNKNOWN when either input is UNKNOWN
+    exclusions: none
+    sources: [planning.plan_line]
+    certification: CANDIDATE
+    tests: [test_projects_oracle_cost_variance]
+
+  - metric_id: forecast_revenue_at_completion
+    version: 1
+    name: Forecast revenue at completion
+    definition: Contract value including approved change orders, basis CONTRACT_APPROVED
+    owner: Project director
+    steward: Project controller
+    grain: project, cutoff
+    formula: untaxed amount of the contract order + confirmed change orders dated on or before cutoff, converted at the fixed project rate when not in EUR
+    calculation: app.controlling.metrics:compute_project_metrics
+    unit: EUR excluding taxes
+    period: whole project life
+    version_rule: pending change orders only in the PENDING_CO scenario
+    null_handling: UNKNOWN without confirmed contract order or fixed rate for foreign currency
+    exclusions: quotations; claims not agreed
+    sources: [marts.fact_change_order, marts.dim_project]
+    certification: CANDIDATE
+    tests: [test_projects_oracle_frac, test_pending_change_order_only_in_scenario]
+
+  - metric_id: pending_change_orders
+    version: 1
+    name: Pending change orders
+    definition: Change order quotations not approved at cutoff
+    owner: Project director
+    steward: Project manager
+    grain: project, cutoff
+    formula: sum of untaxed amounts of quotations (draft or sent) on the project dated on or before cutoff
+    calculation: app.controlling.metrics:compute_project_metrics
+    unit: EUR excluding taxes
+    period: position at cutoff
+    version_rule: not part of BASE revenue
+    null_handling: 0 when none
+    exclusions: cancelled quotations
+    sources: [marts.fact_change_order]
+    certification: CANDIDATE
+    tests: [test_pending_change_order_only_in_scenario]
+
+  - metric_id: forecast_margin_amount
+    version: 1
+    name: Forecast margin at completion
+    definition: Revenue at completion minus estimate at completion
+    owner: Project director
+    steward: Project controller
+    grain: project, cutoff
+    formula: forecast_revenue_at_completion - eac
+    calculation: app.controlling.metrics:margin
+    unit: EUR excluding taxes
+    period: whole project life
+    version_rule: as eac
+    null_handling: UNKNOWN when either input is UNKNOWN
+    exclusions: none
+    sources: [marts.fact_change_order, planning.plan_line]
+    certification: CANDIDATE
+    tests: [test_projects_oracle_margin, test_margin_erosion_decomposition]
+
+  - metric_id: forecast_margin_pct
+    version: 1
+    name: Forecast margin at completion, percentage
+    definition: Margin at completion over revenue at completion
+    owner: Project director
+    steward: Project controller
+    grain: project, cutoff
+    formula: forecast_margin_amount / forecast_revenue_at_completion x 100; ratio of sums when rolled up, never an average of ratios
+    calculation: app.controlling.metrics:ratio_pct
+    unit: percent
+    period: whole project life
+    version_rule: as eac
+    null_handling: null with reason when revenue is zero or unknown
+    exclusions: none
+    sources: [marts.fact_change_order, planning.plan_line]
+    certification: CANDIDATE
+    tests: [test_ratio_of_sums]
+
+  - metric_id: billed_amount
+    version: 1
+    name: Billed amount
+    definition: Untaxed amount invoiced to the customer for the project
+    owner: Head of billing
+    steward: Project controller
+    grain: invoice, rolled up by project
+    formula: posted customer invoices minus credit notes linked to the project order lines, invoice date on or before cutoff
+    calculation: app.controlling.metrics:compute_project_metrics
+    unit: EUR excluding taxes
+    period: cumulative to cutoff
+    version_rule: independent of plan versions
+    null_handling: 0 when none
+    exclusions: draft invoices; revenue recognition
+    sources: [marts.fact_receivable]
+    certification: CANDIDATE
+    tests: [test_projects_oracle_billing]
+
+  - metric_id: collected_amount
+    version: 1
+    name: Collected amount
+    definition: Cash received on the project invoices
+    owner: Treasury
+    steward: Project controller
+    grain: payment allocated to invoice
+    formula: payments dated on or before cutoff allocated to the project invoices
+    calculation: app.controlling.metrics:compute_project_metrics
+    unit: EUR including taxes
+    period: cumulative to cutoff
+    version_rule: independent of plan versions
+    null_handling: 0 when none
+    exclusions: unallocated receipts
+    sources: [marts.fact_customer_payment]
+    certification: CANDIDATE
+    tests: [test_projects_oracle_billing]
+
+  - metric_id: overdue_amount
+    version: 1
+    name: Overdue amount
+    definition: Unpaid residual of invoices past their due date at cutoff
+    owner: Treasury
+    steward: Project controller
+    grain: invoice
+    formula: invoice total - payments at cutoff, where due date < cutoff; ageing buckets 1-30, 31-90, 91-180, 181-365, above 365 days
+    calculation: app.controlling.metrics:ageing_bucket
+    unit: EUR including taxes
+    period: position at cutoff
+    version_rule: independent of plan versions
+    null_handling: 0 when none; invoices without due date are not overdue and are reported
+    exclusions: credit notes shown separately
+    sources: [marts.fact_receivable, marts.fact_customer_payment]
+    certification: CANDIDATE
+    tests: [test_ageing_boundaries, test_projects_oracle_overdue]
+
+  - metric_id: not_yet_due_amount
+    version: 1
+    name: Not yet due amount
+    definition: Unpaid residual of invoices not yet due at cutoff
+    owner: Treasury
+    steward: Project controller
+    grain: invoice
+    formula: invoice total - payments at cutoff, where due date >= cutoff
+    calculation: app.controlling.metrics:compute_project_metrics
+    unit: EUR including taxes
+    period: position at cutoff
+    version_rule: independent of plan versions
+    null_handling: 0 when none
+    exclusions: none
+    sources: [marts.fact_receivable, marts.fact_customer_payment]
+    certification: CANDIDATE
+    tests: [test_projects_oracle_overdue]
+
+  - metric_id: remaining_to_bill
+    version: 1
+    name: Remaining to bill
+    definition: Revenue at completion not yet invoiced
+    owner: Head of billing
+    steward: Project controller
+    grain: project, cutoff
+    formula: forecast_revenue_at_completion - billed_amount
+    calculation: app.controlling.metrics:compute_project_metrics
+    unit: EUR excluding taxes
+    period: position at cutoff
+    version_rule: as forecast_revenue_at_completion
+    null_handling: UNKNOWN when revenue at completion is UNKNOWN
+    exclusions: none
+    sources: [marts.fact_change_order, marts.fact_receivable]
+    certification: CANDIDATE
+    tests: [test_projects_oracle_billing]
+
+  - metric_id: actual_hours
+    version: 1
+    name: Actual hours
+    definition: Hours logged on the project up to the cutoff
+    owner: Head of engineering
+    steward: Resource coordinator
+    grain: timesheet entry, rolled up by project, role, employee, month
+    formula: sum(timesheet hours, entry date <= cutoff)
+    calculation: app.controlling.metrics:compute_project_metrics
+    unit: hours
+    period: cumulative to cutoff
+    version_rule: independent of plan versions
+    null_handling: 0 with completeness check
+    exclusions: internal projects when reporting delivery projects
+    sources: [marts.fact_timesheet]
+    certification: CANDIDATE
+    tests: [test_projects_oracle_hours]
+
+  - metric_id: planned_hours
+    version: 1
+    name: Planned hours
+    definition: Hours of the approved budget
+    owner: Head of engineering
+    steward: Project controller
+    grain: project, role, month
+    formula: sum(planned_hours of the approved budget version)
+    calculation: app.controlling.metrics:plan_totals
+    unit: hours
+    period: whole project life
+    version_rule: as approved_budget
+    null_handling: UNKNOWN without approved budget
+    exclusions: none
+    sources: [planning.plan_line]
+    certification: CANDIDATE
+    tests: [test_projects_oracle_hours]
+
+  - metric_id: hours_at_completion
+    version: 1
+    name: Hours at completion
+    definition: Actual hours plus hours still planned by the forecast in force
+    owner: Head of engineering
+    steward: Project controller
+    grain: project, role
+    formula: actual_hours + planned_hours of the BASE forecast after cutoff
+    calculation: app.controlling.metrics:compute_project_metrics
+    unit: hours
+    period: whole project life
+    version_rule: as etc
+    null_handling: UNKNOWN without forecast
+    exclusions: none
+    sources: [marts.fact_timesheet, planning.plan_line]
+    certification: CANDIDATE
+    tests: [test_projects_oracle_hours]
+
+  - metric_id: available_capacity
+    version: 1
+    name: Available capacity
+    definition: Working hours a resource can give in a month
+    owner: Head of engineering
+    steward: Resource coordinator
+    grain: employee, month
+    formula: working days (Monday to Friday) x hours per day of the working calendar; absences not modelled yet
+    calculation: app.fixtures.projects_dataset:working_days
+    unit: hours
+    period: month
+    version_rule: independent of plan versions
+    null_handling: UNKNOWN without calendar
+    exclusions: public holidays and leave (not modelled)
+    sources: [marts.dim_employee]
+    certification: UNCERTIFIED
+    tests: []
+
+  - metric_id: physical_progress_pct
+    version: 1
+    name: Declared physical progress
+    definition: Physical progress declared by the project manager for the forecast in force
+    owner: Project director
+    steward: Project manager
+    grain: project, work package, cutoff
+    formula: declared value with author and evidence reference; never computed from costs
+    calculation: app.controlling.metrics:compute_project_metrics
+    unit: percent
+    period: position at cutoff
+    version_rule: assumption of the BASE forecast in force
+    null_handling: UNKNOWN when not declared
+    exclusions: cost consumption ratio
+    sources: [planning.assumption]
+    certification: CANDIDATE
+    tests: [test_progress_is_never_cost_ratio]
+
+  - metric_id: cost_consumption_ratio
+    version: 1
+    name: Cost consumption ratio
+    definition: Share of the estimate at completion already spent
+    owner: Head of project controlling
+    steward: Project controller
+    grain: project, cutoff
+    formula: actual_cost / eac x 100
+    calculation: app.controlling.metrics:ratio_pct
+    unit: percent
+    period: position at cutoff
+    version_rule: as eac
+    null_handling: UNKNOWN when EAC is UNKNOWN or zero
+    exclusions: never displayed as progress
+    sources: [marts.fact_timesheet, marts.fact_vendor_bill_line, planning.plan_line]
+    certification: CANDIDATE
+    tests: [test_progress_is_never_cost_ratio]
+
+  - metric_id: delayed_billing_amount
+    version: 1
+    name: Delayed billing
+    definition: Billing value of milestones past their deadline and not reached at cutoff
+    owner: Project director
+    steward: Project manager
+    grain: milestone
+    formula: sum(milestone percentage x order line amount) for late milestones, converted at the fixed project rate
+    calculation: app.controlling.metrics:compute_project_metrics
+    unit: EUR excluding taxes
+    period: position at cutoff
+    version_rule: planned billing periods read from previous and current forecasts
+    null_handling: 0 when no late milestone
+    exclusions: milestones without order line
+    sources: [marts.dim_milestone, planning.plan_line]
+    certification: CANDIDATE
+    tests: [test_late_milestone_shifts_billing]
+
+  - metric_id: unapproved_change_order_cost
+    version: 1
+    name: Cost on unapproved change order scope
+    definition: Labour cost logged on work packages of change orders not yet approved
+    owner: Project director
+    steward: Project controller
+    grain: work package
+    formula: sum(timesheet cost on work packages flagged as change order scope)
+    calculation: app.controlling.metrics:compute_project_metrics
+    unit: EUR excluding taxes
+    period: cumulative to cutoff
+    version_rule: independent of plan versions
+    null_handling: 0 when none
+    exclusions: approved change orders
+    sources: [marts.fact_timesheet, marts.dim_work_package]
+    certification: CANDIDATE
+    tests: [test_projects_oracle_pending_change_order]
+
+  - metric_id: overdue_share
+    version: 1
+    name: Overdue share
+    definition: Share of open receivables that is past due
+    owner: Treasury
+    steward: Treasury analyst
+    grain: company, BU, customer, cutoff
+    formula: overdue_amount / (overdue_amount + not_yet_due_amount) x 100 (inferred from reference figures, to validate)
+    calculation: app.controlling.metrics:ratio_pct
+    unit: percent
+    period: position at cutoff
+    version_rule: independent of plan versions
+    null_handling: null when both amounts are zero
+    exclusions: credit notes
+    sources: [marts.fact_receivable, marts.fact_customer_payment]
+    certification: UNCERTIFIED
+    tests: []
