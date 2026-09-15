@@ -26,10 +26,30 @@ relationships:
   - {type: HYPOTHESIS_EXPLAINS, from: PlanningAssumption, to: Exception, cardinality: "N:M", basis: investigation hypotheses, status: HYPOTHETICAL}
   - {type: RECOMMENDATION_ADDRESSES, from: Recommendation, to: Exception, cardinality: "N:1", basis: decision.recommendation.investigation_id, status: OBSERVED}
   - {type: REPORT_TAKEN_AT, from: ProjectStatusReport, to: ReportingSnapshot, cardinality: "N:1", basis: decision.project_status_report.snapshot_id, status: OBSERVED}
+  # Margin Control (milestone 1)
+  - {type: CUSTOMER_PLACES_ORDER, from: Customer, to: SaleOrder, cardinality: "1:N", basis: sale.order.partner_id (native), status: OBSERVED}
+  - {type: ORDER_HAS_LINE, from: SaleOrder, to: SaleOrderLine, cardinality: "1:N", basis: sale.order.line.order_id (native), status: OBSERVED}
+  - {type: LINE_SELLS_PRODUCT, from: SaleOrderLine, to: Product, cardinality: "N:1", basis: sale.order.line.product_id (native), status: OBSERVED}
+  - {type: LINE_INVOICED_BY, from: SaleOrderLine, to: InvoiceLine, cardinality: "N:M", basis: "sale_order_line_invoice_rel through marts.bridge_sale_invoice_line (weight 1 only)", status: OBSERVED}
+  - {type: ORDER_APPLIES_PRICELIST, from: SaleOrder, to: PriceList, cardinality: "N:1", basis: sale.order.pricelist_id (native), status: OBSERVED}
+  - {type: CUSTOMER_ASSIGNED_PRICELIST, from: Customer, to: PriceList, cardinality: "N:1", basis: res.partner.property_product_pricelist (native), status: OBSERVED}
+  - {type: POLICY_GOVERNS_CUSTOMER, from: DiscountPolicy, to: Customer, cardinality: "N:M", basis: "semantic.discount_policy scope (segment or customer ref)", status: OBSERVED}
+  - {type: DEROGATION_COVERS_ORDER, from: Derogation, to: SaleOrder, cardinality: "N:1", basis: semantic.discount_derogation.order_ref, status: OBSERVED}
+  - {type: FREIGHT_CLAUSE_OF_CUSTOMER, from: FreightContract, to: Customer, cardinality: "N:1", basis: semantic.freight_contract.customer_ref, status: OBSERVED}
+  - {type: CONTRACT_PRICE_FOR, from: ContractPrice, to: Product, cardinality: "N:1", basis: semantic.contract_price.product_code, status: OBSERVED}
+  - {type: COST_REFERENCE_FOR, from: CostReference, to: Product, cardinality: "N:1", basis: semantic.cost_reference.product_code, status: OBSERVED}
+  - {type: EVALUATION_OF_LINE, from: RuleEvaluation, to: SaleOrderLine, cardinality: "N:1", basis: fact_margin_rule_evaluation.subject (sale_order_line), status: OBSERVED}
+  - {type: EVALUATION_OF_ORDER, from: RuleEvaluation, to: SaleOrder, cardinality: "N:1", basis: fact_margin_rule_evaluation.subject (sale_order), status: OBSERVED}
+  - {type: EVALUATION_OF_INVOICE_LINE, from: RuleEvaluation, to: InvoiceLine, cardinality: "N:1", basis: fact_margin_rule_evaluation.subject (invoice_line), status: OBSERVED}
+  - {type: CASE_TRACKS_EVALUATION, from: ExceptionCase, to: RuleEvaluation, cardinality: "1:N", basis: "decision.exception_case.exception_key = rule, subject", status: OBSERVED}
+  - {type: EVALUATION_MEASURED_BY, from: RuleEvaluation, to: MetricDefinition, cardinality: "N:1", basis: rule exposure_type, status: OBSERVED}
   - {type: DECISION_REVIEWS, from: Decision, to: Recommendation, cardinality: "1:1", basis: S6, status: OBSERVED}
   - {type: ACTION_TARGETS, from: Action, to: Project, cardinality: "N:1", basis: S6, status: OBSERVED}
 
 bounded_paths:
+  margin_leakage: [ExceptionCase, RuleEvaluation, SaleOrderLine, SaleOrder, Customer, DiscountPolicy]
+  price_baseline: [SaleOrderLine, Product, ContractPrice, PriceList]
+  cost_variance: [SaleOrderLine, InvoiceLine, Product, CostReference]
   margin_erosion: [Exception, Project, ForecastVersion, PlanningAssumption]
   labour_drivers: [Project, WorkPackage, TimesheetEntry, Resource]
   cost_drivers: [Project, PurchaseCommitment, VendorBillLine]

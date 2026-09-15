@@ -31,6 +31,8 @@ from sqlalchemy.engine import Connection, Engine
 from app.audit.log import append_event
 
 MARTS_TABLES = (
+    "fact_margin_period",
+    "fact_margin_rule_evaluation",
     "reconciliation_result",
     "data_quality_issue",
     "bridge_sale_invoice_line",
@@ -39,6 +41,8 @@ MARTS_TABLES = (
     "fact_posted_cogs_line",
     "fact_invoice_line",
     "fact_sales_order_line",
+    "dim_pricelist_item",
+    "dim_pricelist",
     "dim_account",
     "dim_product",
     "dim_partner",
@@ -49,6 +53,8 @@ MARTS_TABLES = (
 )
 REVENUE_MOVE_TYPES = ("out_invoice", "out_refund")
 AMOUNT_TOLERANCE = Decimal("0.01")
+# Recorded on every snapshot and reconciliation row. Bump when a transformation changes a computed figure.
+TRANSFORMATION_VERSION = "marts.2026.09.2"
 
 
 def D(value: Any) -> Decimal:
@@ -173,6 +179,8 @@ class _Builder:
                     "partner_id": pid,
                     "commercial_partner_id": m2o(partner.get("commercial_partner_id")) or pid,
                     "name": partner["name"],
+                    "ref": partner.get("ref") or None,
+                    "pricelist_id": m2o(partner.get("property_product_pricelist")),
                     "company_id": m2o(partner.get("company_id")),
                     "is_customer": (partner.get("customer_rank") or 0) > 0,
                     "is_supplier": (partner.get("supplier_rank") or 0) > 0,
@@ -194,6 +202,37 @@ class _Builder:
                     "cost_method": category.get("property_cost_method"),
                     "valuation": category.get("property_valuation"),
                     "uom_id": m2o(template.get("uom_id")),
+                    "list_price": D(template["list_price"]) if template.get("list_price") is not None else None,
+                }
+            )
+        for lid, pricelist in d.records.get("product.pricelist", {}).items():
+            self.rows["dim_pricelist"].append(
+                {
+                    "snapshot_id": self.s,
+                    "pricelist_id": lid,
+                    "name": pricelist["name"],
+                    "currency_code": self.currency_by_id.get(m2o(pricelist.get("currency_id")), {}).get("name", "UNKNOWN"),
+                    "company_id": m2o(pricelist.get("company_id")),
+                    "active": bool(pricelist.get("active", True)),
+                }
+            )
+        for iid, item in d.records.get("product.pricelist.item", {}).items():
+            self.rows["dim_pricelist_item"].append(
+                {
+                    "snapshot_id": self.s,
+                    "item_id": iid,
+                    "pricelist_id": m2o(item["pricelist_id"]),
+                    "applied_on": item.get("applied_on") or "3_global",
+                    "product_template_id": m2o(item.get("product_tmpl_id")),
+                    "product_id": m2o(item.get("product_id")),
+                    "category_id": m2o(item.get("categ_id")),
+                    "min_quantity": D(item.get("min_quantity") or 0),
+                    "compute_price": item.get("compute_price") or "fixed",
+                    "fixed_price": D(item["fixed_price"]) if item.get("fixed_price") is not None else None,
+                    "percent_price": D(item["percent_price"]) if item.get("percent_price") is not None else None,
+                    "currency_code": self.currency_by_id.get(m2o(item.get("currency_id")), {}).get("name"),
+                    "date_start": to_date(item.get("date_start")),
+                    "date_end": to_date(item.get("date_end")),
                 }
             )
         for aid, account in d.records.get("account.account", {}).items():
@@ -266,6 +305,7 @@ class _Builder:
                     "order_date": order_date,
                     "order_state": order["state"],
                     "currency_code": currency_code,
+                    "pricelist_id": m2o(order.get("pricelist_id")),
                     "uom_id": uom_id,
                     "qty_ordered": qty,
                     "qty_ordered_product_uom": qty_product_uom,
@@ -489,10 +529,11 @@ def build_marts(engine: Engine, snapshot_id: uuid.UUID, *, actor: str = "service
             conn.execute(sa.text(f"delete from marts.{table} where snapshot_id = :s"), {"s": snapshot_id})  # noqa: S608
         conn.execute(
             sa.text(
-                "insert into marts.snapshot (snapshot_id, source_instance, batch_seq) values (:s, :i, :q)"
-                " on conflict (snapshot_id) do update set built_at = now()"
+                "insert into marts.snapshot (snapshot_id, source_instance, batch_seq, transformation_version)"
+                " values (:s, :i, :q, :v) on conflict (snapshot_id) do update set built_at = now(),"
+                " transformation_version = excluded.transformation_version"
             ),
-            {"s": snapshot_id, "i": data.source_instance, "q": data.batch_seq},
+            {"s": snapshot_id, "i": data.source_instance, "q": data.batch_seq, "v": TRANSFORMATION_VERSION},
         )
         if builder.dates:
             first, last = min(builder.dates), max(builder.dates)
@@ -537,6 +578,10 @@ def build_marts(engine: Engine, snapshot_id: uuid.UUID, *, actor: str = "service
             object_type="snapshot",
             object_id=str(snapshot_id),
             run_id=str(snapshot_id),
-            payload={"source_instance": data.source_instance, "row_counts": stats},
+            payload={
+                "source_instance": data.source_instance,
+                "row_counts": stats,
+                "transformation_version": TRANSFORMATION_VERSION,
+            },
         )
     return stats

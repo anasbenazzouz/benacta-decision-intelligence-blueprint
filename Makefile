@@ -29,6 +29,23 @@ marts:
 reconcile:
 	$(API) benacta reconcile
 
+# Governed commercial terms: fixture terms in fixture mode, data/policies/margin_policy_register.yml otherwise.
+load-policies:
+	$(API) benacta load-policies
+
+# Margin Control: deterministic rules on the latest snapshot, then the CFO views.
+exceptions:
+	$(API) benacta exceptions
+
+margin-overview:
+	$(API) benacta margin-overview
+
+margin-exceptions:
+	$(API) benacta margin-exceptions
+
+reconciliation-report:
+	$(API) benacta reconciliation-report
+
 verify-audit:
 	$(API) benacta verify-audit --export
 

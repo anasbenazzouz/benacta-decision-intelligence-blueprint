@@ -1,4 +1,4 @@
-"""Reconcile marts against control totals computed by the source, per company and month.
+"""Reconcile marts against control totals, per company and month.
 
 Control totals are not re-summed from our own extract: on Odoo they come from
 `formatted_read_group`, aggregated by the server at reconciliation time
@@ -10,20 +10,30 @@ Checks:
 - COGS_POSTED: posted COGS items on direct cost accounts. When goods were invoiced in a
   month without any posted COGS, the check is UNAVAILABLE and gross margin can only be a
   management proxy.
+- INVOICE_HEADER_LINES: the untaxed amount of every posted invoice header against the sum of
+  its product lines in the marts (SOURCE_HEADER: the source's own header, consistent with its
+  lines by construction, so a difference is an extraction or transformation defect).
+
+Every row carries the tolerance, the source timestamp of the newest record behind the
+snapshot, the ingestion timestamp and the transformation version, so a closed period can be
+reported and re-verified later.
 """
 
 from __future__ import annotations
 
+import json
 import uuid
-from dataclasses import dataclass
-from datetime import date
+from dataclasses import dataclass, field
+from datetime import date, datetime
 from decimal import Decimal
+from typing import Any
 
 import sqlalchemy as sa
 from sqlalchemy.engine import Engine
 
 from app.audit.log import append_event
 from app.ingestion.sources import Source
+from app.numbers import decimal_text
 
 TOLERANCE = Decimal("0.01")
 REVENUE_DOMAIN = [
@@ -48,6 +58,19 @@ class ReconciliationRow:
     expected: Decimal | None
     actual: Decimal | None
     explanation: str
+    tolerance: Decimal = TOLERANCE
+    detail: dict[str, Any] = field(default_factory=dict)
+
+    @property
+    def difference(self) -> Decimal | None:
+        return (self.actual - self.expected) if self.expected is not None and self.actual is not None else None
+
+
+@dataclass(frozen=True)
+class SnapshotProvenance:
+    source_timestamp: datetime | None
+    ingested_at: datetime | None
+    transformation_version: str | None
 
 
 def _month_bounds(period: str) -> tuple[str, str]:
@@ -66,6 +89,23 @@ def _status(expected: Decimal | None, actual: Decimal) -> tuple[str, str]:
     return "UNRECONCILED", (
         f"difference {difference}: records changed after the snapshot, excluded lines, or an extraction gap"
     )
+
+
+def snapshot_provenance(engine: Engine, snapshot_id: uuid.UUID) -> SnapshotProvenance:
+    with engine.connect() as conn:
+        row = conn.execute(
+            sa.text(
+                "select b.finished_at, s.transformation_version,"
+                " (select max(v.source_write_date) from raw.source_record_version v"
+                "   where v.source_instance = b.source_instance and v.batch_seq <= b.batch_seq"
+                "     and v.source_model in ('account.move', 'account.move.line')) as source_timestamp"
+                " from raw.ingestion_batch b left join marts.snapshot s on s.snapshot_id = b.batch_id where b.batch_id = :s"
+            ),
+            {"s": snapshot_id},
+        ).first()
+    if row is None:
+        return SnapshotProvenance(None, None, None)
+    return SnapshotProvenance(row.source_timestamp, row.finished_at, row.transformation_version)
 
 
 def reconcile(
@@ -102,6 +142,7 @@ def reconcile(
                 {"s": snapshot_id},
             )
         }
+        header_rows = _invoice_headers(conn, snapshot_id)
 
     rows: list[ReconciliationRow] = []
     periods = sorted({(r.company_id, r.period) for r in revenue} | set(cogs))
@@ -156,15 +197,18 @@ def reconcile(
                     explanation,
                 )
             )
+        rows.append(_header_check(company_id, period, header_rows.get((company_id, period), [])))
 
+    provenance = snapshot_provenance(engine, snapshot_id)
     with engine.begin() as conn:
         conn.execute(sa.text("delete from marts.reconciliation_result where snapshot_id = :s"), {"s": snapshot_id})
         if rows:
             conn.execute(
                 sa.text(
                     "insert into marts.reconciliation_result (snapshot_id, check_id, company_id, period, status,"
-                    " independence, expected, actual, difference, explanation) values (:s, :c, :co, :p, :st, :ind, :e,"
-                    " :a, :d, :x)"
+                    " independence, expected, actual, difference, explanation, tolerance, source_timestamp, ingested_at,"
+                    " transformation_version, detail) values (:s, :c, :co, :p, :st, :ind, :e, :a, :d, :x, :t, :src, :ing,"
+                    " :tv, cast(:det as jsonb))"
                 ),
                 [
                     {
@@ -176,8 +220,13 @@ def reconcile(
                         "ind": r.independence,
                         "e": r.expected,
                         "a": r.actual,
-                        "d": (r.actual - r.expected) if r.expected is not None and r.actual is not None else None,
+                        "d": r.difference,
                         "x": r.explanation,
+                        "t": r.tolerance,
+                        "src": provenance.source_timestamp,
+                        "ing": provenance.ingested_at,
+                        "tv": provenance.transformation_version,
+                        "det": json.dumps(r.detail),
                     }
                     for r in rows
                 ],
@@ -192,9 +241,61 @@ def reconcile(
             object_type="snapshot",
             object_id=str(snapshot_id),
             run_id=str(snapshot_id),
-            payload={"independence": source.independence, "results": summary},
+            payload={
+                "independence": source.independence,
+                "results": summary,
+                "transformation_version": provenance.transformation_version,
+            },
         )
     return rows
+
+
+def _invoice_headers(conn, snapshot_id: uuid.UUID) -> dict[tuple[int, str], list[dict[str, Any]]]:
+    """Posted revenue invoice headers of the snapshot next to the sum of their product lines in the marts."""
+    rows = conn.execute(
+        sa.text(
+            "with batch as (select source_instance, batch_seq from raw.ingestion_batch where batch_id = :s),"
+            " headers as ("
+            "   select h.source_id as invoice_id, h.company_id, to_char(cast(h.payload->>'date' as date), 'YYYY-MM') as period,"
+            "          h.payload->>'name' as name, cast(h.payload->>'amount_untaxed_signed' as numeric) as header_amount"
+            "   from batch b, staging.records_at(b.source_instance, 'account.move', b.batch_seq) h"
+            "   where h.payload->>'state' = 'posted' and h.payload->>'move_type' in ('out_invoice', 'out_refund'))"
+            " select hd.invoice_id, hd.company_id, hd.period, hd.name, hd.header_amount,"
+            "        coalesce((select sum(revenue_company_ccy) from marts.fact_invoice_line l"
+            "                  where l.snapshot_id = :s and l.invoice_id = hd.invoice_id), 0) as lines_amount"
+            " from headers hd order by hd.period, hd.invoice_id"
+        ),
+        {"s": snapshot_id},
+    ).mappings()
+    grouped: dict[tuple[int, str], list[dict[str, Any]]] = {}
+    for r in rows:
+        grouped.setdefault((r["company_id"], r["period"]), []).append(dict(r))
+    return grouped
+
+
+def _header_check(company_id: int, period: str, headers: list[dict[str, Any]]) -> ReconciliationRow:
+    if not headers:
+        return ReconciliationRow(
+            "INVOICE_HEADER_LINES", company_id, period, "UNAVAILABLE", "NONE", None, Decimal(0),
+            "no posted invoice header found for the period", detail={"invoices": 0},
+        )
+    expected = sum((h["header_amount"] or Decimal(0) for h in headers), Decimal(0))
+    actual = sum((h["lines_amount"] for h in headers), Decimal(0))
+    mismatched = [
+        {"invoice_id": h["invoice_id"], "name": h["name"], "header": str(h["header_amount"]), "lines": str(h["lines_amount"])}
+        for h in headers
+        if abs((h["header_amount"] or Decimal(0)) - h["lines_amount"]) > TOLERANCE
+    ]
+    if mismatched:
+        return ReconciliationRow(
+            "INVOICE_HEADER_LINES", company_id, period, "UNRECONCILED", "SOURCE_HEADER", expected, actual,
+            f"{len(mismatched)} invoice(s) whose product lines do not sum to the header",
+            detail={"invoices": len(headers), "mismatched": mismatched[:50]},
+        )
+    return ReconciliationRow(
+        "INVOICE_HEADER_LINES", company_id, period, "RECONCILED", "SOURCE_HEADER", expected, actual,
+        "every posted invoice header equals the sum of its product lines within 0.01", detail={"invoices": len(headers)},
+    )
 
 
 def _control_total(source: Source, domain: list, company_id: int, *, negate: bool) -> Decimal | None:
@@ -220,3 +321,43 @@ def margin_basis(engine: Engine, snapshot_id: uuid.UUID) -> str:
             .all()
         )
     return "RECONCILED_COGS" if statuses == ["RECONCILED"] else "MANAGEMENT_PROXY"
+
+
+def reconciliation_report(engine: Engine, snapshot_id: uuid.UUID, period: str | None = None) -> dict[str, Any]:
+    """The closed-period report: every check with its totals, tolerance, timestamps and versions."""
+    provenance = snapshot_provenance(engine, snapshot_id)
+    with engine.connect() as conn:
+        rows = conn.execute(
+            sa.text(
+                "select check_id, company_id, period, status, independence, expected, actual, difference, tolerance,"
+                " explanation, detail from marts.reconciliation_result where snapshot_id = :s"
+                " and (cast(:p as text) is null or period = :p) order by company_id, period, check_id"
+            ),
+            {"s": snapshot_id, "p": period},
+        ).mappings().all()
+    checks = [
+        {
+            "check_id": r["check_id"], "company_id": r["company_id"], "period": r["period"], "status": r["status"],
+            "independence": r["independence"], "source_total": decimal_text(r["expected"]),
+            "analytical_total": decimal_text(r["actual"]), "difference": decimal_text(r["difference"]),
+            "tolerance": decimal_text(r["tolerance"]), "explanation": r["explanation"], "detail": r["detail"],
+        }
+        for r in rows
+    ]
+    periods = sorted({c["period"] for c in checks})
+    return {
+        "snapshot_id": str(snapshot_id),
+        "period": period,
+        "periods": periods,
+        "source_timestamp": None if provenance.source_timestamp is None else provenance.source_timestamp.isoformat(),
+        "ingestion_timestamp": None if provenance.ingested_at is None else provenance.ingested_at.isoformat(),
+        "transformation_version": provenance.transformation_version,
+        "period_status": {
+            p: ("RECONCILED" if all(c["status"] == "RECONCILED" for c in checks if c["period"] == p and c["check_id"] != "COGS_POSTED")
+                and all(c["status"] in ("RECONCILED", "UNAVAILABLE") for c in checks if c["period"] == p and c["check_id"] == "COGS_POSTED")
+                else "BLOCKED")
+            for p in periods
+        },
+        "margin_basis": margin_basis(engine, snapshot_id),
+        "checks": checks,
+    }

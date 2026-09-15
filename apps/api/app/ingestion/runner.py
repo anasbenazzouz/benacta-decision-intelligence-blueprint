@@ -37,6 +37,8 @@ FOUNDATION_MODELS = (
     "product.category",
     "product.template",
     "product.product",
+    "product.pricelist",
+    "product.pricelist.item",
     "sale.order",
     "sale.order.line",
     "stock.picking",

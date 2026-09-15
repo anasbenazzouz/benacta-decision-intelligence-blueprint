@@ -23,6 +23,9 @@ from app.marts.build import build_marts
 from app.marts.reconcile import margin_basis, reconcile
 from app.ops.discover_odoo import load_spec
 
+# Source instance written by `benacta seed-fixtures` (dataset demo_v2 = demo_v1 + projects).
+FIXTURE_SOURCE_INSTANCE = "fixture_demo_v2"
+
 
 def run_migrations(settings: Settings) -> str | None:
     engine = analytics_engine(settings)
@@ -98,9 +101,50 @@ def run_pipeline(settings: Settings, *, steps: tuple[str, ...], anchor: date = D
             if "reconcile" in steps:
                 snapshot = snapshot or latest_snapshot(engine, source.source_instance)
                 _print_reconciliation(engine, source, snapshot)
+            if "reference" in steps:
+                snapshot = snapshot or latest_snapshot(engine, source.source_instance)
+                _load_reference(engine, source, snapshot)
+            if "exceptions" in steps:
+                snapshot = snapshot or latest_snapshot(engine, source.source_instance)
+                _run_exceptions(engine, snapshot)
     finally:
         engine.dispose()
     return 0
+
+
+def _load_reference(engine: Engine, source: Source, snapshot: uuid.UUID) -> None:
+    """Fixture terms in fixture mode; the policy register file in connected mode."""
+    from app.margin import reference
+
+    with engine.connect() as conn:
+        companies = conn.execute(
+            sa.text("select company_id from marts.dim_company where snapshot_id = :s order by company_id"), {"s": snapshot}
+        ).scalars().all()
+    if isinstance(source, FixtureSource):
+        rows = reference.rows_from_terms(
+            source.dataset.terms, owner="Sales finance controller (synthetic)", source=f"fixture {source.dataset.dataset_id} terms"
+        )
+        kind, ref = "FIXTURE_TERMS", source.dataset.dataset_id
+    elif reference.REGISTER_PATH.exists():
+        _raw, rows = reference.load_register()
+        kind, ref = "POLICY_REGISTER", str(reference.REGISTER_PATH.relative_to(REPO_ROOT))
+    else:
+        print(f"reference: no policy register at {reference.REGISTER_PATH.relative_to(REPO_ROOT)}; rules will report insufficient evidence")
+        return
+    with engine.begin() as conn:
+        for company_id in companies:
+            reference.store_reference(conn, rows, source_instance=source.source_instance, company_id=company_id, source_kind=kind, source_ref=ref)
+    print(f"reference ({kind}): " + ", ".join(f"{k}={v}" for k, v in rows.counts().items()))
+
+
+def _run_exceptions(engine: Engine, snapshot: uuid.UUID) -> None:
+    from app.margin.engine import run_engine
+
+    run = run_engine(engine, snapshot)
+    summary = run.summary()
+    classes = ", ".join(f"{k}={v}" for k, v in summary["by_classification"].items())
+    print(f"margin exceptions: {summary['evaluations']} evaluations ({classes}); cases created={summary['cases_created']}"
+          f" updated={summary['cases_updated']} resolved={summary['cases_resolved']}; periods={summary['periods']}; thresholds {summary['thresholds']}")
 
 
 def run_verify_audit(settings: Settings, export: bool) -> int:

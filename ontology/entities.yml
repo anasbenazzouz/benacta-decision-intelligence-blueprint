@@ -31,5 +31,18 @@ entities:
   Evidence: {source: investigation evidence_refs, key: ref, id_pattern: "benacta:Evidence:{ref}"}
   Investigation: {source: decision.investigation, key: investigation_id, id_pattern: "benacta:Investigation:{investigation_id}"}
   Recommendation: {source: decision.recommendation, key: "recommendation_id", id_pattern: "benacta:Recommendation:{recommendation_id}"}
+  # Margin Control (milestone 1)
+  SaleOrder: {source: marts.fact_sales_order_line, key: sale_order_id, id_pattern: "{instance}:{company_id}:SaleOrder:{sale_order_id}"}
+  SaleOrderLine: {source: marts.fact_sales_order_line, key: sale_line_id, id_pattern: "{instance}:{company_id}:SaleOrderLine:{sale_line_id}"}
+  InvoiceLine: {source: marts.fact_invoice_line, key: invoice_line_id, id_pattern: "{instance}:{company_id}:InvoiceLine:{invoice_line_id}"}
+  Product: {source: marts.dim_product, key: product_id, id_pattern: "{instance}:{company_id}:Product:{product_id}"}
+  PriceList: {source: marts.dim_pricelist, key: pricelist_id, id_pattern: "{instance}:{company_id}:PriceList:{pricelist_id}"}
+  DiscountPolicy: {source: semantic.discount_policy, key: "policy_id, version", id_pattern: "benacta:{company_id}:DiscountPolicy:{policy_id}:v{version}"}
+  Derogation: {source: semantic.discount_derogation, key: derogation_id, id_pattern: "benacta:{company_id}:Derogation:{derogation_id}"}
+  FreightContract: {source: semantic.freight_contract, key: contract_id, id_pattern: "benacta:{company_id}:FreightContract:{contract_id}"}
+  ContractPrice: {source: semantic.contract_price, key: "contract_id, product_code", id_pattern: "benacta:{company_id}:ContractPrice:{contract_id}:{product_code}"}
+  CostReference: {source: semantic.cost_reference, key: "reference_id, product_code", id_pattern: "benacta:{company_id}:CostReference:{reference_id}:{product_code}"}
+  RuleEvaluation: {source: marts.fact_margin_rule_evaluation, key: "snapshot_id, rule_id, subject_type, subject_id", id_pattern: "benacta:RuleEvaluation:{snapshot_id}:{rule_id}:{subject_type}:{subject_id}"}
+  ExceptionCase: {source: decision.exception_case, key: case_ref, id_pattern: "benacta:{company_id}:ExceptionCase:{case_ref}"}
   Decision: {source: decision schema (S6), key: decision_id, id_pattern: "benacta:Decision:{decision_id}", status: not implemented}
   Action: {source: decision schema (S6), key: action_id, id_pattern: "benacta:Action:{action_id}", status: not implemented}

@@ -5,7 +5,70 @@ Status vocabulary: `IMPLEMENTED` (code exists) · `TESTED_LOCAL` (automated test
 real read-only run against the connected Odoo) · `NOT_VERIFIED` · `BLOCKED`.
 A fixture test never proves an Odoo integration. Plan: `docs/implementation_plan.md`.
 
-## Current sprint: A (requirements and mapping) and the first C/D slice (project controlling)
+## Milestone 1: BENACTA Margin Control, margin truth and deterministic exceptions (delivered on fixtures)
+
+Refocus of 2026-09-15: the active product is BENACTA Margin Control (`docs/repository_audit.md`,
+`docs/product_backlog.md`). Every figure below comes from the synthetic dataset `demo_v2` (`demo_v1` trading company
+plus the project extension); no Odoo write happened.
+
+### Evidence (2026-09-15)
+
+| Command | Result |
+|---|---|
+| `uv run pytest -q` in `apps/api` | 219 passed, 7 skipped (live tests are opt-in) |
+| `uv run pytest -q tests/integration/test_margin_engine_oracle.py` | 22 passed: every oracle case (3 golden, 12 negative controls), totals 1 750 / 1 200 / 2 950 EUR, 0 exception on background orders, 9 cases and no duplicate on replay, audit valid, a corrected source closes the case with the reason |
+| `uv run pytest -q tests/unit/test_margin_rules.py` | 30 passed: every outcome of every rule on hand-built facts, the four baseline levels, currency and unit conversions, the comparability guard |
+| `uv run pytest -q tests/integration/test_margin_service_api.py` | 5 passed: overview, queue ranking, case drill-down and lineage, reconciliation report fields, API equals service |
+| `ruff check app tests migrations` | clean |
+| `benacta seed-fixtures` | 12 months `RECONCILED` on `REVENUE_POSTED`, `COGS_POSTED` and `INVOICE_HEADER_LINES`; margin basis `RECONCILED_COGS`; terms loaded (21 segments, 5 policies, 1 derogation, 6 freight contracts, 17 cost references); 933 evaluations: 5 `CONFIRMED_LEAKAGE`, 2 `DATA_QUALITY_ISSUE`, 18 `INSUFFICIENT_EVIDENCE` (2 for review), 2 `LEGITIMATE_EXCEPTION`, 5 `EXPLAINED_VARIANCE`, 699 `COMPLIANT`, 202 `NOT_APPLICABLE`; 9 cases |
+| `benacta seed-fixtures` replayed | 0 new record versions, 0 new cases, 9 updated |
+| `BENACTA_MODE=fixture benacta margin-overview --period 2026-07` | revenue 999 608.20, COGS 160 317.00, gross margin 839 291.20 (goods 112 691.20, goods GM 41.28 % against 41.01 % in June, within threshold); detected leakage 2 050.00, recoverable from customers 1 250.00, realised recovery `NOT_MEASURED` |
+| `BENACTA_MODE=fixture benacta margin-exceptions` | 9 cases: DISC-001 1 000.00, COST-001 800.00, NEG-12 500.00 and 400.00, FREIGHT-001 250.00 (all `CONFIRMED_LEAKAGE`, confidence `HIGH`), then NEG-11, NEG-09, NEG-08, NEG-10 for human review; NEG-01 and NEG-02 (legitimate) absent |
+| `BENACTA_MODE=fixture benacta margin-case MC-000001` | rule `DISCOUNT_CAP` v1 with formula, expected 9 500.00 against actual 8 500.00, policy `POL-DISC-STANDARD` cited, 1 order line, 1 invoice line, 1 delivery, 1 cost allocation, 1 source record version, three reconciliation checks `RECONCILED`, suggested follow-up `PENDING_REVIEW` |
+| `BENACTA_MODE=fixture benacta reconciliation-report --period 2026-07` | three checks `RECONCILED`, tolerance 0.01, source timestamp, ingestion timestamp, transformation `marts.2026.09.2` |
+| `BENACTA_MODE=fixture benacta verify-audit --export` | chain `VALID`, 269 events |
+| V1 suite at repository root (`pytest tests/`) | 155 passed (unchanged) |
+
+### Items
+
+| Item | Status | Where |
+|---|---|---|
+| Repository audit, focused backlog, use-case portfolio classification (7 `ACTIVE`, 13 `ENGINE_FAMILY`, 20 `ROADMAP`, 10 `OPPORTUNITY`) | IMPLEMENTED | `docs/repository_audit.md`, `docs/product_backlog.md`, `data/catalog/use_cases_v2.yml` |
+| Governed commercial terms with provenance, business keys, fixture and register loaders | TESTED_LOCAL | migration `0004_margin_control`, `app/margin/reference.py`, `data/policies/` |
+| Price list ingestion and dimensions; partner reference and assigned price list | TESTED_LOCAL | `app/ingestion/runner.py`, `app/marts/build.py` |
+| Price baseline hierarchy (contract, customer price list, product list price, historical comparable with dispersion guard, unavailable) | TESTED_LOCAL | `app/margin/baseline.py` |
+| Rules `DISCOUNT_CAP`, `PRICE_BELOW_BASELINE`, `FREIGHT_REBILL`, `COST_REFERENCE_VARIANCE`, `INVOICE_WITHOUT_SALE_LINK` with versions, formulas, evidence bundles, six decision classes, severity, confidence, controllability, materiality | TESTED_LOCAL | `app/margin/rules.py`, `docs/margin_rule_catalogue.md` |
+| Engine: evaluations per snapshot, stable cases across snapshots, `NO_LONGER_RAISED` with reason, gross margin per period with basis and leakage | TESTED_LOCAL | `app/margin/engine.py` |
+| Margin KPIs and contracts (revenue, COGS, gross margin, percentage, four leakage types, addressable, recoverable, approved and realised recovery) | TESTED_LOCAL (structure) | `app/margin/kpis.py`, `semantic/metrics.yml` |
+| Reconciliation report with tolerance, timestamps, transformation version, invoice header check | TESTED_LOCAL | `app/marts/reconcile.py`, `docs/reconciliation_specification.md` |
+| Read side: overview with deterioration signal and bridge, ranked queue, case with drill-down and lineage; CLI and API | TESTED_LOCAL | `app/margin/service.py`, `app/ops/margin_ops.py`, `app/main.py` |
+| Ground-truth catalogue: 12 of 18 scenarios covered by the oracle, the rest scheduled | IMPLEMENTED | `docs/ground_truth_catalogue.md`, `data/golden/oracle_v1.yml` (v2) |
+| Demonstration script and local setup | IMPLEMENTED | `docs/margin_control_demo.md` |
+| Rules against the connected Odoo | NOT_VERIFIED | order lines of the connected instance carry no invoice links and no COGS; the engine would report untraceable revenue there; the sandbox seed has not run |
+| Decisions, actions, impact | not started | milestone 2 |
+| AI investigation, cockpit, demonstration profile, Odoo seed run | not started | milestone 3 |
+
+### Findings from this milestone
+
+- Lump-sum project contract lines have no meaningful unit price: the historical baseline flagged nine of them as
+  probable leakage. The comparable baseline now requires a dispersion (median absolute deviation over median) at or
+  below 15 %; those lines report "no defensible baseline" and raise no case.
+- Blending service revenue without posted cost into the gross-margin percentage made the percentage follow the sales
+  mix (84 % in July, 42 % in August). The deterioration signal now reads the goods percentage; service revenue is
+  shown separately with its reason.
+- A case that stops being raised because a rule or a threshold changed must not read as "corrected at the source":
+  the closing status records the new classification, the rule version and the threshold set.
+
+### Known limits
+
+- Thresholds (`data/policies/margin_thresholds.yml`) are demonstration settings, not financial standards.
+- Currency effects are not isolated as a bridge line yet; foreign-currency lines are compared at the order-date rate.
+- Freight recharge is assessed per order; consolidated shipments are not modelled.
+- Cost variance needs FIFO attribution to receipts and a frozen reference; other costing methods stay undetermined.
+- Every margin figure of this milestone is `TESTED_LOCAL`. The Odoo integration remains `VERIFIED_ODOO_READ` for
+  revenue reconciliation only.
+
+## Sprint A (requirements and mapping) and the first C/D slice (project controlling), delivered before the refocus
 
 Every figure below comes from the synthetic dataset `demo_v2` (fictional company, people and contracts).
 

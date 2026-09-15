@@ -44,7 +44,31 @@ def _seed_fixtures(_: argparse.Namespace) -> int:
 
     settings = get_settings().model_copy(update={"benacta_mode": Mode.FIXTURE})
     pipeline.run_migrations(settings)
-    return pipeline.run_pipeline(settings, steps=("ingest", "marts", "plans", "reconcile"))
+    return pipeline.run_pipeline(settings, steps=("ingest", "marts", "plans", "reconcile", "reference", "exceptions"))
+
+
+def _margin_overview(args: argparse.Namespace) -> int:
+    from app.ops import margin_ops
+
+    return margin_ops.run_overview(get_settings(), args.period)
+
+
+def _margin_exceptions(args: argparse.Namespace) -> int:
+    from app.ops import margin_ops
+
+    return margin_ops.run_queue(get_settings(), args.period, args.classification, args.limit)
+
+
+def _margin_case(args: argparse.Namespace) -> int:
+    from app.ops import margin_ops
+
+    return margin_ops.run_case(get_settings(), args.case)
+
+
+def _reconciliation_report(args: argparse.Namespace) -> int:
+    from app.ops import margin_ops
+
+    return margin_ops.run_reconciliation_report(get_settings(), args.period)
 
 
 def _portfolio(args: argparse.Namespace) -> int:
@@ -124,6 +148,26 @@ def main(argv: list[str] | None = None) -> int:
     commands.add_parser("ingest", help="ingest from the configured source").set_defaults(func=_pipeline("ingest"))
     commands.add_parser("marts", help="build marts for the latest snapshot").set_defaults(func=_pipeline("marts"))
     commands.add_parser("reconcile", help="reconcile the latest snapshot").set_defaults(func=_pipeline("reconcile"))
+    commands.add_parser(
+        "load-policies", help="load governed commercial terms (fixture terms, or data/policies/margin_policy_register.yml)"
+    ).set_defaults(func=_pipeline("reference"))
+    commands.add_parser("exceptions", help="run the margin rules on the latest snapshot").set_defaults(
+        func=_pipeline("exceptions")
+    )
+    overview = commands.add_parser("margin-overview", help="gross margin, leakage and drivers for a period")
+    overview.add_argument("--period", help="YYYY-MM; defaults to the latest period with posted revenue")
+    overview.set_defaults(func=_margin_overview)
+    queue = commands.add_parser("margin-exceptions", help="ranked exception queue")
+    queue.add_argument("--period")
+    queue.add_argument("--classification", choices=["CONFIRMED_LEAKAGE", "PROBABLE_LEAKAGE", "DATA_QUALITY_ISSUE", "INSUFFICIENT_EVIDENCE"])
+    queue.add_argument("--limit", type=int, default=50)
+    queue.set_defaults(func=_margin_exceptions)
+    case = commands.add_parser("margin-case", help="one exception with its evidence, drill-down and lineage")
+    case.add_argument("case", help="case reference, e.g. MC-000001")
+    case.set_defaults(func=_margin_case)
+    report = commands.add_parser("reconciliation-report", help="closed-period reconciliation report")
+    report.add_argument("--period")
+    report.set_defaults(func=_reconciliation_report)
     audit = commands.add_parser("verify-audit", help="verify the audit hash chain")
     audit.add_argument("--export", action="store_true", help="also export the journal as JSONL")
     audit.set_defaults(func=_verify_audit)

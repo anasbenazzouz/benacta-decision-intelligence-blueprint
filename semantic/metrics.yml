@@ -473,3 +473,233 @@ metrics:
     sources: [marts.fact_receivable, marts.fact_customer_payment]
     certification: UNCERTIFIED
     tests: []
+
+  # ------------------------------------------------------------------ Margin Control (milestone 1)
+  # Conventions: docs/margin_rule_catalogue.md. Thresholds: data/policies/margin_thresholds.yml.
+  - metric_id: revenue
+    version: 1
+    domain: margin
+    name: Posted revenue
+    definition: Revenue posted on customer invoices and credit notes, product lines only, company currency
+    owner: Chief financial officer
+    steward: Sales finance controller
+    grain: company, accounting month; customer, product, order on demand
+    formula: sum(-balance of posted out_invoice and out_refund product lines)
+    calculation: app.margin.engine:run_engine
+    unit: EUR excluding taxes
+    period: accounting month
+    version_rule: independent of plan versions
+    null_handling: a month without posted revenue has no row
+    exclusions: draft and cancelled invoices; vendor bills; section and note lines
+    sources: [marts.fact_invoice_line, marts.reconciliation_result]
+    certification: CANDIDATE
+    tests: [test_period_margin_ties_to_reconciled_facts, test_live_marts_reconcile_revenue_against_server_aggregates]
+
+  - metric_id: cogs
+    version: 1
+    domain: margin
+    name: Posted cost of goods sold
+    definition: COGS journal items posted on direct cost accounts, company currency
+    owner: Chief financial officer
+    steward: Accounting manager
+    grain: company, accounting month
+    formula: sum(balance of posted journal items with display_type cogs on expense_direct_cost accounts)
+    calculation: app.margin.engine:run_engine
+    unit: EUR excluding taxes
+    period: accounting month
+    version_rule: independent of plan versions
+    null_handling: UNAVAILABLE when goods were invoiced in the month without any posted COGS; never zero
+    exclusions: periodic valuation without COGS entries (reported as unavailable)
+    sources: [marts.fact_posted_cogs_line, marts.reconciliation_result]
+    certification: CANDIDATE
+    tests: [test_period_margin_ties_to_reconciled_facts]
+
+  - metric_id: gross_margin
+    version: 1
+    domain: margin
+    name: Gross margin
+    definition: Posted revenue minus posted cost of goods sold
+    owner: Chief financial officer
+    steward: Sales finance controller
+    grain: company, accounting month
+    formula: revenue - cogs
+    calculation: app.margin.kpis:gross_margin
+    unit: EUR excluding taxes
+    period: accounting month
+    version_rule: independent of plan versions
+    null_handling: UNAVAILABLE when cogs is UNAVAILABLE; basis RECONCILED_COGS, MANAGEMENT_PROXY or UNAVAILABLE stated with the value
+    exclusions: line-level margin is not derived when revenue and cost cannot be allocated to the same grain
+    sources: [marts.fact_margin_period]
+    certification: CANDIDATE
+    tests: [test_period_margin_ties_to_reconciled_facts, test_overview_answers_the_first_cfo_questions]
+
+  - metric_id: gross_margin_pct
+    version: 1
+    domain: margin
+    name: Gross margin percentage
+    definition: Gross margin over revenue, ratio of sums
+    owner: Chief financial officer
+    steward: Sales finance controller
+    grain: company, accounting month
+    formula: gross_margin / revenue x 100; the deterioration signal reads the goods variant (goods revenue minus COGS over goods revenue)
+    calculation: app.margin.kpis:gross_margin_pct
+    unit: percent
+    period: accounting month
+    version_rule: independent of plan versions
+    null_handling: null when gross margin is unavailable or revenue is zero
+    exclusions: never an average of monthly ratios
+    sources: [marts.fact_margin_period]
+    certification: CANDIDATE
+    tests: [test_period_margin_ties_to_reconciled_facts]
+
+  - metric_id: discount_leakage
+    version: 1
+    domain: margin
+    name: Discount leakage
+    definition: Revenue given away through discounts above the applicable policy without a valid derogation
+    owner: Chief financial officer
+    steward: Sales finance controller
+    grain: sale order line, rolled up by period, customer, product, order
+    formula: sum(adverse_exposure of DISCOUNT_CAP evaluations classified CONFIRMED_LEAKAGE or PROBABLE_LEAKAGE)
+    calculation: app.margin.rules:evaluate_discount_cap
+    unit: EUR excluding taxes
+    period: accounting month of the first invoice, else order month
+    version_rule: rule DISCOUNT_CAP v1, thresholds demo/v1
+    null_handling: 0 when no exception; insufficient evidence carries a potential exposure, not a leakage
+    exclusions: legitimate exceptions covered by a derogation; cancelled and unconfirmed orders
+    sources: [marts.fact_margin_rule_evaluation, semantic.discount_policy, semantic.discount_derogation]
+    certification: CANDIDATE
+    tests: [test_oracle_case, test_totals_and_no_exception_on_background_orders]
+
+  - metric_id: price_leakage
+    version: 1
+    domain: margin
+    name: Price leakage
+    definition: Revenue given away through unit prices below the approved baseline
+    owner: Chief financial officer
+    steward: Sales finance controller
+    grain: sale order line
+    formula: sum(adverse_exposure of PRICE_BELOW_BASELINE evaluations classified CONFIRMED_LEAKAGE or PROBABLE_LEAKAGE)
+    calculation: app.margin.rules:evaluate_price_baseline
+    unit: EUR excluding taxes
+    period: as discount_leakage
+    version_rule: rule PRICE_BELOW_BASELINE v1; baseline hierarchy contract, customer price list, product list price, historical comparable
+    null_handling: 0 when no exception; lines without a defensible baseline are reported, never estimated
+    exclusions: freight lines; historical baselines are only ever probable
+    sources: [marts.fact_margin_rule_evaluation, semantic.contract_price, marts.dim_pricelist_item, marts.dim_product]
+    certification: CANDIDATE
+    tests: [test_baseline_hierarchy_levels, test_totals_and_no_exception_on_background_orders]
+
+  - metric_id: freight_leakage
+    version: 1
+    domain: margin
+    name: Freight leakage
+    definition: Contractual freight not recharged after full delivery and invoicing
+    owner: Chief financial officer
+    steward: Billing controller
+    grain: sale order
+    formula: sum(adverse_exposure of FREIGHT_REBILL evaluations classified CONFIRMED_LEAKAGE or PROBABLE_LEAKAGE)
+    calculation: app.margin.rules:evaluate_freight
+    unit: EUR excluding taxes
+    period: as discount_leakage
+    version_rule: rule FREIGHT_REBILL v1
+    null_handling: 0 when no exception; NOT_DUE before the contractual trigger
+    exclusions: waived or included clauses; orders without a freight clause
+    sources: [marts.fact_margin_rule_evaluation, semantic.freight_contract]
+    certification: CANDIDATE
+    tests: [test_oracle_case, test_partial_freight_recharge]
+
+  - metric_id: cost_leakage
+    version: 1
+    domain: margin
+    name: Cost leakage
+    definition: Realised cost of delivered goods above the frozen reference cost
+    owner: Chief financial officer
+    steward: Product controller
+    grain: sale order line
+    formula: sum(adverse_exposure of COST_REFERENCE_VARIANCE evaluations classified CONFIRMED_LEAKAGE or PROBABLE_LEAKAGE)
+    calculation: app.margin.rules:evaluate_cost_variance
+    unit: EUR excluding taxes
+    period: as discount_leakage
+    version_rule: rule COST_REFERENCE_VARIANCE v1
+    null_handling: UNDETERMINED lines carry no amount and raise a data-quality case
+    exclusions: services; favourable variances; lines without a frozen reference
+    sources: [marts.fact_margin_rule_evaluation, marts.fact_cost_allocation, semantic.cost_reference]
+    certification: CANDIDATE
+    tests: [test_oracle_case, test_purchase_price_variance_is_confirmed_leakage_not_receivable]
+
+  - metric_id: total_addressable_leakage
+    version: 1
+    domain: margin
+    name: Total addressable leakage
+    definition: Confirmed and probable leakage whose driver is at least partially controllable
+    owner: Chief financial officer
+    steward: Sales finance controller
+    grain: company, period
+    formula: sum(adverse_exposure where controllability in (CONTROLLABLE, PARTIALLY_CONTROLLABLE))
+    calculation: app.margin.kpis:total_addressable_leakage
+    unit: EUR excluding taxes
+    period: accounting month
+    version_rule: as the rules
+    null_handling: 0 when none
+    exclusions: explained variances, legitimate exceptions, data-quality issues, insufficient evidence
+    sources: [marts.fact_margin_period]
+    certification: CANDIDATE
+    tests: [test_period_margin_ties_to_reconciled_facts]
+
+  - metric_id: recoverable_from_customer
+    version: 1
+    domain: margin
+    name: Recoverable from customer
+    definition: Leakage of the billing component that a complementary invoice or a corrected order can recover
+    owner: Chief financial officer
+    steward: Billing controller
+    grain: company, period
+    formula: sum(adverse_exposure where component = billing_leakage)
+    calculation: app.margin.kpis:recoverable_from_customer
+    unit: EUR excluding taxes
+    period: accounting month
+    version_rule: as the rules
+    null_handling: 0 when none
+    exclusions: cost variances (never receivable)
+    sources: [marts.fact_margin_period]
+    certification: CANDIDATE
+    tests: [test_period_margin_ties_to_reconciled_facts]
+
+  - metric_id: approved_recovery
+    version: 1
+    domain: margin
+    name: Approved recovery
+    definition: Estimated recovery of recommendations approved by a named person
+    owner: Chief financial officer
+    steward: Sales finance controller
+    grain: decision
+    formula: sum(estimated recovery of APPROVED decisions)
+    calculation: app.margin.kpis:margin_at_policy
+    unit: EUR excluding taxes
+    period: decision date
+    version_rule: milestone 2
+    null_handling: NOT_MEASURED until the decision workflow exists
+    exclusions: rejected and deferred recommendations
+    sources: [decision.exception_case]
+    certification: UNCERTIFIED
+    tests: []
+
+  - metric_id: realised_recovery
+    version: 1
+    domain: margin
+    name: Realised recovery
+    definition: Recovery evidenced by later posted and reconciled documents
+    owner: Chief financial officer
+    steward: Sales finance controller
+    grain: decision
+    formula: sum(recovered amount evidenced by posted complementary invoices or corrected orders); otherwise not measured
+    calculation: app.margin.kpis:margin_at_policy
+    unit: EUR excluding taxes
+    period: realisation date
+    version_rule: milestone 2
+    null_handling: NOT_MEASURED without a reconciled document; never estimated
+    exclusions: verbal commitments
+    sources: [decision.exception_case, marts.fact_invoice_line]
+    certification: UNCERTIFIED
+    tests: []

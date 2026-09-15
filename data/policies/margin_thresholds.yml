@@ -1,0 +1,33 @@
+# BENACTA Margin Control: rule thresholds. Configuration reviewed like a contract.
+# Every evaluation records `threshold_set/version`, so a threshold change never rewrites history silently.
+# These are demonstration settings for the synthetic company, not financial standards.
+threshold_set: demo
+version: 1
+currency: EUR
+owner: Sales finance controller (synthetic)
+
+# An exception is material when its adverse exposure (company currency) reaches this amount.
+materiality_min_exposure: 200
+# Severity tiers on adverse exposure, or on the potential exposure when the exposure cannot be computed.
+severity:
+  HIGH: 750
+  MEDIUM: 250
+
+# Price baseline: a unit price is compliant within this percentage below its baseline (rounding, currency).
+price_tolerance_pct: 0.5
+# Cost variance: both conditions must hold for a variance to be adverse.
+cost_tolerance_abs: 1.00
+cost_tolerance_pct: 0.5
+# Level 4 of the price baseline hierarchy: comparable historical baseline.
+historical_baseline:
+  months: 6
+  min_observations: 3
+  # Comparable means tightly priced: median absolute deviation over median, in percent. Lump-sum or
+  # configured-to-order items disperse far beyond this and get no historical baseline.
+  max_dispersion_pct: 15
+
+# Gross margin is flagged as deteriorating when the percentage falls by this many points against the previous period.
+gm_pct_deterioration_points: 1.0
+
+# Products that carry freight or delivery charges (default codes). With the Odoo `delivery` module, list the carrier products.
+freight_product_codes: [FRT]

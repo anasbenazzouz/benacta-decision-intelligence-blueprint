@@ -4,6 +4,19 @@ Scope: V2 of this repository. The V1 Monthly Performance Review blueprint (`app.
 `docs/implementation-plan.md`) stays intact and keeps its public demo. Status of every item lives in
 `docs/progress.md`. Decisions are recorded in `docs/adr/`.
 
+## 0. Refocus (2026-09-15): BENACTA Margin Control
+
+The active product is **BENACTA Margin Control**: detect, investigate, decide and act on gross-margin leakage at
+transaction level. Audit and rationale: `docs/repository_audit.md`. Backlog: `docs/product_backlog.md`. The sprint
+plan below is kept as history; the finance journey S4 to S7 is delivered as milestones M1 to M3, and the project
+controlling track (sprints B to F) is parked as an engine family.
+
+| Milestone | Scope | State |
+|---|---|---|
+| M1 Margin truth and deterministic exceptions | governed terms and baseline hierarchy, margin KPIs, rule engine with classification, severity, confidence, controllability and evidence, enriched reconciliation report, CLI and API | Delivered on fixtures (`docs/progress.md`) |
+| M2 Decision, action, impact | case workflow, recommendations, controlled review activity in Odoo, realised recovery, audit view | Next |
+| M3 Investigation, cockpit, demonstration data | LLM investigation with citations and abstention, Streamlit cockpit, three-year demonstration profile with 18 scenarios, Odoo seed executor, evaluation plan | Planned |
+
 ## 1. Mission
 
 Build the **Finance Decision Command Center on Odoo**, the first demonstrator of the BENACTA Decision System Lab.

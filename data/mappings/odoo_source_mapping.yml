@@ -181,6 +181,8 @@ models:
       customer_rank: {role: attribute}
       supplier_rank: {role: attribute}
       commercial_partner_id: {role: fk, meaning: Legal entity behind a contact}
+      ref: {role: attribute, meaning: Business reference of the partner, the key of BENACTA policies and contracts}
+      property_product_pricelist: {role: fk, meaning: Price list assigned to the customer, level 2 of the price baseline hierarchy}
       write_date: {role: watermark}
 
   product.product:
@@ -216,25 +218,33 @@ models:
       property_valuation: {role: attribute, meaning: manual or real_time, needed_for: [COST-001]}
 
   product.pricelist:
-    meaning: Price list header
+    meaning: Price list header, levels 2 and 3 of the price baseline hierarchy
     fields:
       id: {role: pk}
       name: {role: attribute}
       currency_id: {role: fk}
       company_id: {role: fk}
+      active: {role: state}
       item_ids: {role: bridge}
+      write_date: {role: watermark}
 
   product.pricelist.item:
     meaning: Price rule with validity dates
     fields:
       id: {role: pk}
       pricelist_id: {role: fk}
+      applied_on: {role: attribute, meaning: 3_global, 2_product_category, 1_product or 0_product_variant}
       product_tmpl_id: {role: fk}
-      compute_price: {role: attribute}
+      product_id: {role: fk}
+      categ_id: {role: fk}
+      min_quantity: {role: measure}
+      compute_price: {role: attribute, meaning: fixed, percentage or formula}
       fixed_price: {role: measure}
       percent_price: {role: measure}
+      currency_id: {role: fk}
       date_start: {role: attribute}
       date_end: {role: attribute}
+      write_date: {role: watermark}
 
   res.currency.rate:
     meaning: Dated exchange rate per company

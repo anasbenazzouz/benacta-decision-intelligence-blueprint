@@ -13,14 +13,14 @@ from app.controlling.psr import build_psr_content, save_draft
 from app.controlling.seed_plans import CONTROLLER
 from app.db.engine import analytics_engine
 from app.fixtures.demo_dataset import DEFAULT_ANCHOR
-from app.ops.pipeline import latest_snapshot
+from app.ops.pipeline import FIXTURE_SOURCE_INSTANCE, latest_snapshot
 
 EXPORTS = REPO_ROOT / ".benacta" / "exports"
 
 
 def _context(settings: Settings, cutoff: str | None) -> tuple[date, str]:
     if settings.benacta_mode is Mode.FIXTURE:
-        return (date.fromisoformat(cutoff) if cutoff else DEFAULT_ANCHOR), "fixture_demo_v2"
+        return (date.fromisoformat(cutoff) if cutoff else DEFAULT_ANCHOR), FIXTURE_SOURCE_INSTANCE
     if not cutoff:
         raise SystemExit("--cutoff is required outside fixture mode")
     return date.fromisoformat(cutoff), settings.odoo_source_instance

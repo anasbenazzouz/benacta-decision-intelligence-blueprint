@@ -9,7 +9,12 @@
 # ai_role "none" means the case stays deterministic.
 catalogue_version: 2
 statuses: [Build, Extend, Conference, Hold]
-sprints: [S4, S5, S6, S7, A, B, C, D, E, F, later]
+sprints: [M1, M2, M3, S4, S5, S6, S7, A, B, C, D, E, F, later]
+# Portfolio classes (2026-09-15): the active product is BENACTA Margin Control. ACTIVE cases are the only backlog.
+# ENGINE_FAMILY cases are realised by an engine that already exists in the repository and is reusable; ROADMAP cases
+# extend an engine after the pilot; OPPORTUNITY cases are explained and illustrated only. See docs/product_backlog.md.
+active_product: "BENACTA Margin Control"
+portfolio_classes: [ACTIVE, ENGINE_FAMILY, ROADMAP, OPPORTUNITY]
 website_use_cases_mapping:
   financial-close: [46, 47, 48]
   variance-analysis: [5, 22, 23]
@@ -37,8 +42,9 @@ use_cases:
     action: review activity in Odoo, draft complementary invoice
     outcome_kpi: realised recovery on reconciled documents
     dependencies: [UC48]
+    portfolio: ACTIVE
     status: Build
-    sprint: S4
+    sprint: M1
     acceptance_test: golden DISC-001 gives 1000.00 EUR; approved derogation not flagged
   - id: UC02
     domain: margin
@@ -57,8 +63,9 @@ use_cases:
     action: review activity, draft correction
     outcome_kpi: mismatches closed within 30 days
     dependencies: [UC48]
+    portfolio: ACTIVE
     status: Build
-    sprint: S4
+    sprint: M1
     acceptance_test: many-to-many linked lines never double counted
   - id: UC03
     domain: margin
@@ -77,8 +84,9 @@ use_cases:
     action: draft complementary invoice
     outcome_kpi: freight recovered
     dependencies: []
+    portfolio: ACTIVE
     status: Build
-    sprint: S4
+    sprint: M1
     acceptance_test: golden FREIGHT-001 gives 250.00 EUR; partial delivery not due
   - id: UC04
     domain: margin
@@ -97,8 +105,9 @@ use_cases:
     action: supplier review task
     outcome_kpi: variance trend after action
     dependencies: [UC31]
+    portfolio: ACTIVE
     status: Build
-    sprint: S4
+    sprint: M1
     acceptance_test: golden COST-001 gives 800.00 EUR; missing cost stays UNDETERMINED
   - id: UC05
     domain: margin
@@ -117,8 +126,9 @@ use_cases:
     action: decision log entry
     outcome_kpi: share of variance explained without residual
     dependencies: [UC01, UC04]
+    portfolio: ACTIVE
     status: Build
-    sprint: S5
+    sprint: M3
     acceptance_test: bridge components sum to the total variance
   # ------------------------------------------------------------------ B. Project controlling and PSR
   - id: UC06
@@ -138,6 +148,7 @@ use_cases:
     action: publish immutable PSR
     outcome_kpi: PSR published on time, no retroactive change
     dependencies: [UC41, UC42]
+    portfolio: ENGINE_FAMILY
     status: Build
     sprint: D
     acceptance_test: published PSR unchanged after new data; figures equal metric service
@@ -158,6 +169,7 @@ use_cases:
     action: recovery plan task
     outcome_kpi: overrun reduced at next forecast
     dependencies: [UC08]
+    portfolio: ENGINE_FAMILY
     status: Build
     sprint: C
     acceptance_test: variance sign unfavourable when EAC above budget
@@ -178,6 +190,7 @@ use_cases:
     action: approve and lock forecast
     outcome_kpi: forecasts approved with explained deltas
     dependencies: [UC41]
+    portfolio: ENGINE_FAMILY
     status: Build
     sprint: C
     acceptance_test: commitment already in ETC not added twice
@@ -198,6 +211,7 @@ use_cases:
     action: recommendation reviewed, action tracked
     outcome_kpi: erosion recovered or explained
     dependencies: [UC08, UC06]
+    portfolio: ENGINE_FAMILY
     status: Build
     sprint: D
     acceptance_test: golden MARGIN-EROSION-001 decomposition sums to the erosion
@@ -218,6 +232,7 @@ use_cases:
     action: client follow-up task
     outcome_kpi: pending change order value
     dependencies: [UC06]
+    portfolio: ENGINE_FAMILY
     status: Build
     sprint: D
     acceptance_test: pending change order only in PENDING_CO scenario
@@ -239,6 +254,7 @@ use_cases:
     action: staffing change request
     outcome_kpi: months above 110 percent load
     dependencies: [UC44]
+    portfolio: ROADMAP
     status: Build
     sprint: E
     acceptance_test: team load equals sum of members
@@ -259,6 +275,7 @@ use_cases:
     action: reassignment task
     outcome_kpi: over-allocations resolved
     dependencies: [UC11]
+    portfolio: ROADMAP
     status: Build
     sprint: E
     acceptance_test: resource at 120 percent flagged, at 100 percent not
@@ -279,6 +296,7 @@ use_cases:
     action: assignment proposal
     outcome_kpi: chargeable ratio
     dependencies: [UC11]
+    portfolio: ROADMAP
     status: Extend
     sprint: E
     acceptance_test: bench hours equal capacity minus planned
@@ -299,6 +317,7 @@ use_cases:
     action: reforecast request
     outcome_kpi: hours variance at completion
     dependencies: [UC08]
+    portfolio: ROADMAP
     status: Build
     sprint: E
     acceptance_test: hours overrun scenario visible in PSR and resource view with equal values
@@ -319,6 +338,7 @@ use_cases:
     action: scenario saved as draft version
     outcome_kpi: adoption of proposed assignments
     dependencies: [UC11, UC44]
+    portfolio: ROADMAP
     status: Extend
     sprint: later
     acceptance_test: simulation never alters an approved version
@@ -340,6 +360,7 @@ use_cases:
     action: recovery task
     outcome_kpi: days of billing delay
     dependencies: [UC06]
+    portfolio: ENGINE_FAMILY
     status: Build
     sprint: D
     acceptance_test: delayed milestone shifts billing and cash in the same amounts
@@ -360,6 +381,7 @@ use_cases:
     action: task update
     outcome_kpi: blocked task count
     dependencies: []
+    portfolio: OPPORTUNITY
     status: Hold
     sprint: later
     acceptance_test: dependency cycle detected
@@ -380,6 +402,7 @@ use_cases:
     action: clarification request
     outcome_kpi: unresolved inconsistencies
     dependencies: [UC06]
+    portfolio: ENGINE_FAMILY
     status: Build
     sprint: D
     acceptance_test: cost ratio never overwrites declared progress
@@ -400,6 +423,7 @@ use_cases:
     action: change order draft in Odoo
     outcome_kpi: out-of-scope cost recovered
     dependencies: [UC10]
+    portfolio: ROADMAP
     status: Extend
     sprint: later
     acceptance_test: confirmed change order clears the flag
@@ -420,6 +444,7 @@ use_cases:
     action: action owner assignment
     outcome_kpi: exposure above contingency
     dependencies: [UC06]
+    portfolio: ROADMAP
     status: Extend
     sprint: later
     acceptance_test: ranking stable for equal inputs
@@ -441,6 +466,7 @@ use_cases:
     action: publish flash
     outcome_kpi: flash published by working day 3
     dependencies: [UC06, UC42]
+    portfolio: ROADMAP
     status: Build
     sprint: E
     acceptance_test: BU flash equals sum of project PSR values
@@ -461,6 +487,7 @@ use_cases:
     action: none
     outcome_kpi: variances explained
     dependencies: [UC21]
+    portfolio: ROADMAP
     status: Build
     sprint: E
     acceptance_test: favourable direction follows contract, not the sign
@@ -481,6 +508,7 @@ use_cases:
     action: approve forecast
     outcome_kpi: residual share
     dependencies: [UC08]
+    portfolio: ENGINE_FAMILY
     status: Build
     sprint: C
     acceptance_test: diff components sum to total change
@@ -501,6 +529,7 @@ use_cases:
     action: assign owner
     outcome_kpi: exceptions older than 30 days
     dependencies: [UC09, UC07]
+    portfolio: ROADMAP
     status: Build
     sprint: E
     acceptance_test: overlapping exceptions counted once in totals
@@ -521,6 +550,7 @@ use_cases:
     action: publish validated commentary
     outcome_kpi: claims with valid references
     dependencies: [UC21]
+    portfolio: ROADMAP
     status: Extend
     sprint: S5
     acceptance_test: every amount in the draft maps to a computed value
@@ -542,6 +572,7 @@ use_cases:
     action: collection task
     outcome_kpi: overdue share
     dependencies: []
+    portfolio: ENGINE_FAMILY
     status: Build
     sprint: F
     acceptance_test: partially paid invoice counts its residual only
@@ -562,6 +593,7 @@ use_cases:
     action: reminder task
     outcome_kpi: days sales outstanding
     dependencies: [UC26]
+    portfolio: ROADMAP
     status: Extend
     sprint: F
     acceptance_test: disputed invoice ranked with reason shown
@@ -582,6 +614,7 @@ use_cases:
     action: resolution task
     outcome_kpi: disputed amount
     dependencies: [UC26]
+    portfolio: ROADMAP
     status: Extend
     sprint: F
     acceptance_test: dispute flag changes status never amounts
@@ -602,6 +635,7 @@ use_cases:
     action: forecast version
     outcome_kpi: forecast accuracy
     dependencies: [UC26, UC42]
+    portfolio: ROADMAP
     status: Extend
     sprint: F
     acceptance_test: delayed milestone moves collection week
@@ -622,6 +656,7 @@ use_cases:
     action: scenario decision
     outcome_kpi: forecast error at 4 weeks
     dependencies: [UC29]
+    portfolio: OPPORTUNITY
     status: Conference
     sprint: later
     acceptance_test: scenario totals reconcile to flows
@@ -643,6 +678,7 @@ use_cases:
     action: hold task
     outcome_kpi: unmatched bills
     dependencies: []
+    portfolio: ROADMAP
     status: Extend
     sprint: later
     acceptance_test: service lines with manual receipt handled
@@ -663,6 +699,7 @@ use_cases:
     action: review task
     outcome_kpi: duplicates prevented
     dependencies: []
+    portfolio: ROADMAP
     status: Extend
     sprint: later
     acceptance_test: credit note pair not flagged
@@ -683,6 +720,7 @@ use_cases:
     action: expedite task
     outcome_kpi: late receipts
     dependencies: [UC16]
+    portfolio: OPPORTUNITY
     status: Hold
     sprint: later
     acceptance_test: received line not flagged
@@ -703,6 +741,7 @@ use_cases:
     action: closure request
     outcome_kpi: stale commitment value
     dependencies: [UC08]
+    portfolio: ENGINE_FAMILY
     status: Extend
     sprint: C
     acceptance_test: ETC below commitments flagged per work package
@@ -723,6 +762,7 @@ use_cases:
     action: sourcing task
     outcome_kpi: concentration index
     dependencies: []
+    portfolio: OPPORTUNITY
     status: Conference
     sprint: later
     acceptance_test: shares sum to 100 percent
@@ -744,6 +784,7 @@ use_cases:
     action: review task
     outcome_kpi: dormant value
     dependencies: []
+    portfolio: OPPORTUNITY
     status: Hold
     sprint: later
     acceptance_test: threshold boundary tested
@@ -764,6 +805,7 @@ use_cases:
     action: purchase request
     outcome_kpi: shortages
     dependencies: []
+    portfolio: OPPORTUNITY
     status: Hold
     sprint: later
     acceptance_test: incoming receipt reduces shortage
@@ -784,6 +826,7 @@ use_cases:
     action: transfer proposal
     outcome_kpi: avoided purchases
     dependencies: []
+    portfolio: OPPORTUNITY
     status: Hold
     sprint: later
     acceptance_test: transfer never below reserved quantity
@@ -804,6 +847,7 @@ use_cases:
     action: parameter update
     outcome_kpi: lead time error
     dependencies: []
+    portfolio: OPPORTUNITY
     status: Hold
     sprint: later
     acceptance_test: median computed on received lines only
@@ -824,6 +868,7 @@ use_cases:
     action: none
     outcome_kpi: attributed share
     dependencies: [UC03]
+    portfolio: OPPORTUNITY
     status: Conference
     sprint: later
     acceptance_test: allocations sum to bill amount
@@ -845,6 +890,7 @@ use_cases:
     action: lock version
     outcome_kpi: budgets approved before project start
     dependencies: []
+    portfolio: ENGINE_FAMILY
     status: Build
     sprint: C
     acceptance_test: locked version rejects edits; empty cell never zero
@@ -865,6 +911,7 @@ use_cases:
     action: lock forecast
     outcome_kpi: forecast submitted by cutoff plus 5 days
     dependencies: [UC41]
+    portfolio: ENGINE_FAMILY
     status: Build
     sprint: C
     acceptance_test: revision creates a new version with parent reference
@@ -885,6 +932,7 @@ use_cases:
     action: decision log
     outcome_kpi: none
     dependencies: [UC42]
+    portfolio: ROADMAP
     status: Extend
     sprint: C
     acceptance_test: scenarios never replace the base forecast
@@ -905,6 +953,7 @@ use_cases:
     action: headcount request
     outcome_kpi: capacity gap
     dependencies: [UC11]
+    portfolio: ROADMAP
     status: Extend
     sprint: E
     acceptance_test: planned cost equals hours x rate where both are given
@@ -925,6 +974,7 @@ use_cases:
     action: decision log
     outcome_kpi: none
     dependencies: [UC43, UC30]
+    portfolio: OPPORTUNITY
     status: Conference
     sprint: later
     acceptance_test: infeasible combinations rejected
@@ -946,6 +996,7 @@ use_cases:
     action: completion request
     outcome_kpi: PSRs published with complete data
     dependencies: []
+    portfolio: ENGINE_FAMILY
     status: Build
     sprint: D
     acceptance_test: missing data yields UNKNOWN, never zero
@@ -966,6 +1017,7 @@ use_cases:
     action: accrual review list
     outcome_kpi: accrual adjustments
     dependencies: []
+    portfolio: ROADMAP
     status: Extend
     sprint: C
     acceptance_test: service lines without receipt method flagged as not measurable
@@ -986,8 +1038,9 @@ use_cases:
     action: block publication on UNRECONCILED
     outcome_kpi: months reconciled
     dependencies: []
+    portfolio: ACTIVE
     status: Build
-    sprint: S7
+    sprint: M1
     acceptance_test: live revenue reconciled against server aggregates (verified read-only)
   - id: UC49
     domain: controls
@@ -1006,6 +1059,7 @@ use_cases:
     action: correction task
     outcome_kpi: inconsistencies at publication
     dependencies: [UC06, UC21]
+    portfolio: ROADMAP
     status: Build
     sprint: F
     acceptance_test: PSR, flash and resource views return identical values
@@ -1026,6 +1080,7 @@ use_cases:
     action: close decision
     outcome_kpi: share of decisions with measured outcome
     dependencies: [UC06]
+    portfolio: ACTIVE
     status: Build
-    sprint: S6
+    sprint: M2
     acceptance_test: successful action without document stays not measured

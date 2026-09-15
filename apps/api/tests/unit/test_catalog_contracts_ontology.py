@@ -13,7 +13,7 @@ RELATIONSHIPS = yaml.safe_load((REPO_ROOT / "ontology" / "relationships.yml").re
 
 CASE_FIELDS = {"id", "domain", "title", "problem", "persona", "decision", "cadence", "source", "grain", "metrics",
                "deterministic_logic", "ai_role", "evidence", "approval", "action", "outcome_kpi", "dependencies",
-               "status", "sprint", "acceptance_test"}
+               "status", "sprint", "acceptance_test", "portfolio"}
 
 
 def test_catalogue_has_fifty_stable_cases_with_every_field():
@@ -23,6 +23,19 @@ def test_catalogue_has_fifty_stable_cases_with_every_field():
         assert CASE_FIELDS <= set(case), case["id"]
         assert case["status"] in CATALOG["statuses"], case["id"]
         assert case["sprint"] in CATALOG["sprints"], case["id"]
+
+
+def test_only_active_cases_are_scheduled_in_margin_control_milestones():
+    """The 50 cases are an opportunity portfolio; only ACTIVE cases drive the backlog (docs/product_backlog.md)."""
+    assert CATALOG["active_product"] == "BENACTA Margin Control"
+    for case in CATALOG["use_cases"]:
+        assert case["portfolio"] in CATALOG["portfolio_classes"], case["id"]
+        if case["sprint"] in {"M1", "M2", "M3"}:
+            assert case["portfolio"] == "ACTIVE", case["id"]
+        if case["portfolio"] == "ACTIVE":
+            assert case["sprint"] in {"M1", "M2", "M3"} and case["domain"] in {"margin", "controls"}, case["id"]
+        if case["portfolio"] == "OPPORTUNITY":
+            assert case["status"] in {"Conference", "Hold"}, case["id"]
 
 
 def test_no_case_is_marked_live_and_dependencies_exist():

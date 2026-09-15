@@ -264,16 +264,29 @@ class _DemoGenerator:
             write_date=start,
         )
 
+        # One public price list; customer-specific lists are attached to partners by scenarios.
+        self.public_pricelist = b.add(
+            "product.pricelist",
+            "pricelist_public",
+            name="BENACTA_DEMO Public",
+            currency_id=m2o(EUR),
+            company_id=m2o(COMPANY),
+            active=True,
+            item_ids=[],
+            write_date=start,
+        )
         for key, name in SUPPLIERS.items():
             self.partner_ids[key] = b.add(
                 "res.partner",
                 f"partner_{key}",
                 name=name,
+                ref=key,
                 company_id=m2o(COMPANY),
                 is_company=True,
                 customer_rank=0,
                 supplier_rank=1,
                 commercial_partner_id=False,
+                property_product_pricelist=False,
                 email=f"{key.lower()}@benacta-demo.invalid",
                 write_date=start,
             )
@@ -282,11 +295,13 @@ class _DemoGenerator:
                 "res.partner",
                 f"partner_{key}",
                 name=name,
+                ref=key,
                 company_id=m2o(COMPANY),
                 is_company=True,
                 customer_rank=1,
                 supplier_rank=0,
                 commercial_partner_id=False,
+                property_product_pricelist=[self.public_pricelist, "BENACTA_DEMO Public"],
                 email=f"{key.lower()}@benacta-demo.invalid",
                 write_date=start,
             )
@@ -523,7 +538,7 @@ class _DemoGenerator:
             partner_id=partner,
             company_id=m2o(COMPANY),
             currency_id=m2o(order.currency),
-            pricelist_id=False,
+            pricelist_id=[self.public_pricelist, "BENACTA_DEMO Public"] if order.currency == EUR else False,
             date_order=dt(order_day),
             state=order.state,
             order_line=[],
