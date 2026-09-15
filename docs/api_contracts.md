@@ -53,6 +53,16 @@ REJECTED | DEFERRED | EVIDENCE_REQUESTED | CLOSED | NO_LONGER_RAISED ──REOPE
 COMMENT keeps the status. Every decision is append-only and bumps the case version.
 ```
 
+### `POST /api/v1/margin/exceptions/{case_ref}/investigate` (201)
+
+Body `{"use_llm": false}`. Runs the investigation on the latest snapshot: deterministic by default; with
+`use_llm` and a configured model (`LLM_PROVIDER=anthropic`, `LLM_MODEL`, `LLM_API_KEY`) the model drafts the report,
+the validator refuses any number or citation outside the payload and any instruction-like text, and a refused
+draft falls back to the deterministic report with `fallback_reason`. Returns the stored investigation: `mode`
+(`DETERMINISTIC_NO_LLM` or `LLM`), `label`, `provider`, `report` (`summary`, `statements` with `type`, `text`,
+`refs`, optional `support`; `draft_recommendation`; `confidence`; `limits`), `documents_refused`, `human_control`.
+A validated model draft also creates a `LLM_DRAFT` recommendation version pending review while the case is open.
+
 ### `POST /api/v1/margin/exceptions/{case_ref}/actions`
 
 Body `{"confirm": false}` returns the planned review activity (target model and id, external identifier, request)

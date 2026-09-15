@@ -260,9 +260,17 @@ def exception_case(conn: Connection, snapshot_id: uuid.UUID, case_ref: str) -> d
         "lineage": _lineage(conn, snapshot_id, case["subject_type"], case["subject_id"]),
         "suggested_follow_up": {"label": "Suggested follow-up", "text": SUGGESTED_FOLLOW_UP.get(ev["cause"], "Review the evidence and decide."),
                                 "requires_role": "finance_approver", "status": "PENDING_REVIEW"},
-        "investigation": None,
+        "investigation": _latest_investigation(conn, case["case_ref"]),
         **_workflow(conn, case["case_id"]),
     }
+
+
+def _latest_investigation(conn: Connection, case_ref: str) -> dict[str, Any] | None:
+    row = conn.execute(sa.text("select investigation_id, mode, report, created_at from decision.investigation where subject_type = 'exception_case'"
+                               " and subject_id = :c order by created_at desc limit 1"), {"c": case_ref}).mappings().first()
+    if row is None:
+        return None
+    return {**row["report"], "investigation_id": str(row["investigation_id"]), "created_at": row["created_at"].isoformat()}
 
 
 def _workflow(conn: Connection, case_id: uuid.UUID) -> dict[str, Any]:

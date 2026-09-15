@@ -10,6 +10,8 @@ from app.config import REPO_ROOT, Mode, Settings
 from app.db.engine import analytics_engine
 from app.margin.actions import execute_review_activity, plan_review_activity
 from app.margin.decisions import DecisionError, decide, parse_actor
+from app.margin.investigation import investigate, report_text
+from app.margin.llm import provider_from_settings
 from app.margin.service import case_audit, exception_case, exception_queue, impact_register, margin_overview
 from app.marts.reconcile import reconciliation_report
 from app.ops.pipeline import FIXTURE_SOURCE_INSTANCE, latest_snapshot
@@ -218,6 +220,26 @@ def run_audit(settings: Settings, case_ref: str) -> int:
     for ev in audit["audit_events"]:
         print(f"    #{ev['sequence']} {ev['occurred_at'][:19]} {ev['actor']:28} {ev['action']:28} {ev['event_hash'][:12]}")
     print(f"exported {_export(f'margin_audit_{c['case_ref']}.json', audit).relative_to(REPO_ROOT)}")
+    return 0
+
+
+def run_investigate(settings: Settings, case_ref: str, *, use_llm: bool) -> int:
+    provider = provider_from_settings(settings) if use_llm else None
+    if use_llm and provider is None:
+        print("no language model configured (LLM_PROVIDER=anthropic, LLM_MODEL, LLM_API_KEY): running the deterministic investigation")
+    engine = analytics_engine(settings)
+    try:
+        with engine.begin() as conn:
+            result = investigate(conn, latest_snapshot(engine, _instance(settings)), case_ref, provider=provider)
+    finally:
+        engine.dispose()
+        if provider is not None:
+            provider.close()
+    print(f"Investigation {result['investigation_id']} for {case_ref}")
+    print(report_text(result))
+    if result["documents_refused"]:
+        print(f"  documents refused at indexing: {result['documents_refused']}")
+    print(f"exported {_export(f'margin_investigation_{case_ref}.json', result).relative_to(REPO_ROOT)}")
     return 0
 
 

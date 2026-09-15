@@ -157,6 +157,26 @@ def margin_action_route(case_ref: str, body: ActionBody, x_benacta_actor: str | 
     return {"action_id": str(result.action_id), "status": result.status, "detail": result.detail, "response": result.response}
 
 
+class InvestigateBody(BaseModel):
+    use_llm: bool = False
+
+
+@app.post("/api/v1/margin/exceptions/{case_ref}/investigate", status_code=201)
+def margin_investigate_route(case_ref: str, body: InvestigateBody) -> dict:
+    from app.margin.investigation import investigate
+    from app.margin.llm import provider_from_settings
+
+    provider = provider_from_settings(get_settings()) if body.use_llm else None
+    try:
+        with _engine().begin() as conn:
+            return investigate(conn, _snapshot(None), case_ref, provider=provider)
+    except ValueError as exc:
+        raise HTTPException(404, str(exc)) from exc
+    finally:
+        if provider is not None:
+            provider.close()
+
+
 @app.get("/api/v1/margin/impact")
 def margin_impact_route() -> list[dict]:
     from app.margin.service import impact_register

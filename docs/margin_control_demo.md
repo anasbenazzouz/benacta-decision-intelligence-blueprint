@@ -1,8 +1,8 @@
 # BENACTA Margin Control: local setup and demonstration script
 
-State on 2026-09-15: milestones 1 and 2 delivered (governed data, deterministic rules, evidence, reconciliation
-report, decisions, controlled action, impact, audit; command line and API). The AI-assisted investigation and the
-cockpit arrive in milestone 3. Every figure below comes from the synthetic company `demo_v2` (fictional customers,
+State on 2026-09-15: milestones 1, 2 and 3a delivered (governed data, deterministic rules, evidence, reconciliation
+report, decisions, controlled action, impact, audit, investigation on governed documents; command line and API). The
+cockpit and the demonstration profile follow. Every figure below comes from the synthetic company `demo_v2` (fictional customers,
 products, people and contracts). No Odoo access and no language model are needed.
 
 ## 1. Setup (fixture mode, no credential)
@@ -87,6 +87,19 @@ uv run --project apps/api benacta verify-audit --export
 Point at: source totals against analytical totals, tolerance, timestamps and transformation version; the invoice
 headers against their lines; the audit chain `VALID`.
 
+### Step 4b. Ask for the investigation
+
+```bash
+uv run --project apps/api benacta margin-investigate MC-000001
+```
+
+Point at the order of the answer: observed facts, each with its reference (rule, order line, invoice line, cost
+allocation, reconciliation checks); the governed policy passages cited with owner, version and effective date; one
+hypothesis, labelled and never promoted to a fact; the missing evidence, the questions, the trade-off; a draft
+recommendation that a finance approver must approve. Without a model key the report is deterministic and says so;
+with `--llm` and a configured model, the draft goes through the same validator (no invented number, no citation
+outside the payload, no instruction-like text) and falls back to this report when refused.
+
 ### Step 5. Decide, as a named person
 
 ```bash
@@ -138,3 +151,5 @@ cockpit, and the three-year demonstration company.
   `NOT_MEASURED` until such a document exists.
 - The controlled action has never run against the connected Odoo: `NOT_VERIFIED` until the owner enables writes
   and attests a backup.
+- No language model has been called for real: the model path is exercised through a fake transport and validated
+  drafts; the demonstration runs the deterministic investigation.

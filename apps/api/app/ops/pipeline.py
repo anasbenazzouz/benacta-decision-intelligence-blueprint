@@ -107,6 +107,8 @@ def run_pipeline(settings: Settings, *, steps: tuple[str, ...], anchor: date = D
             if "exceptions" in steps:
                 snapshot = snapshot or latest_snapshot(engine, source.source_instance)
                 _run_exceptions(engine, snapshot)
+            if "documents" in steps:
+                _register_documents(engine)
     finally:
         engine.dispose()
     return 0
@@ -135,6 +137,16 @@ def _load_reference(engine: Engine, source: Source, snapshot: uuid.UUID) -> None
         for company_id in companies:
             reference.store_reference(conn, rows, source_instance=source.source_instance, company_id=company_id, source_kind=kind, source_ref=ref)
     print(f"reference ({kind}): " + ", ".join(f"{k}={v}" for k, v in rows.counts().items()))
+
+
+def _register_documents(engine: Engine) -> None:
+    from app.margin.documents import register_corpus
+
+    with engine.begin() as conn:
+        summary = register_corpus(conn)
+    print(f"documents: {len(summary['indexed'])} governed document(s) indexed" + (f", {len(summary['refused'])} refused" if summary['refused'] else ""))
+    for refusal in summary["refused"]:
+        print(f"  refused {refusal['file']}: {refusal['reason']}")
 
 
 def _run_exceptions(engine: Engine, snapshot: uuid.UUID) -> None:

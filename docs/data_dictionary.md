@@ -89,6 +89,7 @@ carries `owner`, `source`, `valid_from`, `valid_to` and the `load_id` of its pro
 | `freight_contract` | one clause per customer | `rebill`, `waived` or `included`, amount, currency, trigger |
 | `contract_price` | contract and product | unit price, currency, minimum quantity, validity |
 | `cost_reference` | reference and product | frozen unit cost, freeze date, validity |
+| `governed_document` | one authorised document of the investigation corpus | title, source, owner, effective date, version, path, content hash, section count; unauthorised or malformed files are refused at indexing and never registered |
 
 ## planning (migration `0002_planning_and_reports`)
 
@@ -111,6 +112,7 @@ Owned by BENACTA (ADR-0004). Odoo has no equivalent for versioned project plans.
 | `margin_recommendation` | one recommendation version per case | source `DETERMINISTIC_TEMPLATE` or `LLM_DRAFT`, action key, title, rationale, required role, estimated recovery and basis (`BILLING_EXPOSURE`, `NOT_RECEIVABLE`, `UNKNOWN`), expected impact, evidence references, rule and threshold versions, payload hash; superseded when the evidence changes while the case is open |
 | `case_decision` | one human decision, append-only | type, actor and declared roles, status and case version before and after, reason (required to reject, defer, request evidence, reopen), comment, assignee, deferral date |
 | `case_action` | one attempt to execute the approved action, append-only | target system and document, external identifier (one `EXECUTED` row per identifier), request, response, guard report, error |
+| `investigation` | one investigation run of a case (`subject_type` `exception_case`) or a project | mode `DETERMINISTIC_NO_LLM` or `LLM`, full report and its hash |
 | `case_impact` | estimated against realised recovery per approved case | realised only from posted invoice lines dated after the decision; `NOT_MEASURED`, `NOT_MEASURABLE`, `PARTIAL` or `MEASURED`, with the evidence lines and the variance |
 | `project_status_report` | one revision of a project status report per period | content JSON and its hash, plan versions and snapshot used; `DRAFT` or `PUBLISHED`; a published revision is immutable (trigger); publisher differs from preparer; a correction is a new revision |
 | `investigation` | one investigation run | question, mode `DETERMINISTIC_NO_LLM` or `LLM`, status `COMPLETED`, `ABSTAINED` or `FAILED`, full report |

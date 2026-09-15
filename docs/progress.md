@@ -5,6 +5,39 @@ Status vocabulary: `IMPLEMENTED` (code exists) · `TESTED_LOCAL` (automated test
 real read-only run against the connected Odoo) · `NOT_VERIFIED` · `BLOCKED`.
 A fixture test never proves an Odoo integration. Plan: `docs/implementation_plan.md`.
 
+## Milestone 3a: AI-assisted investigation on governed documents (delivered on fixtures)
+
+### Evidence (2026-09-15)
+
+| Command | Result |
+|---|---|
+| `uv run pytest -q` in `apps/api` | 250 passed, 7 skipped (live tests are opt-in) |
+| `uv run pytest -q tests/unit/test_margin_investigation.py` | 7 passed: unauthorised and malformed documents refused at indexing, shipped corpus complete, retrieval with citations and effective dates, deterministic report validates against its payload, validator refuses invented numbers, unknown citations, injected instructions and unlabelled hypotheses, model provider request shape, no provider without configuration |
+| `uv run pytest -q tests/integration/test_margin_investigation_db.py` | 7 passed: payload of computed facts and authorised passages only, deterministic investigation stored and shown on the case, a valid model draft becomes recommendation version 2 `LLM_DRAFT` pending review, an injected or invented draft and a failing provider degrade to the deterministic report with the reason recorded, a decided case keeps its recommendation, unauthorised fixture documents never cited, API route |
+| `benacta seed-fixtures` | 4 governed documents indexed, 0 refused |
+| `BENACTA_MODE=fixture benacta margin-investigate MC-000001` | mode `DETERMINISTIC_NO_LLM`, label "sans LLM": observed facts cite the rule, the order line, the invoice line, the cost allocation and the three reconciliation checks; one labelled hypothesis; three passages of the commercial policy cited with owner, version and effective date; missing evidence, questions, trade-off; draft recommendation requiring a finance approver |
+| `benacta margin-investigate MC-000001 --llm` without a key | deterministic investigation, message that no model is configured |
+| Real model run | NOT_VERIFIED: no `LLM_API_KEY` configured; the Anthropic provider is exercised through a fake transport only |
+
+### Items
+
+| Item | Status | Where |
+|---|---|---|
+| Governed document corpus with front matter (identifier, title, source, owner, effective date, version, authorisation); unauthorised or malformed documents refused at indexing; registry with content hash | TESTED_LOCAL | `data/documents/margin/`, `app/margin/documents.py`, migration `0006_governed_documents` |
+| Transparent retrieval: keyword scoring by section, citation `doc:<id>#<section>`, matched terms, effective-date filter; no embeddings | TESTED_LOCAL | `app/margin/documents.py` |
+| Investigation payload: evaluation, metrics, transactions, rule, reconciliation, related evaluations, passages; allowed numbers and references derived from it; the oracle is unreachable | TESTED_LOCAL | `app/margin/investigation.py` |
+| Deterministic provider ("sans LLM") producing observed facts, labelled hypotheses, missing evidence, questions, trade-offs and a draft recommendation, every statement referenced | TESTED_LOCAL | same |
+| Validator: schema, numbers only from the payload, references only from the payload, hypotheses with support, instruction-like text refused, requires_role | TESTED_LOCAL | same |
+| Language model provider (Anthropic Messages API through httpx, no SDK), system prompt with the boundary, JSON-only parsing; graceful degradation to deterministic with the reason recorded | TESTED_LOCAL (fake transport) | `app/margin/llm.py` |
+| A validated draft becomes a `LLM_DRAFT` recommendation version pending review, only while the case is open; the estimated amount never changes | TESTED_LOCAL | `app/margin/investigation.py` |
+| CLI `margin-investigate [--llm]`, `index-documents`; API `POST /api/v1/margin/exceptions/{case_ref}/investigate`; case view carries the latest investigation | TESTED_LOCAL | `app/ops/margin_ops.py`, `app/main.py` |
+
+### Known limits
+
+- No real model run yet; the evaluation of drafts against the validator on real outputs starts when a key exists.
+- Retrieval is keyword-based by design; a passage is cited when its terms match, not when its meaning does.
+- The deterministic hypotheses are one sentence per cause; the model draft may be richer but is bound by the same validator.
+
 ## Milestone 2: decisions, controlled action and impact (delivered on fixtures)
 
 Every figure below comes from the synthetic dataset `demo_v2`; the Odoo side of the action was exercised against a

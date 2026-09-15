@@ -44,7 +44,7 @@ def _seed_fixtures(_: argparse.Namespace) -> int:
 
     settings = get_settings().model_copy(update={"benacta_mode": Mode.FIXTURE})
     pipeline.run_migrations(settings)
-    return pipeline.run_pipeline(settings, steps=("ingest", "marts", "plans", "reconcile", "reference", "exceptions"))
+    return pipeline.run_pipeline(settings, steps=("ingest", "marts", "plans", "reconcile", "reference", "exceptions", "documents"))
 
 
 def _margin_overview(args: argparse.Namespace) -> int:
@@ -82,6 +82,12 @@ def _margin_impact(_: argparse.Namespace) -> int:
     from app.ops import margin_ops
 
     return margin_ops.run_impact(get_settings())
+
+
+def _margin_investigate(args: argparse.Namespace) -> int:
+    from app.ops import margin_ops
+
+    return margin_ops.run_investigate(get_settings(), args.case, use_llm=args.llm)
 
 
 def _margin_audit(args: argparse.Namespace) -> int:
@@ -207,6 +213,13 @@ def main(argv: list[str] | None = None) -> int:
     act.add_argument("--role", action="append", default=[])
     act.add_argument("--confirm", action="store_true")
     act.set_defaults(func=_margin_act)
+    commands.add_parser("index-documents", help="register the governed document corpus (data/documents/margin)").set_defaults(
+        func=_pipeline("documents")
+    )
+    investigate_case = commands.add_parser("margin-investigate", help="investigate a case: deterministic by default, --llm uses the configured model")
+    investigate_case.add_argument("case")
+    investigate_case.add_argument("--llm", action="store_true", help="draft with LLM_PROVIDER/LLM_MODEL/LLM_API_KEY; falls back when refused")
+    investigate_case.set_defaults(func=_margin_investigate)
     commands.add_parser("margin-impact", help="estimated against realised recovery per approved case").set_defaults(func=_margin_impact)
     audit_case = commands.add_parser("margin-audit", help="everything that happened to a case, with audit events")
     audit_case.add_argument("case")
