@@ -1,0 +1,198 @@
+# Ground-truth oracle for the project controlling scenarios of dataset demo_v2.
+# Written by hand from the scenario definitions in docs/project_controlling_model.md. Never imported by application
+# code. Amounts EUR excluding taxes unless the key says ttc (tax-inclusive receivables and cash).
+# Conventions: EAC = actual cost to cutoff + ETC (ETC includes open commitments); cost variance = EAC - approved budget
+# (positive unfavourable); margin = FRAC - EAC; percentages rounded to 2 decimals for comparison.
+oracle_version: 1
+dataset_id: demo_v2
+reporting_period: "2026-08"
+cutoff: "2026-08-31"
+previous_cutoff: "2026-07-31"
+
+portfolio:
+  delivery_projects: 15
+  internal_projects: 5  # proposals, development, improvement, non-productive, support functions
+  employees: 40
+  external_employees: 6
+  forecast_labels: [FC-2026-06, FC-2026-07, FC-2026-08]
+
+projects:
+  PRJ-01:
+    scenario: healthy
+    frac: "800000.00"
+    approved_budget: "600000.00"
+    actual_cost: "300000.00"
+    actual_cost_by_category: {LABOUR: "200000.00", SUBCONTRACT: "75000.00", MATERIALS: "25000.00"}
+    open_commitments: "100000.00"
+    etc: "300000.00"
+    eac: "600000.00"
+    uncommitted_etc: "200000.00"
+    cost_variance_at_completion: "0.00"
+    margin: "200000.00"
+    margin_pct: "25.00"
+    previous: {actual_cost: "270000.00", open_commitments: "110000.00", etc: "330000.00", eac: "600000.00", margin: "200000.00"}
+    hours: {budget: "4750", actual: "2365", at_completion: "4750"}
+    billed: "320000.00"
+    collected_ttc: "384000.00"
+    overdue_ttc: "0.00"
+    not_yet_due_ttc: "0.00"
+    remaining_to_bill: "480000.00"
+    late_milestones: []
+    exceptions: []
+
+  PRJ-02:
+    scenario: hours overrun, margin erosion, late milestone, partially paid overdue invoice
+    frac: "2000000.00"
+    approved_budget: "1600000.00"
+    actual_cost: "840000.00"
+    actual_cost_by_category: {LABOUR: "490000.00", SUBCONTRACT: "250000.00", MATERIALS: "100000.00"}
+    open_commitments: "440000.00"
+    open_commitments_by_category: {SUBCONTRACT: "290000.00", MATERIALS: "150000.00"}
+    etc: "924000.00"
+    eac: "1764000.00"
+    uncommitted_etc: "484000.00"
+    cost_variance_at_completion: "164000.00"
+    margin: "236000.00"
+    margin_pct: "11.80"
+    previous: {actual_cost: "700000.00", open_commitments: "450000.00", etc: "900000.00", eac: "1600000.00", margin: "400000.00", margin_pct: "20.00"}
+    hours: {budget: "9000", actual: "5550", at_completion: "10450"}
+    billed: "600000.00"
+    collected_ttc: "540000.00"
+    overdue_ttc: "180000.00"
+    overdue_buckets_ttc: {"91-180": "180000.00"}
+    not_yet_due_ttc: "0.00"
+    remaining_to_bill: "1400000.00"
+    late_milestones:
+      - {name: Detailed engineering approval, deadline: "2026-07-15", days_late: 47, billing_amount: "600000.00",
+         previous_planned_billing_period: "2026-08", current_planned_billing_period: "2026-10"}
+    erosion:
+      golden_id: MARGIN-EROSION-001
+      margin_change: "-164000.00"
+      revenue_change: "0.00"
+      eac_change: "164000.00"
+      by_category: {LABOUR: "124000.00", SUBCONTRACT: "40000.00", MATERIALS: "0.00", CONTINGENCY: "0.00"}
+      labour_by_role:
+        LE: {hours_change: "200", rate: "120.00", cost_change: "24000.00"}
+        EN: {hours_change: "1250", rate: "80.00", cost_change: "100000.00"}
+      residual: "0.00"
+    exceptions: [MARGIN_EROSION, BUDGET_OVERRUN_AT_COMPLETION, MILESTONE_LATE, RECEIVABLE_OVERDUE]
+
+  PRJ-03:
+    scenario: commitment already included in ETC
+    frac: "1500000.00"
+    approved_budget: "1200000.00"
+    actual_cost: "500000.00"
+    open_commitments: "400000.00"
+    etc: "700000.00"
+    eac: "1200000.00"
+    uncommitted_etc: "300000.00"
+    naive_double_counted_eac: "1600000.00"
+    margin: "300000.00"
+    margin_pct: "20.00"
+    previous: {actual_cost: "450000.00", open_commitments: "110000.00", etc: "750000.00", eac: "1200000.00"}
+    billed: "150000.00"
+    collected_ttc: "180000.00"
+    overdue_ttc: "0.00"
+    exceptions: []
+
+  PRJ-04:
+    scenario: vendor bill already in actual cost
+    frac: "1150000.00"
+    approved_budget: "900000.00"
+    actual_cost: "480000.00"
+    open_commitments: "150000.00"
+    etc: "420000.00"
+    eac: "900000.00"
+    margin: "250000.00"
+    margin_pct: "21.74"
+    previous: {actual_cost: "350000.00", open_commitments: "250000.00", etc: "550000.00", eac: "900000.00"}
+    august_vendor_bill: "100000.00"
+    billed: "575000.00"
+    collected_ttc: "138000.00"
+    overdue_ttc: "552000.00"
+    overdue_buckets_ttc: {"1-30": "552000.00"}
+    exceptions: [RECEIVABLE_OVERDUE]
+
+  PRJ-05:
+    scenario: approved change order
+    base_contract: "1000000.00"
+    approved_change_orders: "150000.00"
+    frac: "1150000.00"
+    budget_baseline: "800000.00"
+    approved_budget: "910000.00"
+    actual_cost: "440000.00"
+    open_commitments: "250000.00"
+    etc: "470000.00"
+    eac: "910000.00"
+    margin: "240000.00"
+    margin_pct: "20.87"
+    billed: "175000.00"
+    collected_ttc: "120000.00"
+    overdue_ttc: "0.00"
+    not_yet_due_ttc: "90000.00"
+    exceptions: []
+
+  PRJ-06:
+    scenario: pending change order
+    frac: "600000.00"
+    approved_budget: "480000.00"
+    actual_cost: "286000.00"
+    open_commitments: "60000.00"
+    etc: "194000.00"
+    eac: "480000.00"
+    margin: "120000.00"
+    margin_pct: "20.00"
+    pending_change_orders: "80000.00"
+    unapproved_change_order_cost_to_date: "16000.00"
+    pending_co_scenario: {frac: "680000.00", etc: "238000.00", eac: "524000.00", margin: "156000.00", margin_pct: "22.94"}
+    billed: "120000.00"
+    exceptions: [UNAPPROVED_CHANGE_ORDER_WORK]
+
+  PRJ-07:
+    scenario: foreign currency contract
+    contract_currency: USD
+    contract_amount_usd: "1100000.00"
+    fixed_project_rate_usd_per_eur: "1.10"
+    frac: "1000000.00"
+    approved_budget: "750000.00"
+    actual_cost: "150000.00"
+    open_commitments: "0.00"
+    etc: "600000.00"
+    eac: "750000.00"
+    margin: "250000.00"
+    margin_pct: "25.00"
+    billed: "100000.00"
+    collected_ttc: "100000.00"
+    overdue_ttc: "0.00"
+    exceptions: []
+
+  PRJ-08:
+    scenario: missing approved forecast and missing time
+    frac: "400000.00"
+    approved_budget: "300000.00"
+    actual_cost: "130000.00"
+    open_commitments: "50000.00"
+    etc: null
+    eac: null
+    margin: null
+    eac_status: UNKNOWN
+    eac_reason: no approved BASE forecast at cutoff 2026-08-31
+    missing_timesheet_employee_months: 1
+    exceptions: [FORECAST_MISSING, TIMESHEETS_INCOMPLETE]
+
+  PRJ-09:
+    scenario: reconciliation inconsistency
+    frac: "500000.00"
+    approved_budget: "400000.00"
+    actual_cost: "210000.00"
+    open_commitments: "90000.00"
+    etc: "190000.00"
+    eac: "400000.00"
+    margin: "100000.00"
+    margin_pct: "20.00"
+    data_quality_issues: [VENDOR_BILL_PROJECT_MISMATCH]
+    exceptions: []
+
+cross_checks:
+  prj01_unchanged_by_prj09_mismatch: "PRJ-01 actual cost stays 300000.00"
+  portfolio_eac_excludes_unknown: "portfolio EAC total lists PRJ-08 as UNKNOWN and excludes it with a count"

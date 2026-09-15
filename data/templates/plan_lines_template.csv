@@ -1,0 +1,5 @@
+project_code,version_type,scenario,label,cutoff_date,currency,business_unit,work_package,cost_category,resource_or_role,period,planned_hours,planned_rate,planned_cost,planned_revenue,planned_billing,planned_cash_collection
+PRJ-EXAMPLE,FORECAST,BASE,FC-2026-09,2026-09-30,EUR,PLANTS,WP20,LABOUR,EN,2026-10,160,80,12800,,,
+PRJ-EXAMPLE,FORECAST,BASE,FC-2026-09,2026-09-30,EUR,PLANTS,WP40,SUBCONTRACT,,2026-10,,,45000,,,
+PRJ-EXAMPLE,FORECAST,BASE,FC-2026-09,2026-09-30,EUR,PLANTS,MS03,REVENUE,,2026-11,,,,,600000,
+PRJ-EXAMPLE,FORECAST,BASE,FC-2026-09,2026-09-30,EUR,PLANTS,MS03,REVENUE,,2027-01,,,,,,720000

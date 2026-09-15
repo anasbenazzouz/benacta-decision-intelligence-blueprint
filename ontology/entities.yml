@@ -1,0 +1,35 @@
+# BENACTA ontology: business objects (project controlling extension).
+# The semantic layer defines numbers; the ontology defines objects, relations and action capabilities.
+# Canonical id pattern: <source_instance>:<company_id>:<type>:<source reference>. The Neo4j projection is rebuilt
+# from governed data and is never a source of financial truth (not deployed yet).
+schema_version: 1
+entities:
+  Company: {source: marts.dim_company, key: company_id, id_pattern: "{instance}:{company_id}:Company:{company_id}"}
+  BusinessUnit: {source: marts.dim_project.business_unit, key: business_unit, id_pattern: "{instance}:{company_id}:BusinessUnit:{code}"}
+  Customer: {source: marts.dim_customer, key: partner_id, id_pattern: "{instance}:{company_id}:Customer:{partner_id}"}
+  Supplier: {source: marts.dim_supplier, key: partner_id, id_pattern: "{instance}:{company_id}:Supplier:{partner_id}"}
+  Project: {source: marts.dim_project, key: project_code, id_pattern: "{instance}:{company_id}:Project:{project_code}"}
+  WorkPackage: {source: marts.dim_work_package, key: task_id, id_pattern: "{instance}:{company_id}:WorkPackage:{task_id}"}
+  Milestone: {source: marts.dim_milestone, key: milestone_id, id_pattern: "{instance}:{company_id}:Milestone:{milestone_id}"}
+  ChangeOrder: {source: marts.fact_change_order, key: sale_order_id, id_pattern: "{instance}:{company_id}:ChangeOrder:{sale_order_id}"}
+  Resource: {source: marts.dim_employee, key: employee_code, id_pattern: "{instance}:{company_id}:Resource:{employee_code}"}
+  Skill: {source: raw hr.employee.skill, key: skill_id, id_pattern: "{instance}:{company_id}:Skill:{skill_id}"}
+  Assignment: {source: planning.assignment, key: "version_id, work_package, employee_code, period", id_pattern: "benacta:{company_id}:Assignment:{version_id}:{employee_code}:{period}"}
+  TimesheetEntry: {source: marts.fact_timesheet, key: line_id, id_pattern: "{instance}:{company_id}:TimesheetEntry:{line_id}"}
+  PurchaseCommitment: {source: marts.fact_purchase_commitment, key: purchase_line_id, id_pattern: "{instance}:{company_id}:PurchaseCommitment:{purchase_line_id}"}
+  VendorBillLine: {source: marts.fact_vendor_bill_line, key: move_line_id, id_pattern: "{instance}:{company_id}:VendorBillLine:{move_line_id}"}
+  Invoice: {source: marts.fact_receivable, key: invoice_id, id_pattern: "{instance}:{company_id}:Invoice:{invoice_id}"}
+  Payment: {source: marts.fact_customer_payment, key: "payment_id, invoice_id", id_pattern: "{instance}:{company_id}:Payment:{payment_id}"}
+  BudgetVersion: {source: planning.plan_version (BUDGET_*), key: version_id, id_pattern: "benacta:{company_id}:BudgetVersion:{version_id}"}
+  ForecastVersion: {source: planning.plan_version (FORECAST), key: version_id, id_pattern: "benacta:{company_id}:ForecastVersion:{version_id}"}
+  PlanningAssumption: {source: planning.assumption, key: "version_id, key, work_package", id_pattern: "benacta:{company_id}:PlanningAssumption:{version_id}:{key}"}
+  Risk: {source: planning.assumption (key risk_*), key: "version_id, key", id_pattern: "benacta:{company_id}:Risk:{version_id}:{key}", status: not populated yet}
+  MetricDefinition: {source: semantic/metrics.yml, key: "metric_id, version", id_pattern: "benacta:MetricDefinition:{metric_id}:v{version}"}
+  ReportingSnapshot: {source: marts.snapshot, key: snapshot_id, id_pattern: "benacta:ReportingSnapshot:{snapshot_id}"}
+  ProjectStatusReport: {source: decision.project_status_report, key: psr_id, id_pattern: "benacta:{company_id}:ProjectStatusReport:{psr_id}"}
+  Exception: {source: metric service exception rules, key: "project_code, code, cutoff", id_pattern: "benacta:{company_id}:Exception:{project_code}:{code}:{cutoff}"}
+  Evidence: {source: investigation evidence_refs, key: ref, id_pattern: "benacta:Evidence:{ref}"}
+  Investigation: {source: decision.investigation, key: investigation_id, id_pattern: "benacta:Investigation:{investigation_id}"}
+  Recommendation: {source: decision.recommendation, key: "recommendation_id", id_pattern: "benacta:Recommendation:{recommendation_id}"}
+  Decision: {source: decision schema (S6), key: decision_id, id_pattern: "benacta:Decision:{decision_id}", status: not implemented}
+  Action: {source: decision schema (S6), key: action_id, id_pattern: "benacta:Action:{action_id}", status: not implemented}

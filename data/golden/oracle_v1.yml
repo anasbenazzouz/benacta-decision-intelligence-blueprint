@@ -1,0 +1,199 @@
+# Ground-truth oracle for dataset demo_v1. Written by hand, versioned, independent of the engine.
+#
+# Rules for this file:
+# - It is never generated and never imported by application code, rules, tools or agents.
+#   Only tests read it. Investigation tools must not be able to retrieve it.
+# - Amounts are EUR excluding taxes, as decimal strings.
+# - `facts` state what the source data must contain for the case to be valid.
+#   `expected` states what the deterministic engine must conclude (checked from S4 onward).
+# - Exposure is not recoverable revenue. Billing leakage and cost variance are separate components.
+oracle_version: 1
+dataset_id: demo_v1
+anchor_date: "2026-08-31"
+window_start: "2026-06-03"
+seed: 20260831
+company: BENACTA DEMO
+currency: EUR
+
+structure:
+  sale_orders: 120
+  sale_orders_by_state: {sale: 115, draft: 4, cancel: 1}
+  customers: 21
+  suppliers: 5
+  storable_products: 17
+  service_products: 1
+  invoices_without_sale_order: 1
+
+cases:
+  # ------------------------------------------------------------------ golden cases
+  - case_id: DISC-001
+    kind: golden
+    rule: discount_cap
+    subject: {type: sale_order_line, order: BD/SO/DISC-001, product: SC1}
+    facts:
+      order_date: "2026-07-03"
+      customer_segment: standard
+      quantity: "100"
+      price_unit: "100.00"
+      discount_pct: "15"
+      line_subtotal: "8500.00"
+      qty_delivered: "100"
+      qty_invoiced: "100"
+      invoiced_subtotal: "8500.00"
+      applicable_policy: POL-DISC-STANDARD
+      allowed_discount_pct: "5"
+      valid_derogation: null
+    expected:
+      status: VIOLATION
+      exposure_type: price
+      component: billing_leakage
+      expected_amount: "9500.00"
+      actual_amount: "8500.00"
+      adverse_exposure: "1000.00"
+
+  - case_id: FREIGHT-001
+    kind: golden
+    rule: freight_rebilling
+    subject: {type: sale_order, order: BD/SO/FREIGHT-001}
+    facts:
+      contract: CTR-FREIGHT-G2
+      contract_terms: rebill
+      contract_amount: "250.00"
+      trigger: full_delivery
+      goods_quantity: "10"
+      goods_delivered: "10"
+      goods_invoiced: "10"
+      freight_lines_on_order: 0
+      freight_lines_on_invoices: 0
+    expected:
+      status: VIOLATION
+      exposure_type: freight
+      component: billing_leakage
+      expected_amount: "250.00"
+      actual_amount: "0.00"
+      adverse_exposure: "250.00"
+
+  - case_id: COST-001
+    kind: golden
+    rule: cost_reference_variance
+    subject: {type: sale_order_line, order: BD/SO/COST-001, product: SC3}
+    facts:
+      quantity_sold: "100"
+      quantity_delivered: "100"
+      reference_unit_cost: "60.00"
+      reference_frozen_before_sale: true
+      receipt_unit_cost: "68.00"
+      delivery_move_value: "6800.00"
+      posted_cogs: "6800.00"
+      invoiced_revenue: "12000.00"
+      cost_attribution: receipt -> delivery move -> sale line, FIFO on a single receipt layer
+    expected:
+      status: VIOLATION
+      exposure_type: cost
+      component: cost_variance
+      expected_amount: "6000.00"
+      actual_amount: "6800.00"
+      adverse_exposure: "800.00"
+      customer_receivable: false
+
+  # ------------------------------------------------------------------ negative controls
+  - case_id: NEG-01
+    kind: negative_control
+    control: approved derogation
+    subject: {type: sale_order_line, order: BD/SO/NEG-01, product: P03}
+    facts: {quantity: "20", price_unit: "210.00", discount_pct: "15", line_subtotal: "3570.00", derogation: DEROG-2026-014, derogation_valid_on_order_date: true}
+    expected: {status: COMPLIANT, adverse_exposure: "0.00"}
+
+  - case_id: NEG-02
+    kind: negative_control
+    control: freight waived by contract
+    subject: {type: sale_order, order: BD/SO/NEG-02}
+    facts: {contract: CTR-FREIGHT-N02, contract_terms: waived, delivered_in_full: true, invoiced_in_full: true, freight_lines_on_order: 0}
+    expected: {status: COMPLIANT, adverse_exposure: "0.00"}
+
+  - case_id: NEG-03
+    kind: negative_control
+    control: partial delivery and partial invoicing
+    subject: {type: sale_order, order: BD/SO/NEG-03}
+    facts: {contract: CTR-FREIGHT-N03, contract_terms: rebill, quantity: "100", qty_delivered: "60", qty_invoiced: "60", invoiced_subtotal: "7200.00"}
+    expected: {status: NOT_DUE, adverse_exposure: "0.00", reason: freight becomes due after full delivery}
+
+  - case_id: NEG-04
+    kind: negative_control
+    control: credit note, discount exactly at the cap
+    subject: {type: sale_order_line, order: BD/SO/NEG-04, product: P04}
+    facts: {quantity: "10", discount_pct: "5", allowed_discount_pct: "5", invoiced_subtotal: "807.50", refunded_quantity: "2", refunded_subtotal: "161.50", net_revenue: "646.00", refund_reverses_invoice: true}
+    expected: {status: COMPLIANT, adverse_exposure: "0.00"}
+
+  - case_id: NEG-05
+    kind: negative_control
+    control: cancelled order
+    subject: {type: sale_order, order: BD/SO/NEG-05}
+    facts: {state: cancel, discount_pct: "20", line_subtotal: "1104.00", deliveries: 0, invoices: 0}
+    expected: {status: EXCLUDED, adverse_exposure: "0.00", net_revenue: "0.00"}
+
+  - case_id: NEG-06
+    kind: negative_control
+    control: unit of measure variation
+    subject: {type: sale_order_line, order: BD/SO/NEG-06, product: P05}
+    facts: {order_uom: Dozens, uom_factor: "12", quantity: "5", quantity_in_units: "60", price_per_dozen: "480.00", list_price_per_unit: "40.00", discount_pct: "5", line_subtotal: "2280.00", delivered_units: "60"}
+    expected: {status: COMPLIANT, adverse_exposure: "0.00"}
+
+  - case_id: NEG-07
+    kind: negative_control
+    control: foreign currency
+    subject: {type: sale_order_line, order: BD/SO/NEG-07, product: P06}
+    facts: {currency: USD, quantity: "4", price_unit: "430.00", discount_pct: "5", line_subtotal_usd: "1634.00", invoice_date: "2026-08-05", rate_date: "2026-07-31", rate_usd_per_eur: "1.10", revenue_eur: "1485.45"}
+    expected: {status: COMPLIANT, adverse_exposure: "0.00"}
+
+  - case_id: NEG-08
+    kind: negative_control
+    control: missing cost
+    subject: {type: sale_order_line, order: BD/SO/NEG-08, product: SC4}
+    facts: {quantity_delivered: "10", receipts_for_product: 0, delivery_move_value: "0.00", posted_cogs_lines: 0, reference_unit_cost: "48.00"}
+    expected: {status: UNDETERMINED, cost_variance: null, reason: no attributable realised cost}
+
+  - case_id: NEG-09
+    kind: negative_control
+    control: expired policy
+    subject: {type: sale_order_line, order: BD/SO/NEG-09, product: P02}
+    facts: {customer_segment: distributor, discount_pct: "12", order_date: "2026-08-07", only_segment_policy: POL-DISC-DISTRIBUTOR, policy_valid_to: "2026-06-02"}
+    expected: {status: UNKNOWN, adverse_exposure: null, requires_human_review: true}
+
+  - case_id: NEG-10
+    kind: negative_control
+    control: contradictory policies
+    subject: {type: sale_order_line, order: BD/SO/NEG-10, product: P07}
+    facts: {discount_pct: "8", policies: [POL-DISC-UBAYE-A, POL-DISC-UBAYE-B], caps: ["5", "10"], same_priority: true}
+    expected: {status: CONFLICT, adverse_exposure: null, requires_human_review: true}
+
+  - case_id: NEG-11
+    kind: negative_control
+    control: invoice without sale order
+    subject: {type: invoice, invoice: BD/INV/NEG-11}
+    facts: {product: P10, quantity: "10", subtotal: "650.00", sale_line_links: 0}
+    expected: {status: NO_SALE_LINK, adverse_exposure: "0.00", data_quality_issue: INVOICE_LINE_WITHOUT_SALE_LINE, counted_in_net_revenue: true}
+
+  - case_id: NEG-12
+    kind: negative_control
+    control: two anomalies on the same line
+    subject: {type: sale_order_line, order: BD/SO/NEG-12, product: SC5}
+    facts: {quantity: "50", price_unit: "100.00", discount_pct: "15", allowed_discount_pct: "5", line_subtotal: "4250.00", reference_unit_cost: "60.00", receipt_unit_cost: "68.00", delivery_move_value: "3400.00"}
+    expected:
+      status: VIOLATION
+      exceptions:
+        - {exposure_type: price, component: billing_leakage, expected_amount: "4750.00", actual_amount: "4250.00", adverse_exposure: "500.00"}
+        - {exposure_type: cost, component: cost_variance, expected_amount: "3000.00", actual_amount: "3400.00", adverse_exposure: "400.00"}
+      same_overlap_group: true
+      both_aggregation_eligible: true
+
+totals:
+  golden_cases_only:
+    billing_leakage: "1250.00"
+    cost_variance: "800.00"
+    combined_exposure: "2050.00"
+  whole_dataset:
+    billing_leakage: "1750.00"
+    cost_variance: "1200.00"
+    combined_exposure: "2950.00"
+    exceptions_on_background_orders: 0

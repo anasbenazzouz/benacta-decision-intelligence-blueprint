@@ -1,0 +1,457 @@
+# Candidate Odoo sources for the Gross Margin Exception journey.
+#
+# This file states what BENACTA needs and where it expects to find it.
+# It is an input to discovery, not a claim about any instance:
+# `benacta discover-odoo` checks every entry against the live schema and
+# writes the verified result to data/discovery/odoo_discovery_snapshot.json.
+#
+# role: pk | fk | bridge | measure | attribute | state | watermark
+# needed_for: journeys or golden cases that depend on the field
+schema_version: 1
+
+models:
+  sale.order:
+    meaning: Customer order header
+    fields:
+      id: {role: pk}
+      name: {role: attribute, meaning: Order reference}
+      partner_id: {role: fk, meaning: Ordering customer}
+      company_id: {role: fk, meaning: Owning company, needed_for: [isolation]}
+      currency_id: {role: fk, meaning: Order currency}
+      pricelist_id: {role: fk, meaning: Pricelist applied at order time, needed_for: [DISC-001]}
+      date_order: {role: attribute, meaning: Order date}
+      state: {role: state, meaning: Quotation, sale or cancelled}
+      order_line: {role: fk, meaning: Order lines}
+      invoice_ids: {role: bridge, meaning: Invoices derived from the order}
+      picking_ids: {role: bridge, meaning: Deliveries derived from the order, needed_for: [FREIGHT-001]}
+      write_date: {role: watermark}
+
+  sale.order.line:
+    meaning: Ordered product line, the grain of price and discount exceptions
+    fields:
+      id: {role: pk}
+      order_id: {role: fk}
+      product_id: {role: fk}
+      company_id: {role: fk}
+      currency_id: {role: fk}
+      display_type: {role: attribute, meaning: Section or note lines carry no amount}
+      product_uom_qty: {role: measure, meaning: Ordered quantity}
+      product_uom_id: {role: fk, meaning: Unit of measure of the ordered quantity, needed_for: [uom_control]}
+      price_unit: {role: measure, meaning: Unit price before discount, needed_for: [DISC-001]}
+      discount: {role: measure, meaning: Discount percentage applied, needed_for: [DISC-001]}
+      price_subtotal: {role: measure, meaning: Amount excluding taxes after discount}
+      qty_delivered: {role: measure, needed_for: [partial_delivery_control]}
+      qty_invoiced: {role: measure, needed_for: [partial_invoice_control]}
+      invoice_lines: {role: bridge, meaning: Many-to-many link to invoice lines}
+      move_ids: {role: bridge, meaning: Stock moves fulfilling the line, needed_for: [COST-001]}
+      purchase_price: {role: measure, meaning: Cost captured on the line by the sale_margin module, needed_for: [COST-001]}
+      tax_ids: {role: fk}
+      project_id: {role: fk, meaning: Project of a change order line (sale_project)}
+      qty_delivered_method: {role: attribute, meaning: milestones for milestone billing}
+      write_date: {role: watermark}
+
+  account.move:
+    meaning: Journal entry, invoice or credit note header
+    fields:
+      id: {role: pk}
+      name: {role: attribute}
+      move_type: {role: attribute, meaning: out_invoice, out_refund, in_invoice, in_refund, entry}
+      state: {role: state, meaning: draft, posted or cancel}
+      company_id: {role: fk}
+      partner_id: {role: fk}
+      currency_id: {role: fk}
+      invoice_date: {role: attribute}
+      date: {role: attribute, meaning: Accounting date}
+      invoice_origin: {role: attribute, meaning: Free-text origin, not a key}
+      reversed_entry_id: {role: fk, meaning: Invoice reversed by this credit note, needed_for: [refund_control]}
+      amount_untaxed_signed: {role: measure}
+      amount_untaxed: {role: measure, meaning: Untaxed amount in document currency}
+      amount_total: {role: measure, meaning: Tax-inclusive amount in document currency}
+      amount_residual: {role: measure, meaning: Residual at extraction time, not at cutoff}
+      invoice_date_due: {role: attribute, meaning: Due date for ageing}
+      payment_state: {role: state}
+      write_date: {role: watermark}
+
+  account.move.line:
+    meaning: Journal item, the grain of billed revenue and posted cost
+    fields:
+      id: {role: pk}
+      move_id: {role: fk}
+      company_id: {role: fk}
+      account_id: {role: fk}
+      display_type: {role: attribute, meaning: product, cogs, tax, payment_term and others}
+      parent_state: {role: state}
+      product_id: {role: fk}
+      quantity: {role: measure}
+      product_uom_id: {role: fk}
+      price_unit: {role: measure}
+      discount: {role: measure}
+      price_subtotal: {role: measure}
+      balance: {role: measure, meaning: Signed company-currency amount}
+      amount_currency: {role: measure, meaning: Signed transaction-currency amount}
+      currency_id: {role: fk}
+      date: {role: attribute}
+      sale_line_ids: {role: bridge, meaning: Many-to-many link back to order lines}
+      purchase_line_id: {role: fk, meaning: Purchase line billed by a vendor bill line}
+      analytic_distribution: {role: attribute, meaning: Analytic account percentages used for project attribution}
+      write_date: {role: watermark}
+
+  stock.picking:
+    meaning: Delivery or receipt document
+    fields:
+      id: {role: pk}
+      name: {role: attribute}
+      origin: {role: attribute, meaning: Free-text origin, not a key}
+      sale_id: {role: fk, needed_for: [FREIGHT-001]}
+      partner_id: {role: fk}
+      company_id: {role: fk}
+      picking_type_code: {role: attribute}
+      state: {role: state}
+      date_done: {role: attribute}
+      write_date: {role: watermark}
+
+  stock.move:
+    meaning: Goods movement; on Odoo 19 it also carries valuation
+    fields:
+      id: {role: pk}
+      picking_id: {role: fk}
+      sale_line_id: {role: fk, needed_for: [COST-001]}
+      purchase_line_id: {role: fk, needed_for: [COST-001]}
+      product_id: {role: fk}
+      company_id: {role: fk}
+      state: {role: state}
+      date: {role: attribute}
+      product_uom_qty: {role: measure}
+      quantity: {role: measure}
+      uom_id: {role: fk, meaning: Unit of measure of the move}
+      price_unit: {role: measure, meaning: Unit cost recorded on the move, needed_for: [COST-001]}
+      account_move_id: {role: fk, meaning: Valuation journal entry when valuation is perpetual, needed_for: [COST-001]}
+      location_id: {role: fk}
+      location_dest_id: {role: fk}
+      is_valued: {role: attribute, needed_for: [COST-001]}
+      value: {role: measure, meaning: Valuation of the move, needed_for: [COST-001]}
+      remaining_value: {role: measure}
+      write_date: {role: watermark}
+
+  stock.valuation.layer:
+    meaning: Valuation layer model of Odoo 13 to 18
+    fields:
+      id: {role: pk}
+      stock_move_id: {role: fk, needed_for: [COST-001]}
+      unit_cost: {role: measure}
+      value: {role: measure}
+
+  purchase.order:
+    meaning: Supplier order header
+    fields:
+      id: {role: pk}
+      name: {role: attribute}
+      partner_id: {role: fk}
+      company_id: {role: fk}
+      currency_id: {role: fk}
+      date_order: {role: attribute}
+      state: {role: state}
+      write_date: {role: watermark}
+
+  purchase.order.line:
+    meaning: Supplier order line, the origin of received cost
+    fields:
+      id: {role: pk}
+      order_id: {role: fk}
+      product_id: {role: fk}
+      product_qty: {role: measure}
+      uom_id: {role: fk}
+      price_unit: {role: measure, needed_for: [COST-001]}
+      qty_received: {role: measure}
+      qty_invoiced: {role: measure}
+      move_ids: {role: bridge}
+      price_subtotal: {role: measure}
+      date_planned: {role: attribute}
+      analytic_distribution: {role: attribute, meaning: Project attribution of the commitment}
+      x_benacta_work_package: {role: attribute, meaning: Extension field (Studio) with the work package of the commitment}
+      write_date: {role: watermark}
+
+  res.partner:
+    meaning: Customer, supplier or contact
+    fields:
+      id: {role: pk}
+      name: {role: attribute}
+      company_id: {role: fk, meaning: Empty when shared across companies}
+      is_company: {role: attribute}
+      customer_rank: {role: attribute}
+      supplier_rank: {role: attribute}
+      commercial_partner_id: {role: fk, meaning: Legal entity behind a contact}
+      write_date: {role: watermark}
+
+  product.product:
+    meaning: Product variant, the key used on transaction lines
+    fields:
+      id: {role: pk}
+      product_tmpl_id: {role: fk}
+      default_code: {role: attribute}
+      standard_price: {role: measure, meaning: CURRENT cost only, never a historical cost}
+      write_date: {role: watermark}
+
+  product.template:
+    meaning: Product definition shared by variants
+    fields:
+      id: {role: pk}
+      name: {role: attribute}
+      type: {role: attribute}
+      is_storable: {role: attribute, meaning: Tracked in inventory, needed_for: [COST-001]}
+      categ_id: {role: fk}
+      list_price: {role: measure}
+      uom_id: {role: fk}
+      company_id: {role: fk}
+      seller_ids: {role: bridge, meaning: Supplier price lists}
+      write_date: {role: watermark}
+
+  product.category:
+    meaning: Product category carrying the costing policy
+    fields:
+      id: {role: pk}
+      name: {role: attribute}
+      write_date: {role: watermark}
+      property_cost_method: {role: attribute, meaning: standard, fifo or average, needed_for: [COST-001]}
+      property_valuation: {role: attribute, meaning: manual or real_time, needed_for: [COST-001]}
+
+  product.pricelist:
+    meaning: Price list header
+    fields:
+      id: {role: pk}
+      name: {role: attribute}
+      currency_id: {role: fk}
+      company_id: {role: fk}
+      item_ids: {role: bridge}
+
+  product.pricelist.item:
+    meaning: Price rule with validity dates
+    fields:
+      id: {role: pk}
+      pricelist_id: {role: fk}
+      product_tmpl_id: {role: fk}
+      compute_price: {role: attribute}
+      fixed_price: {role: measure}
+      percent_price: {role: measure}
+      date_start: {role: attribute}
+      date_end: {role: attribute}
+
+  res.currency.rate:
+    meaning: Dated exchange rate per company
+    fields:
+      id: {role: pk}
+      currency_id: {role: fk}
+      company_id: {role: fk}
+      name: {role: attribute, meaning: Rate date}
+      rate: {role: measure, meaning: Units of currency for one unit of company currency}
+      write_date: {role: watermark}
+
+  delivery.carrier:
+    meaning: Shipping method from the delivery module
+    fields:
+      id: {role: pk}
+      name: {role: attribute}
+      product_id: {role: fk, needed_for: [FREIGHT-001]}
+
+  mail.activity:
+    meaning: Review activity, the first allowed write-back action
+    fields:
+      id: {role: pk}
+      res_model: {role: attribute}
+      res_id: {role: attribute}
+      activity_type_id: {role: fk}
+      summary: {role: attribute}
+      user_id: {role: fk}
+      date_deadline: {role: attribute}
+
+  res.company:
+    meaning: Legal entity, the isolation boundary of every fact
+    fields:
+      id: {role: pk}
+      name: {role: attribute}
+      currency_id: {role: fk, meaning: Company currency}
+      country_id: {role: fk}
+      parent_id: {role: fk}
+      write_date: {role: watermark}
+
+  res.currency:
+    meaning: Currency and its rounding
+    fields:
+      id: {role: pk}
+      name: {role: attribute, meaning: ISO code}
+      decimal_places: {role: attribute}
+      rounding: {role: attribute}
+      active: {role: state}
+      write_date: {role: watermark}
+
+  uom.uom:
+    meaning: Unit of measure; on Odoo 19 factor is relative to the root unit
+    fields:
+      id: {role: pk}
+      name: {role: attribute}
+      factor: {role: measure, needed_for: [uom_control]}
+      relative_factor: {role: measure}
+      relative_uom_id: {role: fk}
+      write_date: {role: watermark}
+
+  account.account:
+    meaning: General ledger account; account_type separates income and direct cost
+    fields:
+      id: {role: pk}
+      code: {role: attribute}
+      name: {role: attribute}
+      account_type: {role: attribute, needed_for: [reconciliation]}
+      write_date: {role: watermark}
+
+  res.users:
+    meaning: User, referenced as project manager
+    fields:
+      id: {role: pk}
+      name: {role: attribute}
+      write_date: {role: watermark}
+
+  account.analytic.account:
+    meaning: Analytic account; its code is the project code
+    fields:
+      id: {role: pk}
+      name: {role: attribute}
+      code: {role: attribute}
+      plan_id: {role: fk}
+      partner_id: {role: fk}
+      company_id: {role: fk}
+      write_date: {role: watermark}
+
+  project.tags:
+    meaning: Project tags; BU/<code> and INTERNAL/<category> carry the business unit and hour category
+    fields:
+      id: {role: pk}
+      name: {role: attribute}
+      write_date: {role: watermark}
+
+  project.project:
+    meaning: Project
+    fields:
+      id: {role: pk}
+      name: {role: attribute}
+      partner_id: {role: fk}
+      user_id: {role: fk, meaning: Project manager}
+      date_start: {role: attribute}
+      date: {role: attribute, meaning: Planned end date}
+      account_id: {role: fk}
+      allow_milestones: {role: attribute}
+      tag_ids: {role: bridge}
+      company_id: {role: fk}
+      sale_line_id: {role: fk, meaning: Originating contract order line}
+      x_benacta_contract_type: {role: attribute, meaning: Extension field (Studio)}
+      x_benacta_phase: {role: attribute, meaning: Extension field (Studio)}
+      x_benacta_fixed_rate_per_eur: {role: measure, meaning: Extension field (Studio) with the fixed project conversion rate}
+      write_date: {role: watermark}
+
+  project.task:
+    meaning: Task; top-level tasks are work packages
+    fields:
+      id: {role: pk}
+      name: {role: attribute}
+      project_id: {role: fk}
+      parent_id: {role: fk}
+      milestone_id: {role: fk}
+      allocated_hours: {role: measure}
+      x_benacta_wbs_code: {role: attribute, meaning: Extension field (Studio)}
+      x_benacta_change_order: {role: attribute, meaning: Extension field (Studio) marking the scope of a pending change order}
+      write_date: {role: watermark}
+
+  project.milestone:
+    meaning: Billing or execution milestone
+    fields:
+      id: {role: pk}
+      name: {role: attribute}
+      project_id: {role: fk}
+      deadline: {role: attribute}
+      is_reached: {role: state}
+      reached_date: {role: attribute}
+      sale_line_id: {role: fk}
+      quantity_percentage: {role: measure}
+      x_benacta_milestone_code: {role: attribute, meaning: Extension field (Studio), key of planned billing lines}
+      write_date: {role: watermark}
+
+  hr.department:
+    meaning: Department
+    fields:
+      id: {role: pk}
+      name: {role: attribute}
+      write_date: {role: watermark}
+
+  hr.job:
+    meaning: Job position, mapped to a planning role
+    fields:
+      id: {role: pk}
+      name: {role: attribute}
+      write_date: {role: watermark}
+
+  resource.calendar:
+    meaning: Working calendar
+    fields:
+      id: {role: pk}
+      name: {role: attribute}
+      hours_per_day: {role: measure}
+      write_date: {role: watermark}
+
+  hr.employee:
+    meaning: Employee or contractor
+    fields:
+      id: {role: pk}
+      name: {role: attribute}
+      job_id: {role: fk}
+      department_id: {role: fk}
+      hourly_cost: {role: measure}
+      company_id: {role: fk}
+      user_id: {role: fk}
+      resource_calendar_id: {role: fk}
+      x_benacta_employee_code: {role: attribute, meaning: Extension field (Studio)}
+      x_benacta_is_external: {role: attribute, meaning: Extension field (Studio)}
+      write_date: {role: watermark}
+
+  hr.skill:
+    meaning: Skill
+    fields:
+      id: {role: pk}
+      name: {role: attribute}
+      write_date: {role: watermark}
+
+  hr.employee.skill:
+    meaning: Skill held by an employee
+    fields:
+      id: {role: pk}
+      employee_id: {role: fk}
+      skill_id: {role: fk}
+      write_date: {role: watermark}
+
+  account.analytic.line:
+    meaning: Analytic line; with hr_timesheet it is a timesheet entry
+    fields:
+      id: {role: pk}
+      date: {role: attribute}
+      name: {role: attribute}
+      account_id: {role: fk}
+      project_id: {role: fk, meaning: Requires hr_timesheet (not installed on the connected instance)}
+      task_id: {role: fk, meaning: Requires hr_timesheet}
+      employee_id: {role: fk, meaning: Requires hr_timesheet}
+      unit_amount: {role: measure, meaning: Hours}
+      amount: {role: measure, meaning: Cost, negative}
+      company_id: {role: fk}
+      write_date: {role: watermark}
+
+  account.payment:
+    meaning: Customer or supplier payment
+    fields:
+      id: {role: pk}
+      name: {role: attribute}
+      date: {role: attribute}
+      amount: {role: measure, meaning: Payment currency}
+      currency_id: {role: fk}
+      partner_id: {role: fk}
+      payment_type: {role: attribute}
+      state: {role: state}
+      reconciled_invoice_ids: {role: bridge, meaning: Invoices settled by the payment}
+      company_id: {role: fk}
+      write_date: {role: watermark}

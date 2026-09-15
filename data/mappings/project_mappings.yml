@@ -1,0 +1,20 @@
+# BENACTA mappings for project controlling facts. Configuration reviewed like a contract.
+schema_version: 1
+business_unit_tag_prefix: "BU/"
+internal_tag_prefix: "INTERNAL/"
+# Product category (complete name) -> cost category of purchase and vendor bill lines.
+cost_category_by_product_category:
+  BENACTA_DEMO Subcontracting: SUBCONTRACT
+  BENACTA_DEMO Project materials: MATERIALS
+default_cost_category: OTHER
+# Job position name -> planning role code.
+role_by_job:
+  Project Manager: PM
+  Project Controller: PC
+  Buyer: BY
+  Site Supervisor: SS
+  Lead Engineer: LE
+  Senior Engineer: SE
+  Engineer: EN
+  Designer: DS
+support_roles: [PM, PC, BY, SS]
