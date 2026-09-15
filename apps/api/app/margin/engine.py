@@ -258,6 +258,9 @@ def evaluate_snapshot(conn: Connection, snapshot_id: uuid.UUID, thresholds: Thre
             rules.evaluate_price_baseline(line, facts.baseline(line, ref), thresholds=thresholds),
             rules.evaluate_cost_variance(line, facts.cost(line, ref), thresholds=thresholds),
         ]
+        mapping = rules.evaluate_product_mapping(line, thresholds=thresholds)
+        if mapping is not None:
+            results.append(mapping)
         for result in results:
             run.evaluations.append(Evaluation("sale_order_line", line.sale_line_id, f"{line.order_name} / {line.product_code or line.sale_line_id}",
                                               line.company_id, line.customer_id, line.product_id, line.sale_order_id, line.order_date, line.period,

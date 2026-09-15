@@ -15,7 +15,7 @@ controlling track (sprints B to F) is parked as an engine family.
 |---|---|---|
 | M1 Margin truth and deterministic exceptions | governed terms and baseline hierarchy, margin KPIs, rule engine with classification, severity, confidence, controllability and evidence, enriched reconciliation report, CLI and API | Delivered on fixtures (`docs/progress.md`) |
 | M2 Decision, action, impact | case workflow, recommendations, controlled review activity in Odoo, realised recovery, audit view | Delivered on fixtures; Odoo execution NOT_VERIFIED (`docs/progress.md`) |
-| M3 Investigation, cockpit, demonstration data | LLM investigation with citations and abstention, Streamlit cockpit, three-year demonstration profile with 18 scenarios, Odoo seed executor, evaluation plan | Next |
+| M3 Investigation, cockpit, demonstration data | LLM investigation with citations and abstention, Streamlit cockpit, three-year demonstration profile with its ground-truth manifest, evaluation plan, production gaps | Delivered on fixtures except the Odoo seed executor of the trading company (blocked on owner inputs); real model run NOT_VERIFIED |
 
 ## 1. Mission
 

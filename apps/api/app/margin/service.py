@@ -41,6 +41,8 @@ SUGGESTED_FOLLOW_UP: dict[str, str] = {
     "NO_COST_REFERENCE": "Freeze a reference cost for this product so realised costs can be compared.",
     "NO_PRICE_BASELINE": "Record a contract price or a price list for this product so the price can be checked.",
     "INVOICE_WITHOUT_ORDER": "Link the invoice to its order, or document why this revenue has no order behind it.",
+    "UNRESOLVED_UNIT_OR_PRODUCT": "Correct the product master (unit of measure) so quantities, prices and costs can be checked.",
+    "MISSING_PRODUCT": "Attach the product to the order line so it can be checked.",
 }
 
 

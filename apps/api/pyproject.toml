@@ -43,6 +43,7 @@ dev = [
 testpaths = ["tests"]
 markers = [
     "odoo_live: reads the configured Odoo instance; skipped unless BENACTA_LIVE_ODOO=1",
+    "full_profile: runs the whole pipeline on the three-year demonstration profile; skipped unless BENACTA_FULL_PROFILE=1",
 ]
 
 [tool.ruff]

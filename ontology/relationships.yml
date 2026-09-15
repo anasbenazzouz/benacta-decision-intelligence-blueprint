@@ -43,11 +43,16 @@ relationships:
   - {type: EVALUATION_OF_INVOICE_LINE, from: RuleEvaluation, to: InvoiceLine, cardinality: "N:1", basis: fact_margin_rule_evaluation.subject (invoice_line), status: OBSERVED}
   - {type: CASE_TRACKS_EVALUATION, from: ExceptionCase, to: RuleEvaluation, cardinality: "1:N", basis: "decision.exception_case.exception_key = rule, subject", status: OBSERVED}
   - {type: EVALUATION_MEASURED_BY, from: RuleEvaluation, to: MetricDefinition, cardinality: "N:1", basis: rule exposure_type, status: OBSERVED}
+  - {type: PASSAGE_OF_DOCUMENT, from: Passage, to: GovernedDocument, cardinality: "N:1", basis: front matter and section heading, status: OBSERVED}
+  - {type: INVESTIGATION_CITES, from: Investigation, to: Passage, cardinality: "N:M", basis: report statement refs (doc:...), status: OBSERVED}
+  - {type: INVESTIGATION_EXAMINES, from: Investigation, to: ExceptionCase, cardinality: "N:1", basis: decision.investigation.subject_id, status: OBSERVED}
+  - {type: HYPOTHESIS_SUGGESTS_CAUSE, from: Investigation, to: RuleEvaluation, cardinality: "N:1", basis: HYPOTHESIS statements, status: HYPOTHETICAL}
   - {type: DECISION_REVIEWS, from: Decision, to: Recommendation, cardinality: "1:1", basis: S6, status: OBSERVED}
   - {type: ACTION_TARGETS, from: Action, to: Project, cardinality: "N:1", basis: S6, status: OBSERVED}
 
 bounded_paths:
   margin_leakage: [ExceptionCase, RuleEvaluation, SaleOrderLine, SaleOrder, Customer, DiscountPolicy]
+  investigation_evidence: [Investigation, ExceptionCase, RuleEvaluation, Passage, GovernedDocument]
   price_baseline: [SaleOrderLine, Product, ContractPrice, PriceList]
   cost_variance: [SaleOrderLine, InvoiceLine, Product, CostReference]
   margin_erosion: [Exception, Project, ForecastVersion, PlanningAssumption]

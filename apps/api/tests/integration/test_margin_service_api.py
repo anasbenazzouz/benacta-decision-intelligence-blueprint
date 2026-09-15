@@ -136,7 +136,7 @@ def test_api_returns_the_same_figures_as_the_service(built, client):
     assert client.get("/api/v1/margin/exceptions/MC-999999", params={"snapshot": snapshot}).status_code == 404
     assert client.get("/api/v1/margin/overview", params={"snapshot": "not-a-uuid"}).status_code == 400
     rules = client.get("/api/v1/margin/rules").json()
-    assert {r["rule_id"] for r in rules} == {"DISCOUNT_CAP", "PRICE_BELOW_BASELINE", "FREIGHT_REBILL", "COST_REFERENCE_VARIANCE", "INVOICE_WITHOUT_SALE_LINK"}
+    assert {r["rule_id"] for r in rules} == {"DISCOUNT_CAP", "PRICE_BELOW_BASELINE", "FREIGHT_REBILL", "COST_REFERENCE_VARIANCE", "INVOICE_WITHOUT_SALE_LINK", "PRODUCT_MAPPING"}
     report = client.get("/api/v1/reconciliation", params={"period": "2026-07", "snapshot": snapshot}).json()
     assert report["period_status"] == {"2026-07": "RECONCILED"}
     assert client.get("/api/v1/health").json() == {"status": "ok"}

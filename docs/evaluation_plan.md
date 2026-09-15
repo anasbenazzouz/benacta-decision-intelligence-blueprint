@@ -23,7 +23,7 @@ test suite or a command; none relies on a human reading a screen. Status words f
 | Two anomalies on one line counted once per component | NEG-12 | oracle | TESTED_LOCAL |
 | Immaterial confirmed leakage counted, not queued | FREIGHT-002 | oracle | TESTED_LOCAL |
 | Stable cases across snapshots; corrected source closes the case with the reason | replay and correction tests | engine | TESTED_LOCAL |
-| Detection on realistic volumes (about 10 000 order lines, 3 years) | demonstration profile with its own oracle | milestone 3 | not started |
+| Detection on realistic volumes (about 21 000 order lines, 36 months, 80 injected scenarios) | demonstration profile `demo_full`: every month reconciled on the three checks, every scenario at its expected outcome, class, cause and amount, no confirmed or probable leakage outside the scenarios, cases and totals equal to the manifest, year-three deterioration visible | `data/golden/demo_full_manifest_v1.json` | TESTED_LOCAL (opt-in gates and `scripts/verify_full_profile.py`) |
 
 ## 3. Decision and action integrity
 
@@ -63,4 +63,11 @@ test suite or a command; none relies on a human reading a screen. Status words f
 cd apps/api && uv run pytest -q                       # everything local
 BENACTA_LIVE_ODOO=1 uv run pytest -q -m odoo_live      # read-only live checks
 uv run --project apps/api benacta verify-audit --export
+BENACTA_FULL_PROFILE=1 uv run pytest -q tests/unit/test_full_profile.py               # demonstration profile, generator (about 3 min)
+BENACTA_FULL_PROFILE=1 uv run pytest -q tests/integration/test_full_profile_pipeline.py  # demonstration profile, pipeline (about 8 min)
+uv run --project apps/api benacta seed-fixtures --profile full && uv run --project apps/api python scripts/verify_full_profile.py
 ```
+
+The demonstration-profile gates build about 130 000 records in memory and need about 3 GB free; on a small machine run
+them one at a time in the foreground. The last line performs the pipeline checks on the development database instead of a
+second database and exits 0 when the profile is verified.

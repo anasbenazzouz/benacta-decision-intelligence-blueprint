@@ -17,11 +17,11 @@ controllability.
 | 5 | Partial freight recharge | FREIGHT-002 (150 EUR, below materiality: counted, not queued) | `FREIGHT_REBILL`, cause `FREIGHT_PARTIALLY_INVOICED` | confirmed leakage | TESTED_LOCAL |
 | 6 | Standard-cost drift after supplier price increases | COST-001 (800 EUR) | `COST_REFERENCE_VARIANCE` | confirmed leakage | TESTED_LOCAL |
 | 7 | Purchase-price variance on product margin | NEG-12 (400 EUR) | `COST_REFERENCE_VARIANCE` | confirmed leakage | TESTED_LOCAL |
-| 8 | Margin erosion hidden by volume | VOL-001 | period KPI: goods margin percentage falling while revenue grows | deterioration signal | planned, milestone 3 (demonstration profile) |
+| 8 | Margin erosion hidden by volume | demonstration profile: key accounts push volume by 60 % in year three on a low-margin mix | period KPI: goods margin percentage falling while revenue grows | deterioration signal | TESTED_LOCAL (opt-in full-profile gate) |
 | 9 | Credit note issued after the initial invoice | NEG-04 | `DISCOUNT_CAP` at the cap, signed refund in revenue | compliant | TESTED_LOCAL |
-| 10 | Product or customer mix deterioration | MIX-001 | period bridge (mix effect) | explained variance | planned, milestone 3 |
+| 10 | Product or customer mix deterioration | demonstration profile: spare parts and consumables weigh twice as much in year three | goods gross-margin percentage of year three at least one point below year two | deterioration signal (a mix line in the bridge is still planned) | TESTED_LOCAL (opt-in) |
 | 11 | Currency effect that explains a variance | NEG-07 | `PRICE_BELOW_BASELINE` at the order-date rate | compliant | TESTED_LOCAL; a separate currency line in the bridge is planned |
-| 12 | Incorrect product or customer mapping | MAP-001 | data quality (`UOM_UNRESOLVED`, unknown partner) | data-quality issue | planned, milestone 3 |
+| 12 | Incorrect product or customer mapping | FULL-MAP-001 to 003 (product without a resolvable unit of measure) | `PRODUCT_MAPPING` | data-quality issue (`UNRESOLVED_UNIT_OR_PRODUCT`) | TESTED_LOCAL (opt-in) |
 | 13 | Missing or delayed cost posting | NEG-08 | `COST_REFERENCE_VARIANCE` | data-quality issue (`MISSING_COST`) | TESTED_LOCAL |
 | 14 | Invoice and delivery timing mismatch | NEG-03 | `FREIGHT_REBILL` not due on partial delivery | explained variance | TESTED_LOCAL |
 | 15 | Project costs posted to the wrong analytic account | PRJ-06 vendor bill (project controlling dataset) | `VENDOR_BILL_PROJECT_MISMATCH` data-quality flag | data-quality issue | TESTED_LOCAL in the project marts; not a margin case yet |
@@ -54,5 +54,7 @@ one line counted once per component (NEG-12).
 - Tests: `apps/api/tests/integration/test_margin_engine_oracle.py` (engine against the oracle),
   `apps/api/tests/unit/test_margin_rules.py` (every outcome of every rule on hand-built facts).
 
-The demonstration profile of milestone 3 gets its own oracle (`data/golden/oracle_demo_full_v1.yml`) with the
-remaining scenarios (8, 10, 12) at realistic volumes.
+The demonstration profile carries eighty scenario instances across fourteen families in its own manifest
+(`data/golden/demo_full_manifest_v1.json`, exported by `scripts/export_ground_truth.py`, checked equal to the generated
+ground truth by `tests/unit/test_full_profile.py`); the pipeline test `tests/integration/test_full_profile_pipeline.py`
+verifies every instance and the absence of any other exception. Specification: `docs/seed_data_specification.md`.

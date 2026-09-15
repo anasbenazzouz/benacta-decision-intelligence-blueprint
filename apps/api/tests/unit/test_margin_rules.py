@@ -217,6 +217,13 @@ class TestFreight:
     def test_freight_invoiced_in_full_is_compliant(self, thresholds):
         assert rules.evaluate_freight(order(freight_invoiced=D(250)), REBILL, thresholds=thresholds).outcome == "COMPLIANT"
 
+    def test_foreign_currency_freight_is_compared_in_the_order_currency(self, thresholds):
+        gbp = order(currency_code="GBP", fx_rate=D("0.86"), freight_invoiced=D("215.00"))
+        assert rules.evaluate_freight(gbp, REBILL, thresholds=thresholds).outcome == "COMPLIANT", "250 EUR is 215 GBP at 0.86"
+        short = rules.evaluate_freight(order(currency_code="GBP", fx_rate=D("0.86"), freight_invoiced=D(100)), REBILL, thresholds=thresholds)
+        assert short.cause == "FREIGHT_PARTIALLY_INVOICED" and short.expected_amount == D("250.00")
+        assert short.adverse_exposure == ((D(215) - D(100)) / D("0.86")).quantize(D("0.01"))
+
 
 # --------------------------------------------------------------------------- COST_REFERENCE_VARIANCE
 REFERENCE = {"reference_id": "REF-COST-Q3", "unit_cost": D(60), "frozen_on": date(2026, 6, 2), "valid_from": date(2026, 6, 2), "valid_to": None, "source": "freeze"}

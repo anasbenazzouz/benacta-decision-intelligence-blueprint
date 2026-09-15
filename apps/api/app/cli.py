@@ -38,11 +38,11 @@ def _pipeline(*steps: str):
     return run
 
 
-def _seed_fixtures(_: argparse.Namespace) -> int:
+def _seed_fixtures(args: argparse.Namespace) -> int:
     from app.config import Mode
     from app.ops import pipeline
 
-    settings = get_settings().model_copy(update={"benacta_mode": Mode.FIXTURE})
+    settings = get_settings().model_copy(update={"benacta_mode": Mode.FIXTURE, "benacta_fixture_profile": args.profile})
     pipeline.run_migrations(settings)
     return pipeline.run_pipeline(settings, steps=("ingest", "marts", "plans", "reconcile", "reference", "exceptions", "documents"))
 
@@ -188,9 +188,9 @@ def main(argv: list[str] | None = None) -> int:
         func=_discover_odoo
     )
     commands.add_parser("migrate", help="upgrade the verified analytics database").set_defaults(func=_migrate)
-    commands.add_parser(
-        "seed-fixtures", help="fixture mode: migrate, ingest the demo dataset, build marts, reconcile"
-    ).set_defaults(func=_seed_fixtures)
+    seed = commands.add_parser("seed-fixtures", help="fixture mode: migrate, ingest a fixture profile, build marts, reconcile, load terms, run the rules")
+    seed.add_argument("--profile", choices=["dev", "full"], default="dev", help="dev: 90-day company plus projects; full: three-year demonstration company")
+    seed.set_defaults(func=_seed_fixtures)
     commands.add_parser("ingest", help="ingest from the configured source").set_defaults(func=_pipeline("ingest"))
     commands.add_parser("marts", help="build marts for the latest snapshot").set_defaults(func=_pipeline("marts"))
     commands.add_parser("reconcile", help="reconcile the latest snapshot").set_defaults(func=_pipeline("reconcile"))

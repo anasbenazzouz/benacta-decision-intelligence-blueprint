@@ -39,7 +39,7 @@ from app.margin.service import (  # noqa: E402
     margin_overview,
 )
 from app.marts.reconcile import reconciliation_report  # noqa: E402
-from app.ops.pipeline import FIXTURE_SOURCE_INSTANCE, latest_snapshot  # noqa: E402
+from app.ops.pipeline import fixture_instance, latest_snapshot  # noqa: E402
 
 # Locked charter palette (.claude/benacta/brand-system.md): colour is information, never decoration.
 GREEN, PORCELAIN, CHAMPAGNE, BLUE, BLUE_GREY, STONE = "#122B20", "#F1E9DA", "#BBA06B", "#6C9BA3", "#536875", "#7C898B"
@@ -81,7 +81,7 @@ def _engine():
 
 def _snapshot() -> uuid.UUID:
     settings = get_settings()
-    instance = FIXTURE_SOURCE_INSTANCE if settings.benacta_mode is Mode.FIXTURE else settings.odoo_source_instance
+    instance = fixture_instance(settings) if settings.benacta_mode is Mode.FIXTURE else settings.odoo_source_instance
     engine = _engine()
     try:
         return latest_snapshot(engine, instance)
@@ -367,7 +367,7 @@ def view_decision(snapshot: uuid.UUID, actor) -> None:
 def view_impact(snapshot: uuid.UUID) -> None:
     _band("Impact tracking · realised only from posted documents", "Estimated against realised recovery")
     settings = get_settings()
-    instance = FIXTURE_SOURCE_INSTANCE if settings.benacta_mode is Mode.FIXTURE else settings.odoo_source_instance
+    instance = fixture_instance(settings) if settings.benacta_mode is Mode.FIXTURE else settings.odoo_source_instance
     with _engine().connect() as conn:
         inst = conn.execute(sa.text("select source_instance from marts.snapshot where snapshot_id = :s"), {"s": snapshot}).scalar() or instance
         rows = impact_register(conn, inst)

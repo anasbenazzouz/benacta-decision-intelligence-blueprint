@@ -572,7 +572,7 @@ class _DemoGenerator:
     def sale(self, order: _Order) -> None:
         b = self.b
         order_day = b.day(order.day)
-        customer_name = ({**BACKGROUND_CUSTOMERS, **SCENARIO_CUSTOMERS})[order.customer][0]
+        customer_name = self.customer_name(order.customer)
         partner = [self.partner_ids[order.customer], customer_name]
         so_id = b.add(
             "sale.order",
@@ -678,6 +678,9 @@ class _DemoGenerator:
                 so["invoice_ids"].append(refund)
                 self._sol(first[0])["qty_invoiced"] = float(first[2] - refunded)
                 so["write_date"] = dt(invoice_day + timedelta(days=days_after), 11)
+
+    def customer_name(self, key: str) -> str:
+        return ({**BACKGROUND_CUSTOMERS, **SCENARIO_CUSTOMERS})[key][0]
 
     def _order_pricelist(self, order: _Order) -> Any:
         if order.currency != EUR:

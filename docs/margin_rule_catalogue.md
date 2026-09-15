@@ -52,6 +52,7 @@ is `PRICELIST_MISMATCH`.
 | `FREIGHT_REBILL` | 1 | sale order | `VIOLATION` (`FREIGHT_NOT_INVOICED`, `FREIGHT_PARTIALLY_INVOICED`) once goods are fully delivered and invoiced under a rebill clause; `NOT_DUE` before (explained variance); `LEGITIMATE_EXCEPTION` for waived or included clauses; not applicable without a clause | freight, billing leakage: `contract amount - freight invoiced` |
 | `COST_REFERENCE_VARIANCE` | 1 | sale order line | `VIOLATION` (`PURCHASE_PRICE_VARIANCE`) when the attributed receipt cost exceeds the frozen reference beyond both tolerances; `UNDETERMINED` (`MISSING_COST`, data quality) without full attribution; `UNKNOWN` (`NO_COST_REFERENCE`) without a reference; not applicable to services | cost, cost variance: `realised - reference x delivered units`; never receivable |
 | `INVOICE_WITHOUT_SALE_LINK` | 1 | invoice line | `NO_SALE_LINK`, data quality, human review | potential exposure = the line's revenue |
+| `PRODUCT_MAPPING` | 1 | sale order line | `UNDETERMINED` (`UNRESOLVED_UNIT_OR_PRODUCT`, `MISSING_PRODUCT`), data quality, human review; nothing when the product master resolves | potential exposure = the line subtotal |
 
 Policy resolution: customer-scoped policies outrank segment policies by priority; two policies of the top priority
 with different caps are a conflict; validity is checked on the order date.

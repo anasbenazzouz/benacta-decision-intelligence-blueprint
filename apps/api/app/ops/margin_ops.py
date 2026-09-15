@@ -14,13 +14,13 @@ from app.margin.investigation import investigate, report_text
 from app.margin.llm import provider_from_settings
 from app.margin.service import case_audit, exception_case, exception_queue, impact_register, margin_overview
 from app.marts.reconcile import reconciliation_report
-from app.ops.pipeline import FIXTURE_SOURCE_INSTANCE, latest_snapshot
+from app.ops.pipeline import fixture_instance, latest_snapshot
 
 EXPORTS = REPO_ROOT / ".benacta" / "exports"
 
 
 def _instance(settings: Settings) -> str:
-    return FIXTURE_SOURCE_INSTANCE if settings.benacta_mode is Mode.FIXTURE else settings.odoo_source_instance
+    return fixture_instance(settings) if settings.benacta_mode is Mode.FIXTURE else settings.odoo_source_instance
 
 
 def _export(name: str, content: Any) -> Path:

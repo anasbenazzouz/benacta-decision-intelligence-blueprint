@@ -27,10 +27,10 @@ def _engine() -> Engine:
 
 
 def _instance() -> str:
-    from app.ops.pipeline import FIXTURE_SOURCE_INSTANCE
+    from app.ops.pipeline import fixture_instance
 
     settings = get_settings()
-    return FIXTURE_SOURCE_INSTANCE if settings.benacta_mode is Mode.FIXTURE else settings.odoo_source_instance
+    return fixture_instance(settings) if settings.benacta_mode is Mode.FIXTURE else settings.odoo_source_instance
 
 
 def _snapshot(snapshot: str | None) -> uuid.UUID:

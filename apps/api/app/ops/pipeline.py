@@ -23,8 +23,13 @@ from app.marts.build import build_marts
 from app.marts.reconcile import margin_basis, reconcile
 from app.ops.discover_odoo import load_spec
 
-# Source instance written by `benacta seed-fixtures` (dataset demo_v2 = demo_v1 + projects).
+# Source instances written by `benacta seed-fixtures`: dev = demo_v2 (demo_v1 + projects), full = the demonstration profile.
 FIXTURE_SOURCE_INSTANCE = "fixture_demo_v2"
+FIXTURE_INSTANCES = {"dev": "fixture_demo_v2", "full": "fixture_demo_full"}
+
+
+def fixture_instance(settings: Settings) -> str:
+    return FIXTURE_INSTANCES.get(settings.benacta_fixture_profile, FIXTURE_SOURCE_INSTANCE)
 
 
 def run_migrations(settings: Settings) -> str | None:
@@ -39,6 +44,11 @@ def run_migrations(settings: Settings) -> str | None:
 @contextmanager
 def configured_source(settings: Settings, anchor: date = DEFAULT_ANCHOR):
     if settings.benacta_mode is Mode.FIXTURE:
+        if settings.benacta_fixture_profile == "full":
+            from app.fixtures.full_profile import build_full_profile
+
+            yield FixtureSource(build_full_profile(anchor=anchor))
+            return
         yield FixtureSource(extend_with_projects(build_demo_dataset(anchor=anchor)))
         return
     with OdooJson2Client.from_settings(settings) as client:

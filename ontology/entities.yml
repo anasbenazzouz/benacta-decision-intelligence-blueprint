@@ -44,5 +44,7 @@ entities:
   CostReference: {source: semantic.cost_reference, key: "reference_id, product_code", id_pattern: "benacta:{company_id}:CostReference:{reference_id}:{product_code}"}
   RuleEvaluation: {source: marts.fact_margin_rule_evaluation, key: "snapshot_id, rule_id, subject_type, subject_id", id_pattern: "benacta:RuleEvaluation:{snapshot_id}:{rule_id}:{subject_type}:{subject_id}"}
   ExceptionCase: {source: decision.exception_case, key: case_ref, id_pattern: "benacta:{company_id}:ExceptionCase:{case_ref}"}
+  GovernedDocument: {source: semantic.governed_document, key: doc_id, id_pattern: "benacta:GovernedDocument:{doc_id}"}
+  Passage: {source: retrieval over governed documents, key: "doc_id, section", id_pattern: "doc:{doc_id}#{section}"}
   Decision: {source: decision schema (S6), key: decision_id, id_pattern: "benacta:Decision:{decision_id}", status: not implemented}
   Action: {source: decision schema (S6), key: action_id, id_pattern: "benacta:Action:{action_id}", status: not implemented}

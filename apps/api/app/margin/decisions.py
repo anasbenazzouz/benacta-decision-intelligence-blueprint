@@ -75,6 +75,9 @@ TEMPLATES: dict[str, dict[str, str]] = {
     "NO_COST_REFERENCE": {"title": "Freeze a reference cost for the product", "rationale": "No reference cost is valid on the order date.", "basis": "UNKNOWN"},
     "NO_PRICE_BASELINE": {"title": "Record a contract price or price list for the product", "rationale": "No defensible price baseline exists.",
                           "basis": "UNKNOWN"},
+    "UNRESOLVED_UNIT_OR_PRODUCT": {"title": "Correct the product master", "rationale": "Quantities, prices and costs of this line cannot be checked until the "
+                                  "unit of measure is resolved on the product.", "basis": "UNKNOWN"},
+    "MISSING_PRODUCT": {"title": "Attach a product to the order line", "rationale": "The line has no product to check against terms.", "basis": "UNKNOWN"},
     "INVOICE_WITHOUT_ORDER": {"title": "Link the invoice to its order or document the exception",
                               "rationale": "Posted revenue with no order behind it cannot be checked against price, discount or freight terms.",
                               "basis": "UNKNOWN"},

@@ -26,6 +26,14 @@ reference (FIXTURE_TERMS): customer_segments=24, discount_policies=5, discount_d
 margin exceptions: 948 evaluations (... CONFIRMED_LEAKAGE=8 ...); cases created=11 ...
 ```
 
+For the three-year demonstration company (about 130 000 records, a few minutes end to end):
+
+```bash
+uv run --project apps/api benacta seed-fixtures --profile full
+uv run --project apps/api python scripts/verify_full_profile.py   # every month reconciled, every scenario as expected, nothing else raised
+BENACTA_FIXTURE_PROFILE=full uv run --project apps/api benacta margin-overview
+```
+
 Run it again: 0 new record versions, 0 new cases. Stop the embedded database with
 `uv run --project apps/api benacta local-db-stop`. Checks: `cd apps/api && uv run pytest -q && uv run ruff check app tests migrations`.
 

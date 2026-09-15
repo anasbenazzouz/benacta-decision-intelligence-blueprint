@@ -64,6 +64,16 @@ RULES: dict[str, dict[str, Any]] = {
                    "when both the absolute and the relative tolerance are exceeded; UNDETERMINED without full attribution",
         "controllability": "PARTIALLY_CONTROLLABLE",
     },
+    "PRODUCT_MAPPING": {
+        "version": 1,
+        "name": "Order line whose product or unit of measure cannot be resolved",
+        "grain": "sale order line",
+        "exposure_type": None,
+        "component": None,
+        "formula": "potential_exposure = line subtotal in company currency; no leakage is computed because the price, the quantity in product "
+                   "units or the cost cannot be derived from an unresolved product master",
+        "controllability": "NOT_APPLICABLE",
+    },
     "INVOICE_WITHOUT_SALE_LINK": {
         "version": 1,
         "name": "Posted revenue not traceable to an order line",
@@ -469,16 +479,19 @@ def evaluate_freight(order: OrderFacts, contract: dict[str, Any] | None, *, thre
         return _result(rule, "NOT_DUE", "EXPLAINED_VARIANCE", "FREIGHT_NOT_YET_DUE", thresholds=thresholds, evidence=evidence,
                        reason="freight becomes due after full delivery and invoicing of the goods")
     amount = Decimal(contract["amount"])
+    # The clause is in the contract currency (company currency); the invoiced freight is in the order currency.
     fx = order.fx_rate if contract["currency"] != order.currency_code else None
+    due = money(amount * fx) if fx else amount
+    evidence["freight_due_order_currency"] = str(due)
     invoiced = order.freight_invoiced
-    if invoiced >= amount - CENT:
+    if invoiced >= due - CENT:
         return _result(rule, "COMPLIANT", "COMPLIANT", "FREIGHT_INVOICED", thresholds=thresholds, evidence=evidence,
                        reason="contractual freight invoiced in full")
     cause = "FREIGHT_NOT_INVOICED" if invoiced <= 0 else "FREIGHT_PARTIALLY_INVOICED"
     confidence = "HIGH" if order.period_reconciled else "MEDIUM"
     return _result(rule, "VIOLATION", _violation_class(confidence), cause, thresholds=thresholds, evidence=evidence,
-                   reason=f"freight due {_num(amount)} {contract['currency']}, invoiced {money(invoiced)}",
-                   expected=to_company(amount, fx), actual=to_company(invoiced, fx), adverse=to_company(amount - invoiced, fx),
+                   reason=f"freight due {_num(due)} {order.currency_code}, invoiced {money(invoiced)}",
+                   expected=to_company(due, fx), actual=to_company(invoiced, fx), adverse=to_company(due - invoiced, fx),
                    stage="INVOICED", confidence=confidence)
 
 
@@ -527,6 +540,21 @@ def evaluate_cost_variance(line: LineFacts, cost: CostFacts, *, thresholds: Thre
                    evidence={**evidence, "customer_receivable": False},
                    reason=f"realised cost {money(realised)} exceeds reference {money(expected)} by {money(variance)}",
                    expected=expected, actual=realised, adverse=variance, stage=line.exposure_stage, confidence=confidence)
+
+
+# --------------------------------------------------------------------------- PRODUCT_MAPPING
+def evaluate_product_mapping(line: LineFacts, *, thresholds: Thresholds) -> RuleResult | None:
+    """A data-quality case when the product is missing or its unit of measure cannot be resolved; None when the master is fine."""
+    if line.order_state != "sale":
+        return None
+    if line.product_id is None:
+        cause, reason = "MISSING_PRODUCT", "order line without a product"
+    elif line.qty_product_uom is None and not line.is_freight and line.product_type != "service":
+        cause, reason = "UNRESOLVED_UNIT_OR_PRODUCT", "the quantity cannot be expressed in product units: unit of measure unresolved on the product master"
+    else:
+        return None
+    return _result("PRODUCT_MAPPING", "UNDETERMINED", "DATA_QUALITY_ISSUE", cause, thresholds=thresholds, evidence=_line_evidence(line), reason=reason,
+                   potential=to_company(line.subtotal, line.fx_rate), stage=line.exposure_stage, confidence="LOW", requires_review=True)
 
 
 # --------------------------------------------------------------------------- INVOICE_WITHOUT_SALE_LINK

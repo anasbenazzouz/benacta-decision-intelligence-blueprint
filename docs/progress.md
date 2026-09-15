@@ -5,6 +5,56 @@ Status vocabulary: `IMPLEMENTED` (code exists) · `TESTED_LOCAL` (automated test
 real read-only run against the connected Odoo) · `NOT_VERIFIED` · `BLOCKED`.
 A fixture test never proves an Odoo integration. Plan: `docs/implementation_plan.md`.
 
+## Milestone 3c: three-year demonstration company and its ground truth (delivered on fixtures)
+
+### Evidence (2026-09-15)
+
+| Command | Result |
+|---|---|
+| `BENACTA_FULL_PROFILE=1 uv run pytest -q tests/unit/test_full_profile.py` | 5 passed in 202 s: deterministic across two builds, referential integrity (every line, item, move and payment resolves; every entry balances; only the freight service and the missing-cost scenario products lack a receipt), realistic distributions (seasonality, growth, four currencies, customer concentration and long tails, payment states, refunds, backorders, quarterly cost drift), ground truth separate from the records and equal to the committed manifest |
+| `BENACTA_FULL_PROFILE=1 uv run pytest -q tests/integration/test_full_profile_pipeline.py` | 4 passed in 217 s: 36 months `RECONCILED` on the three checks; every one of the 80 injected scenarios gives its expected outcome, class, cause and amount; no confirmed or probable leakage outside the injected scenarios; cases equal the manifest; leakage totals by type equal the manifest; goods gross-margin percentage of year three at least one point below year two; the overview of the anchor month shows revenue and leakage drivers |
+| `uv run --project apps/api benacta seed-fixtures --profile full` then `uv run --project apps/api python scripts/verify_full_profile.py` | 72 276 evaluations (COMPLIANT 59 462, CONFIRMED_LEAKAGE 43, DATA_QUALITY_ISSUE 10, EXPLAINED_VARIANCE 179, INSUFFICIENT_EVIDENCE 6, LEGITIMATE_EXCEPTION 924, NOT_APPLICABLE 11 652), 41 cases created, 36 periods; the script prints `full profile verified` (36 periods reconciled, 80 scenarios checked, 41 cases, goods margin year 2 39.12 % to year 3 36.22 %) and exits 0 |
+| Timings on the two-core development VM (8 GB) | generate about 65 s, whole seed about 7 min for about 130 000 records; each opt-in gate about 3.5 min and about 3 GB, one at a time in the foreground; a replay adds no version and no case |
+| `uv run pytest -q` in `apps/api` (default suite, profile gates skipped) and `uv run ruff check app tests migrations` | 253 passed, 16 skipped; lint clean |
+| `scripts/export_ground_truth.py` | `data/golden/demo_full_manifest_v1.json`: 505 customers, 100 suppliers, 213 products, 9 548 orders, 20 907 order lines, 5 798 purchase orders with 8 872 lines, 9 719 invoices, 76 568 journal items, 26 749 stock moves, 8 208 payments; 80 scenarios, 43 confirmed leakage evaluations, 41 cases, leakage by type cost 9 263.92, discount 21 721.81, freight 1 896.00, price 7 203.56 EUR; four scenario families place one instance in the anchor month |
+
+### Items
+
+| Item | Status | Where |
+|---|---|---|
+| Demonstration profile generator on the same lineage as `demo_v1` (Odoo shapes, same ingestion, marts and rules): families with margin profiles, customer sizes, segments, countries and currencies, seasonality, growth, year-three mix shift and volume push, just-in-time purchasing in two waves a month at quarterly reference costs with drift and FIFO valuation of every delivery, price lists and contract prices, partial deliveries, refunds, payment terms and late payments, open pipeline at the anchor | TESTED_LOCAL (opt-in gates) | `app/fixtures/full_profile.py`, `docs/seed_data_specification.md` |
+| Ground-truth manifest apart from the records, exported by a script outside application code, versioned and checked equal to the generator's output | TESTED_LOCAL | `data/golden/demo_full_manifest_v1.json`, `scripts/export_ground_truth.py` |
+| Rule `PRODUCT_MAPPING` (order line whose product or unit of measure cannot be resolved) for scenario 12 | TESTED_LOCAL | `app/margin/rules.py` |
+| Profile switch: `benacta seed-fixtures --profile full`, `BENACTA_FIXTURE_PROFILE` read by the views, the API and the cockpit | TESTED_LOCAL | `app/config.py`, `app/ops/pipeline.py`, `app/cli.py` |
+| Opt-in gates (`BENACTA_FULL_PROFILE=1`) documented in the evaluation plan | IMPLEMENTED | `docs/evaluation_plan.md` |
+| Verification of the seeded profile against the manifest without a second database (exit 0 when verified) | TESTED_LOCAL | `scripts/verify_full_profile.py` |
+
+### Findings from this milestone
+
+- Realistic data found two defects the small fixture could not: the freight rule compared a EUR clause with
+  freight invoiced in GBP or CHF without converting (42 false alarms, fixed in the rule with a unit test), and the
+  generator priced foreign-currency orders with EUR figures (289 false alarms, fixed in the generator: prices in the
+  customer's currency at the order-date rate).
+- The customer that carries the conflicting-policies scenario cannot also carry a policy-gap scenario: the
+  conflict outranks the gap. The manifest now separates them.
+- Valuing deliveries at the quarter's cost while the marts replay FIFO over the receipt layers broke down as soon as
+  purchasing became realistic (two waves a month with a safety stock): the replayed cost no longer matched the recorded
+  move value and about 15 000 lines fell to `MISSING_COST`. The generator now values each delivery from the layers it
+  consumes, in the marts' replay order, and buys just in time so that every layer is consumed within its half-month.
+- A delivery in the quarter after its order is valued at the new receipt cost while the reference is frozen on the
+  order date: the rule reported 200 immaterial cost variances on background lines, all correct. The profile keeps
+  deliveries within the cost quarter of their order; a real pilot would tune the cost tolerance or the reference date.
+- Scenario orders of customers on a freight rebill clause must carry their freight line, or the freight rule raises
+  them as well (11 such orders, one of them material). A credit note dated after the anchor opened a 37th period.
+
+### Known limits
+
+- The profile runs on the embedded database; its Odoo seed is not written (blocked on the owner inputs listed
+  under milestone 2).
+- Purchases stay in EUR; supplier currencies, lead-time variance, stock locations and stock counts are not modelled.
+- The gates take about seven minutes each on the development VM, need about 3 GB free and stay opt-in.
+- No stock is carried between half-months, so cost variances only come from the injected scenarios.
+
 ## Milestone 3b: CFO cockpit (delivered on fixtures)
 
 ### Evidence (2026-09-15)
