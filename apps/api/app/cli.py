@@ -132,10 +132,10 @@ def _seed_odoo_dry_run(_: argparse.Namespace) -> int:
     return seed_odoo.dry_run(get_settings())
 
 
-def _seed_odoo(_: argparse.Namespace) -> int:
+def _seed_odoo(args: argparse.Namespace) -> int:
     from app.ops import seed_odoo
 
-    return seed_odoo.seed(get_settings())
+    return seed_odoo.seed(get_settings(), confirm=args.confirm)
 
 
 def _odoo_configure(args: argparse.Namespace) -> int:
@@ -248,9 +248,11 @@ def main(argv: list[str] | None = None) -> int:
     commands.add_parser("seed-odoo-dry-run", help="plan the Odoo sandbox seed; writes nothing").set_defaults(
         func=_seed_odoo_dry_run
     )
-    commands.add_parser("seed-odoo", help="seed the Odoo sandbox; refused unless the write guard passes").set_defaults(
-        func=_seed_odoo
+    seed_odoo = commands.add_parser(
+        "seed-odoo", help="write the trading company into the Odoo sandbox; dry run without --confirm, refused unless the write guard passes"
     )
+    seed_odoo.add_argument("--confirm", action="store_true")
+    seed_odoo.set_defaults(func=_seed_odoo)
     configure = commands.add_parser(
         "odoo-configure", help="install authorised modules, currencies and extension fields; dry run without --confirm"
     )

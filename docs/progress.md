@@ -5,6 +5,39 @@ Status vocabulary: `IMPLEMENTED` (code exists) · `TESTED_LOCAL` (automated test
 real read-only run against the connected Odoo) · `NOT_VERIFIED` · `BLOCKED`.
 A fixture test never proves an Odoo integration. Plan: `docs/implementation_plan.md`.
 
+## Odoo write path: trading-company seed executor (2026-09-16, IMPLEMENTED, NOT_VERIFIED)
+
+The owner asked on 2026-09-16 for the connected instance (`benacta.odoo.com/benacta`, Odoo saas~19.4, company
+`Benacta`, the only one) to carry the demonstration data as if it had been entered there. The instance already has
+the five required modules, USD active, a French chart, no `benacta_demo` external identifier, and some existing
+documents of its own (31 sale orders, 52 journal entries, 38 payments on 2026-09-16), which the pipeline will read
+alongside the seed.
+
+| Item | Status | Where |
+|---|---|---|
+| Executor of the trading company (`demo_v1`): categories with FIFO and automated valuation, price lists, partners, products, purchase orders confirmed and received, sale orders confirmed or cancelled, deliveries validated (one partial with a backorder), invoices created from the orders through Odoo's wizard, one credit note through the reversal wizard, one invoice without order, all dated as in the dataset and named `BD/SO/...`, `BD/PO/...`; external identifiers under `benacta_demo` for replay | IMPLEMENTED, TESTED_LOCAL (dry run and refusals against a fake transport), NOT_VERIFIED | `app/ops/seed_odoo.py` |
+| Shared seeder base (external identifiers, adoption of twins, batching, line mapping) used by the project seeder too | TESTED_LOCAL | `app/ops/odoo_seed_base.py`, `app/ops/seed_projects.py` |
+| Dry run reads the instance facts the executor relies on (units model, valuation fields, stock accounts, tax, warehouse, anglo-saxon flag) and reports what is missing | IMPLEMENTED | `benacta seed-odoo` without `--confirm` |
+| Policy register of the seeded company written for `benacta load-policies` in connected mode | IMPLEMENTED | `data/policies/margin_policy_register.yml` (ignored by git) |
+| Default suite | 254 passed, 16 skipped | `uv run pytest -q` |
+
+What the first confirmed run still needs, all owner decisions taken outside this session:
+
+1. `.env`: `ODOO_WRITES_ENABLED=true`, `ODOO_BACKUP_ATTESTED_AT` (ISO date within 7 days) and `ODOO_BACKUP_REFERENCE`
+   (the downloaded backup, or an explicit waiver text for a throw-away instance). The session's permission layer
+   refused these edits on 2026-09-16, so they stay with the owner.
+2. Two shared settings the executor changes on the instance and reports: anglo-saxon accounting on the company
+   (cost of goods sold posted with the invoice, which `COGS_POSTED` needs) and the unit of measure "Dozens".
+3. The guarded writer's method allowlist must admit five document workflows on their own model only:
+   `stock.picking.button_validate`, `stock.backorder.confirmation.process`, `sale.advance.payment.inv.create_invoices`,
+   `account.move.reversal.reverse_moves`, `sale.order.action_cancel` (`MODEL_METHODS` in `app/connectors/odoo.py`,
+   with a unit test that every other model still refuses them). Without it the executor stops at the first
+   receipt with `WriteNotAllowed`, which is the intended behaviour of the guard.
+
+Then, in order: `benacta seed-odoo --confirm`, `benacta ingest`, `benacta marts`, `benacta reconcile`,
+`benacta load-policies`, `benacta exceptions`, `benacta margin-overview`, one `margin-decide` and one
+`margin-act --confirm`, and the status words move to `VERIFIED_ODOO_SANDBOX` where the run proves them.
+
 ## Milestone 3c: three-year demonstration company and its ground truth (delivered on fixtures)
 
 ### Evidence (2026-09-15)
@@ -340,8 +373,8 @@ Versions are pinned in `apps/api/uv.lock`.
 | Oracle facts realised by marts (all 3 goldens and the negative controls that have data facts) | TESTED_LOCAL | `tests/integration/test_marts_oracle.py` |
 | Reconciliation with explicit status and independence | TESTED_LOCAL, VERIFIED_ODOO_READ | `app/marts/reconcile.py` |
 | Seed plan (dry run) with prerequisites and external identifier registry check | TESTED_LOCAL, VERIFIED_ODOO_READ | `app/ops/seed_odoo.py` |
-| Seed executor writing the sandbox company | BLOCKED | needs sandbox company, attested backup and the decisions below |
-| Golden cases in Odoo | NOT_VERIFIED | depends on the executor |
+| Seed executor writing the sandbox company | IMPLEMENTED on 2026-09-16, TESTED_LOCAL (fake transport), NOT_VERIFIED on the instance | `app/ops/seed_odoo.py`, see the section "Odoo write path" |
+| Golden cases in Odoo | NOT_VERIFIED | depends on the executor's first confirmed run |
 | Exposure amounts 1 000 / 250 / 800 EUR computed by the engine | NOT_VERIFIED | S4 rule engine |
 | Data dictionary | IMPLEMENTED | `docs/data_dictionary.md` |
 

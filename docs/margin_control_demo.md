@@ -163,7 +163,8 @@ cockpit, and the three-year demonstration company.
 
 - Fixture mode proves the engine, not the Odoo integration. The connected Odoo has been read (revenue reconciled
   against server aggregates), never seeded with these orders; order-level exceptions are `NOT_VERIFIED` against
-  Odoo until the sandbox seed runs.
+  Odoo until the sandbox seed runs. The seed executor exists (`benacta seed-odoo`, dry run without `--confirm`)
+  and waits for the owner's write switch, see `docs/progress.md`, section "Odoo write path".
 - Thresholds are demonstration settings, not financial standards.
 - Recovery is measured only from posted documents dated after a decision; on the demonstration data it stays
   `NOT_MEASURED` until such a document exists.
