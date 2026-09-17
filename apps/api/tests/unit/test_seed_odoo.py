@@ -57,7 +57,7 @@ def _patch_client(monkeypatch, fake: _RecordingOdoo):
 def test_seed_is_refused_by_the_guard_and_only_reads(monkeypatch, capsys):
     fake = _RecordingOdoo(company_exists=True)
     _patch_client(monkeypatch, fake)
-    assert seed_odoo.seed(_settings()) == 2
+    assert seed_odoo.seed(_settings(), confirm=True) == 2
     assert "Nothing was written" in capsys.readouterr().out
     assert fake.calls and all(method in READ_METHODS for _, method in fake.calls)
 
@@ -71,7 +71,7 @@ def test_dry_run_plans_every_step_and_flags_shared_configuration(monkeypatch, tm
 
     assert [op["model"] for op in plan["operations"]] == [model for model, _ in seed_odoo.OPERATIONS]
     sale = next(op for op in plan["operations"] if op["model"] == "sale.order")
-    assert sale["objects"] == 120 and sale["detail"] == {"sale": 115, "draft": 4, "cancel": 1}
+    assert sale["objects"] == 123 and sale["detail"] == {"sale": 118, "draft": 4, "cancel": 1}
     decisions = {p["check"] for p in plan["prerequisites"] if p["decision_needed"]}
     assert "sandbox company 'BENACTA DEMO' exists" in decisions
     assert "USD currency active (global setting)" in decisions
@@ -79,7 +79,7 @@ def test_dry_run_plans_every_step_and_flags_shared_configuration(monkeypatch, tm
     assert all(method in READ_METHODS for _, method in fake.calls)
 
 
-def test_guard_passing_still_writes_nothing_until_the_executor_is_verified(monkeypatch):
+def test_seed_without_confirm_is_a_dry_run_even_when_the_guard_passes(monkeypatch, capsys):
     fake = _RecordingOdoo(company_exists=True)
     _patch_client(monkeypatch, fake)
     settings = _settings(
@@ -88,5 +88,21 @@ def test_guard_passing_still_writes_nothing_until_the_executor_is_verified(monke
         odoo_backup_attested_at=date.today().isoformat(),
         odoo_backup_reference="backup.zip",
     )
-    assert seed_odoo.seed(settings) == 3
+    assert seed_odoo.seed(settings) == 0
+    out = capsys.readouterr().out
+    assert "dry run, nothing written" in out and "sale.order" in out and "MISSING" in out
+    assert all(method in READ_METHODS for _, method in fake.calls)
+
+
+def test_confirmed_seed_refuses_an_instance_that_lacks_its_references(monkeypatch, capsys):
+    fake = _RecordingOdoo(company_exists=True, usd_active=True)
+    _patch_client(monkeypatch, fake)
+    settings = _settings(
+        odoo_writes_enabled=True,
+        odoo_sandbox_allowlist="example.odoo.com/example",
+        odoo_backup_attested_at=date.today().isoformat(),
+        odoo_backup_reference="backup.zip",
+    )
+    assert seed_odoo.seed(settings, confirm=True) == 4
+    assert "Nothing was written" in capsys.readouterr().out
     assert all(method in READ_METHODS for _, method in fake.calls)

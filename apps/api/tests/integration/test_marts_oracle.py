@@ -311,7 +311,9 @@ def test_reconciliation_statuses_are_explicit(built):
     results = built["reconciliation"]
     assert results, "every month with activity is reconciled"
     assert {r.status for r in results} == {"RECONCILED"}
-    assert {r.independence for r in results} == {"FIXTURE_CONTROL_TOTAL"}
+    assert {r.check_id for r in results} == {"REVENUE_POSTED", "COGS_POSTED", "INVOICE_HEADER_LINES"}
+    assert {r.independence for r in results if r.check_id != "INVOICE_HEADER_LINES"} == {"FIXTURE_CONTROL_TOTAL"}
+    assert {r.independence for r in results if r.check_id == "INVOICE_HEADER_LINES"} == {"SOURCE_HEADER"}
     assert margin_basis(built["engine"], built["snapshot"]) == "RECONCILED_COGS"
 
 

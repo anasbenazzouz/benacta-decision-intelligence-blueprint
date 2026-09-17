@@ -1,8 +1,8 @@
 # Data dictionary: analytical foundation, planning and project controlling
 
 Database: BENACTA analytics PostgreSQL (`benacta_analytics`), never the Odoo database. Migrations:
-`apps/api/migrations/versions/0001_foundation.py`, `0002_planning_and_reports.py`, `0003_project_marts.py`. Money and quantities are `numeric`, handled as `Decimal`
-in code, never as floats.
+`apps/api/migrations/versions/0001_foundation.py`, `0002_planning_and_reports.py`, `0003_project_marts.py`,
+`0004_margin_control.py`, `0005_decision_workflow.py`. Money and quantities are `numeric`, handled as `Decimal` in code, never as floats.
 
 ## Schemas
 
@@ -11,9 +11,9 @@ in code, never as floats.
 | `raw` | Every observed source record version, batches, watermarks | `benacta ingest` |
 | `staging` | `staging.records_at(instance, model, batch_seq)`: the consistent state of a model at a snapshot | function, no storage |
 | `marts` | Snapshot-scoped dimensions, facts, bridges, data quality, reconciliation | `benacta marts`, `benacta reconcile` |
-| `semantic` | Metric, dimension, policy and rule contracts | S2 |
+| `semantic` | Governed commercial terms (segments, discount policies, derogations, freight contracts, contract prices, cost references) with provenance | `benacta load-policies`, `benacta seed-fixtures` |
 | `planning` | Budget and forecast versions, lines, assignments, assumptions, imports | `benacta seed-fixtures` (step plans), CSV import |
-| `decision` | Status reports, investigations, recommendations; later approvals and actions | `benacta psr --save`, `benacta investigate --save` |
+| `decision` | Exception cases, recommendations, decisions, actions, impact; project status reports and investigations | `benacta exceptions`, `benacta margin-decide`, `benacta margin-act`, `benacta psr --save`, `benacta investigate --save` |
 | `audit` | Append-only hash-chained journal | every command |
 
 ## raw
@@ -39,18 +39,22 @@ Every table is keyed by `snapshot_id` (a succeeded ingestion batch). Rebuilding 
 | `dim_currency` | currency | `currency_id` | rounding step |
 | `fx_rate` | dated rate | `company_id` (0 when shared), `currency_id`, `rate_date` | Odoo convention: units of currency per one unit of company currency |
 | `dim_uom` | unit of measure | `uom_id` | `factor` relative to the root unit (Odoo 19) |
-| `dim_partner` | partner | `partner_id` | views `dim_customer`, `dim_supplier` |
-| `dim_product` | product variant | `product_id` | type, storable flag, costing method and valuation of its category |
+| `dim_partner` | partner | `partner_id` | views `dim_customer`, `dim_supplier`; `ref` is the business key of policies and contracts; `pricelist_id` the assigned price list |
+| `dim_product` | product variant | `product_id` | type, storable flag, costing method and valuation of its category, list price |
+| `dim_pricelist` | price list | `pricelist_id` | currency, active flag |
+| `dim_pricelist_item` | price rule | `item_id` | applicability (variant, template, category, global), minimum quantity, fixed or percentage price, validity dates |
 | `dim_account` | account | `account_id` | `account_type` separates income and direct cost |
 | `dim_date` | calendar day | `date_day` | shared across snapshots |
-| `fact_sales_order_line` | ordered line (sections and notes excluded) | `sale_line_id` | quantity in order unit and in product unit; company-currency subtotal at the rate valid on the order date |
+| `fact_sales_order_line` | ordered line (sections and notes excluded) | `sale_line_id` | quantity in order unit and in product unit; company-currency subtotal at the rate valid on the order date; price list applied on the order |
 | `fact_invoice_line` | posted customer invoice or credit note product line | `invoice_line_id` | quantity and subtotal signed negative for credit notes; `revenue_company_ccy = -balance` |
 | `fact_posted_cogs_line` | posted COGS item on a direct cost account | `move_line_id` | empty when valuation is periodic |
 | `fact_stock_move` | stock move | `move_id` | direction from the picking type; Odoo valuation `value` |
 | `fact_cost_allocation` | slice of a delivered quantity attributed to a receipt | `delivery_move_id`, `allocation_no` | FIFO replay; `UNDETERMINED` when no valued receipt layer exists, when the replay differs from Odoo's move value, or when the costing method is not FIFO |
 | `bridge_sale_invoice_line` | link between order line and invoice line | `sale_line_id`, `invoice_line_id` | from `sale_order_line_invoice_rel`; `allocation_weight` is 1 only when the invoice line belongs to a single order line, otherwise null and never summed |
 | `data_quality_issue` | one issue on one source record | `issue_code`, `source_model`, `source_id` | `INVOICE_LINE_WITHOUT_SALE_LINE`, `FX_RATE_MISSING`, `UOM_UNRESOLVED`, `ORDER_LINE_WITHOUT_ORDER` |
-| `reconciliation_result` | one check per company and month | `check_id`, `company_id`, `period` | see below |
+| `reconciliation_result` | one check per company and month | `check_id`, `company_id`, `period` | see below; carries `tolerance`, `source_timestamp`, `ingested_at`, `transformation_version`, `detail` |
+| `fact_margin_rule_evaluation` | one rule applied to one subject (order line, order, invoice line) | `rule_id`, `subject_type`, `subject_id` | outcome, classification, cause, amounts in company currency, severity, confidence, controllability, materiality, `evidence` JSON with every input, formula and threshold version; every outcome is stored, including compliant ones |
+| `fact_margin_period` | gross margin per company and accounting month | `company_id`, `period` | revenue (goods and services), COGS, gross margin and percentage, basis and status from the reconciliation, leakage by type, addressable and recoverable amounts, untraceable revenue, exception counts |
 
 ### Project marts (migration `0003_project_marts`)
 
@@ -70,6 +74,23 @@ Built by `app/marts/project_build.py` from the same snapshot. Classification rul
 | `fact_customer_payment` | inbound payment allocated to an invoice | `payment_id`, `invoice_id` | payments in date order, split across their reconciled invoices up to each invoice total |
 | `fact_change_order` | sale order linked to a project, per project | `sale_order_id`, `project_id` | `is_contract` separates the contract from change orders; confirmed change order = approved, draft or sent = pending |
 
+## semantic (migration `0004_margin_control`)
+
+Governed commercial terms keyed by business references (`customer_ref` = partner `ref`, `product_code` = product
+internal reference), never by Odoo ids, so the rules read the same terms whatever the system of record. Each row
+carries `owner`, `source`, `valid_from`, `valid_to` and the `load_id` of its provenance.
+
+| Table | Grain | Notes |
+|---|---|---|
+| `reference_load` | one load of terms for an instance and company | source kind `FIXTURE_TERMS` or `POLICY_REGISTER`, file reference, content hash, actor, row counts |
+| `customer_segment` | customer and validity | segment used by segment-scoped policies |
+| `discount_policy` | policy version | scope by segment or customer, cap, priority, validity |
+| `discount_derogation` | one approved derogation | order reference, cap, approving role, validity, evidence reference |
+| `freight_contract` | one clause per customer | `rebill`, `waived` or `included`, amount, currency, trigger |
+| `contract_price` | contract and product | unit price, currency, minimum quantity, validity |
+| `cost_reference` | reference and product | frozen unit cost, freeze date, validity |
+| `governed_document` | one authorised document of the investigation corpus | title, source, owner, effective date, version, path, content hash, section count; unauthorised or malformed files are refused at indexing and never registered |
+
 ## planning (migration `0002_planning_and_reports`)
 
 Owned by BENACTA (ADR-0004). Odoo has no equivalent for versioned project plans.
@@ -83,10 +104,16 @@ Owned by BENACTA (ADR-0004). Odoo has no equivalent for versioned project plans.
 | `import_batch` | one CSV, spreadsheet, UI or seed submission | file hash, row count, error count, control totals, status `VALIDATED` or `REJECTED`, resulting version |
 | `import_error` | one issue on one row | row number, field, code, message; a rejected import creates no version |
 
-## decision (project controlling)
+## decision
 
 | Table | Grain | Notes |
 |---|---|---|
+| `exception_case` | the stable identity of one exception (rule and subject) across snapshots | `case_ref` (`MC-000001`), first and last snapshot, latest classification, cause, severity and exposures; workflow status (`NEW`, `OPEN`, `UNDER_REVIEW`, `EVIDENCE_REQUESTED`, `DEFERRED`, `APPROVED`, `REJECTED`, `ACTIONED`, `CLOSED`, `NO_LONGER_RAISED` with `resolved_note`), owner, `version` for optimistic concurrency, estimated recovery, decision and action timestamps; never deleted |
+| `margin_recommendation` | one recommendation version per case | source `DETERMINISTIC_TEMPLATE` or `LLM_DRAFT`, action key, title, rationale, required role, estimated recovery and basis (`BILLING_EXPOSURE`, `NOT_RECEIVABLE`, `UNKNOWN`), expected impact, evidence references, rule and threshold versions, payload hash; superseded when the evidence changes while the case is open |
+| `case_decision` | one human decision, append-only | type, actor and declared roles, status and case version before and after, reason (required to reject, defer, request evidence, reopen), comment, assignee, deferral date |
+| `case_action` | one attempt to execute the approved action, append-only | target system and document, external identifier (one `EXECUTED` row per identifier), request, response, guard report, error |
+| `investigation` | one investigation run of a case (`subject_type` `exception_case`) or a project | mode `DETERMINISTIC_NO_LLM` or `LLM`, full report and its hash |
+| `case_impact` | estimated against realised recovery per approved case | realised only from posted invoice lines dated after the decision; `NOT_MEASURED`, `NOT_MEASURABLE`, `PARTIAL` or `MEASURED`, with the evidence lines and the variance |
 | `project_status_report` | one revision of a project status report per period | content JSON and its hash, plan versions and snapshot used; `DRAFT` or `PUBLISHED`; a published revision is immutable (trigger); publisher differs from preparer; a correction is a new revision |
 | `investigation` | one investigation run | question, mode `DETERMINISTIC_NO_LLM` or `LLM`, status `COMPLETED`, `ABSTAINED` or `FAILED`, full report |
 | `recommendation` | one proposed action of an investigation | `action_key` and version; created `PENDING_REVIEW`, never executed without approval |
@@ -101,7 +128,9 @@ Owned by BENACTA (ADR-0004). Odoo has no equivalent for versioned project plans.
 | `UNAVAILABLE` | no control total can be computed, or goods were invoiced without any posted COGS |
 
 `independence` states how independent the control total is: `SERVER_AGGREGATE` (Odoo `formatted_read_group`
-computed by the server), `FIXTURE_CONTROL_TOTAL` (the fixture source itself, not independent evidence) or `NONE`.
+computed by the server), `FIXTURE_CONTROL_TOTAL` (the fixture source itself, not independent evidence),
+`SOURCE_HEADER` (the source's own invoice headers against their lines) or `NONE`. Specification and report:
+`docs/reconciliation_specification.md`.
 
 Margin basis: `RECONCILED_COGS` only when every COGS check reconciled; otherwise `MANAGEMENT_PROXY`.
 

@@ -12,7 +12,7 @@ from tests.integration.conftest import scalar
 
 
 def test_migration_from_empty_database_creates_every_schema_and_pgvector(engine):
-    assert migrate.current_revision(engine) == "0003_project_marts"
+    assert migrate.current_revision(engine) == "0006_governed_documents"
     expected = {"raw", "staging", "marts", "semantic", "decision", "audit", "planning"}
     assert expected <= set(sa.inspect(engine).get_schema_names())
     assert scalar(engine, "select extversion from pg_extension where extname = 'vector'")
@@ -20,7 +20,7 @@ def test_migration_from_empty_database_creates_every_schema_and_pgvector(engine)
 
 def test_migration_is_idempotent(engine):
     migrate.upgrade(engine)
-    assert migrate.current_revision(engine) == "0003_project_marts"
+    assert migrate.current_revision(engine) == "0006_governed_documents"
 
 
 def test_engine_refuses_a_database_with_another_name(analytics_url):

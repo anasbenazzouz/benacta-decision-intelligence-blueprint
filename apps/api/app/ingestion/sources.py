@@ -114,7 +114,8 @@ class FixtureSource:
 
     def available_fields(self, model):
         rows = self.dataset.records.get(model, [])
-        return set().union(*(r.keys() for r in rows)) if rows else set()
+        # A model with no record still exists in the source: it is ingested as empty, never refused.
+        return set().union(*(r.keys() for r in rows)) if rows else {"id", "write_date"}
 
     def iter_changed(self, model, fields, after, page_size=500):
         rows = sorted(self.dataset.records.get(model, []), key=lambda r: (r["write_date"], r["id"]))

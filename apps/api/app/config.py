@@ -35,6 +35,8 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=REPO_ROOT / ".env", env_file_encoding="utf-8", extra="ignore")
 
     benacta_mode: Mode = Mode.FIXTURE
+    # Fixture profile: `dev` (demo_v2: 90-day trading company plus projects) or `full` (three-year demonstration company).
+    benacta_fixture_profile: str = "dev"
 
     # 1. Direct read access to the Odoo PostgreSQL database, only where it exists and is authorised.
     odoo_read_dsn: SecretStr | None = None

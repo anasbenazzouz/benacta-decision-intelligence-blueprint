@@ -20,9 +20,12 @@ def _isolated_environment(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
-    if os.environ.get("BENACTA_LIVE_ODOO") == "1":
-        return
-    skip = pytest.mark.skip(reason="live Odoo read; set BENACTA_LIVE_ODOO=1 to run")
+    live = os.environ.get("BENACTA_LIVE_ODOO") == "1"
+    full = os.environ.get("BENACTA_FULL_PROFILE") == "1"
+    skip_live = pytest.mark.skip(reason="live Odoo read; set BENACTA_LIVE_ODOO=1 to run")
+    skip_full = pytest.mark.skip(reason="three-year demonstration profile (minutes); set BENACTA_FULL_PROFILE=1 to run")
     for item in items:
-        if "odoo_live" in item.keywords:
-            item.add_marker(skip)
+        if "odoo_live" in item.keywords and not live:
+            item.add_marker(skip_live)
+        if "full_profile" in item.keywords and not full:
+            item.add_marker(skip_full)

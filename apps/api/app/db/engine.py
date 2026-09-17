@@ -15,7 +15,7 @@ from pathlib import Path
 import sqlalchemy as sa
 from sqlalchemy.engine import Engine, make_url
 
-from app.config import REPO_ROOT, Mode, Settings
+from app.config import REPO_ROOT, Settings
 from app.connectors.guards import (
     ODOO_SIGNATURE_TABLES,
     GuardReport,
@@ -97,9 +97,8 @@ def local_database_url(database: str, pgdata: Path = LOCAL_PGDATA, *, server=Non
 def resolve_analytics_url(settings: Settings) -> str:
     if settings.analytics_database_url is not None:
         return _psycopg(settings.analytics_database_url.get_secret_value())
-    if settings.benacta_mode is Mode.FIXTURE:
-        return local_database_url(settings.analytics_db_expected_name)
-    raise TargetGuardError("ANALYTICS_DATABASE_URL is required outside fixture mode")
+    # Without a managed database, every mode uses the embedded development server (.benacta/pgdata).
+    return local_database_url(settings.analytics_db_expected_name)
 
 
 def verify_live_target(engine: Engine, settings: Settings) -> GuardReport:

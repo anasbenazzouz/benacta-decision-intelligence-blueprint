@@ -122,3 +122,55 @@ def test_iter_search_read_paginates_on_id_without_offset_drift():
     assert [r["id"] for r in rows] == list(range(1, 8))
     assert [d[-1] for d in domains] == [["id", ">", 0], ["id", ">", 3], ["id", ">", 6]]
     assert all(d[0] == ["active", "=", True] for d in domains)
+
+
+class _Guard:
+    def __init__(self, allowed: bool):
+        self.allowed = allowed
+
+    def raise_if_blocked(self):
+        raise odoo_module.WriteNotAllowed("guard blocked")
+
+
+def test_writer_cannot_be_built_from_a_blocked_guard():
+    with pytest.raises(PermissionError):
+        odoo_module.OdooWriter(_client(lambda request: httpx.Response(200, json=True)), _Guard(False))
+
+
+@pytest.mark.parametrize(("model", "method"), [("sale.order", "unlink"), ("account.move", "button_draft"),
+                                               ("account.move.line", "write"), ("res.users", "action_reset_password"),
+                                               ("sale.order", "button_validate"), ("account.move", "reverse_moves"),
+                                               ("purchase.order", "action_cancel")])
+def test_writer_refuses_methods_outside_its_allowlist(model, method):
+    def handler(request: httpx.Request) -> httpx.Response:  # pragma: no cover - must never be called
+        raise AssertionError("a refused write reached the network")
+
+    with pytest.raises(odoo_module.WriteNotAllowed):
+        odoo_module.OdooWriter(_client(handler), _Guard(True)).call(model, method, ids=[1])
+
+
+@pytest.mark.parametrize(("model", "method"), sorted((m, method) for m, methods in odoo_module.MODEL_METHODS.items() for method in methods))
+def test_writer_allows_document_workflows_on_their_own_model_only(model, method):
+    seen = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request.url.path)
+        return httpx.Response(200, json=True)
+
+    assert odoo_module.OdooWriter(_client(handler), _Guard(True)).call(model, method, ids=[1]) is True
+    assert seen == [f"/json/2/{model}/{method}"]
+
+
+def test_writer_disables_mail_and_tracking_and_never_retries():
+    calls = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls.append(json.loads(request.content))
+        return httpx.Response(503, json={"name": "unavailable", "message": "busy"})
+
+    writer = odoo_module.OdooWriter(_client(handler), _Guard(True))
+    with pytest.raises(OdooError):
+        writer.create("res.partner", [{"name": "X"}], context={"lang": "fr_FR"})
+    assert len(calls) == 1
+    assert calls[0]["vals_list"] == [{"name": "X"}]
+    assert calls[0]["context"]["tracking_disable"] is True and calls[0]["context"]["lang"] == "fr_FR"

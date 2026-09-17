@@ -38,7 +38,7 @@ def _payload_at(engine, instance, model, source_id, batch_seq):
 def test_full_ingestion_then_replay_adds_no_duplicate(engine, dataset):
     source = _source(dataset)
     first = ingest(engine, source, SPEC, models=FOUNDATION_MODELS)
-    expected = sum(len(dataset.records[m]) for m in first.models)
+    expected = sum(len(dataset.records.get(m, [])) for m in first.models)
     assert first.new_versions == expected
 
     second = ingest(engine, source, SPEC, models=FOUNDATION_MODELS)

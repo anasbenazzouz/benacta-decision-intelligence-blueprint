@@ -29,3 +29,6 @@ Thumbs.db
 
 # V2 local runtime state (embedded PostgreSQL data, local exports)
 .benacta/
+
+# governed terms of the connected instance, written by the seed or by the owner
+data/policies/margin_policy_register.yml

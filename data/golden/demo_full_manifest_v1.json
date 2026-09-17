@@ -1,0 +1,2544 @@
+{
+  "profile": "demo_full",
+  "manifest_version": 1,
+  "seed": 20260831,
+  "anchor_date": "2026-08-31",
+  "window_start": "2023-09-01",
+  "months": 36,
+  "structure": {
+    "customers": 505,
+    "suppliers": 100,
+    "products": 213,
+    "sale_orders": 9548,
+    "sale_order_lines": 20907,
+    "purchase_orders": 5798,
+    "purchase_order_lines": 8872,
+    "invoices": 9719,
+    "journal_items": 76568,
+    "stock_moves": 26749,
+    "payments": 8208,
+    "currency_rates": 111,
+    "pricelist_items": 200
+  },
+  "scenarios": [
+    {
+      "scenario_id": "FULL-CN-001",
+      "family": "credit_note_after_invoice",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/CN-001",
+        "product": "DRV-003"
+      },
+      "order_date": "2024-07-13",
+      "period": "2024-07",
+      "expected": {
+        "status": "COMPLIANT",
+        "classification": "COMPLIANT",
+        "cause": "WITHIN_POLICY",
+        "adverse_exposure": null,
+        "potential_exposure": null,
+        "exposure_type": "discount",
+        "controllability": "NOT_APPLICABLE",
+        "severity": "NONE",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "partial credit note reverses part of the invoice; discount at the cap",
+      "evidence": [
+        "invoice",
+        "credit note"
+      ],
+      "recommended_action": "None: not raised",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-CN-002",
+      "family": "credit_note_after_invoice",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/CN-002",
+        "product": "ENC-006"
+      },
+      "order_date": "2023-12-11",
+      "period": "2023-12",
+      "expected": {
+        "status": "COMPLIANT",
+        "classification": "COMPLIANT",
+        "cause": "WITHIN_POLICY",
+        "adverse_exposure": null,
+        "potential_exposure": null,
+        "exposure_type": "discount",
+        "controllability": "NOT_APPLICABLE",
+        "severity": "NONE",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "partial credit note reverses part of the invoice; discount at the cap",
+      "evidence": [
+        "invoice",
+        "credit note"
+      ],
+      "recommended_action": "None: not raised",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-CN-003",
+      "family": "credit_note_after_invoice",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/CN-003",
+        "product": "FLW-016"
+      },
+      "order_date": "2025-02-13",
+      "period": "2025-02",
+      "expected": {
+        "status": "COMPLIANT",
+        "classification": "COMPLIANT",
+        "cause": "WITHIN_POLICY",
+        "adverse_exposure": null,
+        "potential_exposure": null,
+        "exposure_type": "discount",
+        "controllability": "NOT_APPLICABLE",
+        "severity": "NONE",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "partial credit note reverses part of the invoice; discount at the cap",
+      "evidence": [
+        "invoice",
+        "credit note"
+      ],
+      "recommended_action": "None: not raised",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-CN-004",
+      "family": "credit_note_after_invoice",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/CN-004",
+        "product": "CON-008"
+      },
+      "order_date": "2026-03-15",
+      "period": "2026-03",
+      "expected": {
+        "status": "COMPLIANT",
+        "classification": "COMPLIANT",
+        "cause": "WITHIN_POLICY",
+        "adverse_exposure": null,
+        "potential_exposure": null,
+        "exposure_type": "discount",
+        "controllability": "NOT_APPLICABLE",
+        "severity": "NONE",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "partial credit note reverses part of the invoice; discount at the cap",
+      "evidence": [
+        "invoice",
+        "credit note"
+      ],
+      "recommended_action": "None: not raised",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-CN-005",
+      "family": "credit_note_after_invoice",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/CN-005",
+        "product": "ENC-004"
+      },
+      "order_date": "2024-03-06",
+      "period": "2024-03",
+      "expected": {
+        "status": "COMPLIANT",
+        "classification": "COMPLIANT",
+        "cause": "WITHIN_POLICY",
+        "adverse_exposure": null,
+        "potential_exposure": null,
+        "exposure_type": "discount",
+        "controllability": "NOT_APPLICABLE",
+        "severity": "NONE",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "partial credit note reverses part of the invoice; discount at the cap",
+      "evidence": [
+        "invoice",
+        "credit note"
+      ],
+      "recommended_action": "None: not raised",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-CN-006",
+      "family": "credit_note_after_invoice",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/CN-006",
+        "product": "CON-015"
+      },
+      "order_date": "2026-02-11",
+      "period": "2026-02",
+      "expected": {
+        "status": "COMPLIANT",
+        "classification": "COMPLIANT",
+        "cause": "WITHIN_POLICY",
+        "adverse_exposure": null,
+        "potential_exposure": null,
+        "exposure_type": "discount",
+        "controllability": "NOT_APPLICABLE",
+        "severity": "NONE",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "partial credit note reverses part of the invoice; discount at the cap",
+      "evidence": [
+        "invoice",
+        "credit note"
+      ],
+      "recommended_action": "None: not raised",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-CN-007",
+      "family": "credit_note_after_invoice",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/CN-007",
+        "product": "DRV-020"
+      },
+      "order_date": "2024-11-04",
+      "period": "2024-11",
+      "expected": {
+        "status": "COMPLIANT",
+        "classification": "COMPLIANT",
+        "cause": "WITHIN_POLICY",
+        "adverse_exposure": null,
+        "potential_exposure": null,
+        "exposure_type": "discount",
+        "controllability": "NOT_APPLICABLE",
+        "severity": "NONE",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "partial credit note reverses part of the invoice; discount at the cap",
+      "evidence": [
+        "invoice",
+        "credit note"
+      ],
+      "recommended_action": "None: not raised",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-CN-008",
+      "family": "credit_note_after_invoice",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/CN-008",
+        "product": "SAF-011"
+      },
+      "order_date": "2025-01-07",
+      "period": "2025-01",
+      "expected": {
+        "status": "COMPLIANT",
+        "classification": "COMPLIANT",
+        "cause": "WITHIN_POLICY",
+        "adverse_exposure": null,
+        "potential_exposure": null,
+        "exposure_type": "discount",
+        "controllability": "NOT_APPLICABLE",
+        "severity": "NONE",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "partial credit note reverses part of the invoice; discount at the cap",
+      "evidence": [
+        "invoice",
+        "credit note"
+      ],
+      "recommended_action": "None: not raised",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-CN-009",
+      "family": "credit_note_after_invoice",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/CN-009",
+        "product": "VLV-002"
+      },
+      "order_date": "2023-12-15",
+      "period": "2023-12",
+      "expected": {
+        "status": "COMPLIANT",
+        "classification": "COMPLIANT",
+        "cause": "WITHIN_POLICY",
+        "adverse_exposure": null,
+        "potential_exposure": null,
+        "exposure_type": "discount",
+        "controllability": "NOT_APPLICABLE",
+        "severity": "NONE",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "partial credit note reverses part of the invoice; discount at the cap",
+      "evidence": [
+        "invoice",
+        "credit note"
+      ],
+      "recommended_action": "None: not raised",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-CN-010",
+      "family": "credit_note_after_invoice",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/CN-010",
+        "product": "CTL-003"
+      },
+      "order_date": "2024-05-02",
+      "period": "2024-05",
+      "expected": {
+        "status": "COMPLIANT",
+        "classification": "COMPLIANT",
+        "cause": "WITHIN_POLICY",
+        "adverse_exposure": null,
+        "potential_exposure": null,
+        "exposure_type": "discount",
+        "controllability": "NOT_APPLICABLE",
+        "severity": "NONE",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "partial credit note reverses part of the invoice; discount at the cap",
+      "evidence": [
+        "invoice",
+        "credit note"
+      ],
+      "recommended_action": "None: not raised",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-CONF-001",
+      "family": "data_quality_prevents_recommendation",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/CONF-001",
+        "product": "CON-018"
+      },
+      "order_date": "2025-05-12",
+      "period": "2025-05",
+      "expected": {
+        "status": "CONFLICT",
+        "classification": "INSUFFICIENT_EVIDENCE",
+        "cause": "POLICY_CONFLICT",
+        "adverse_exposure": null,
+        "potential_exposure": "148.72",
+        "exposure_type": "discount",
+        "controllability": "CONTROLLABLE",
+        "severity": "LOW",
+        "material": false,
+        "case_created": true
+      },
+      "root_cause": "two customer policies of the same priority with different caps",
+      "evidence": [
+        "policy register"
+      ],
+      "recommended_action": "Resolve the conflicting policies",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-COST-001",
+      "family": "purchase_price_variance",
+      "rule": "COST_REFERENCE_VARIANCE",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/COST-001",
+        "product": "SCP-01"
+      },
+      "order_date": "2023-10-15",
+      "period": "2023-10",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "PURCHASE_PRICE_VARIANCE",
+        "adverse_exposure": "916.90",
+        "potential_exposure": null,
+        "exposure_type": "cost",
+        "controllability": "PARTIALLY_CONTROLLABLE",
+        "severity": "HIGH",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "receipt at 165.58 against reference 148.28",
+      "evidence": [
+        "receipt",
+        "delivery move",
+        "cost allocation",
+        "cost reference"
+      ],
+      "recommended_action": "Review the supplier price with procurement",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-COST-002",
+      "family": "purchase_price_variance",
+      "rule": "COST_REFERENCE_VARIANCE",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/COST-002",
+        "product": "SCP-02"
+      },
+      "order_date": "2026-07-19",
+      "period": "2026-07",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "PURCHASE_PRICE_VARIANCE",
+        "adverse_exposure": "1014.90",
+        "potential_exposure": null,
+        "exposure_type": "cost",
+        "controllability": "PARTIALLY_CONTROLLABLE",
+        "severity": "HIGH",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "receipt at 193.18 against reference 181.24",
+      "evidence": [
+        "receipt",
+        "delivery move",
+        "cost allocation",
+        "cost reference"
+      ],
+      "recommended_action": "Review the supplier price with procurement",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-COST-003",
+      "family": "purchase_price_variance",
+      "rule": "COST_REFERENCE_VARIANCE",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/COST-003",
+        "product": "SCP-03"
+      },
+      "order_date": "2024-09-19",
+      "period": "2024-09",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "PURCHASE_PRICE_VARIANCE",
+        "adverse_exposure": "2141.76",
+        "potential_exposure": null,
+        "exposure_type": "cost",
+        "controllability": "PARTIALLY_CONTROLLABLE",
+        "severity": "HIGH",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "receipt at 243.35 against reference 220.07",
+      "evidence": [
+        "receipt",
+        "delivery move",
+        "cost allocation",
+        "cost reference"
+      ],
+      "recommended_action": "Review the supplier price with procurement",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-COST-004",
+      "family": "purchase_price_variance",
+      "rule": "COST_REFERENCE_VARIANCE",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/COST-004",
+        "product": "SCP-04"
+      },
+      "order_date": "2025-02-19",
+      "period": "2025-02",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "PURCHASE_PRICE_VARIANCE",
+        "adverse_exposure": "1271.04",
+        "potential_exposure": null,
+        "exposure_type": "cost",
+        "controllability": "PARTIALLY_CONTROLLABLE",
+        "severity": "HIGH",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "receipt at 217.64 against reference 197.78",
+      "evidence": [
+        "receipt",
+        "delivery move",
+        "cost allocation",
+        "cost reference"
+      ],
+      "recommended_action": "Review the supplier price with procurement",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-COST-005",
+      "family": "purchase_price_variance",
+      "rule": "COST_REFERENCE_VARIANCE",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/COST-005",
+        "product": "SCP-05"
+      },
+      "order_date": "2025-09-16",
+      "period": "2025-09",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "PURCHASE_PRICE_VARIANCE",
+        "adverse_exposure": "972.00",
+        "potential_exposure": null,
+        "exposure_type": "cost",
+        "controllability": "PARTIALLY_CONTROLLABLE",
+        "severity": "HIGH",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "receipt at 172.48 against reference 160.48",
+      "evidence": [
+        "receipt",
+        "delivery move",
+        "cost allocation",
+        "cost reference"
+      ],
+      "recommended_action": "Review the supplier price with procurement",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-COST-006",
+      "family": "purchase_price_variance",
+      "rule": "COST_REFERENCE_VARIANCE",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/COST-006",
+        "product": "SCP-06"
+      },
+      "order_date": "2025-09-20",
+      "period": "2025-09",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "PURCHASE_PRICE_VARIANCE",
+        "adverse_exposure": "763.14",
+        "potential_exposure": null,
+        "exposure_type": "cost",
+        "controllability": "PARTIALLY_CONTROLLABLE",
+        "severity": "HIGH",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "receipt at 248.37 against reference 231.78",
+      "evidence": [
+        "receipt",
+        "delivery move",
+        "cost allocation",
+        "cost reference"
+      ],
+      "recommended_action": "Review the supplier price with procurement",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-COST-007",
+      "family": "purchase_price_variance",
+      "rule": "COST_REFERENCE_VARIANCE",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/COST-007",
+        "product": "SCP-07"
+      },
+      "order_date": "2023-11-04",
+      "period": "2023-11",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "PURCHASE_PRICE_VARIANCE",
+        "adverse_exposure": "1814.28",
+        "potential_exposure": null,
+        "exposure_type": "cost",
+        "controllability": "PARTIALLY_CONTROLLABLE",
+        "severity": "HIGH",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "receipt at 224.54 against reference 201.28",
+      "evidence": [
+        "receipt",
+        "delivery move",
+        "cost allocation",
+        "cost reference"
+      ],
+      "recommended_action": "Review the supplier price with procurement",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-COST-008",
+      "family": "purchase_price_variance",
+      "rule": "COST_REFERENCE_VARIANCE",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/COST-008",
+        "product": "SCP-08"
+      },
+      "order_date": "2026-03-19",
+      "period": "2026-03",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "PURCHASE_PRICE_VARIANCE",
+        "adverse_exposure": "369.90",
+        "potential_exposure": null,
+        "exposure_type": "cost",
+        "controllability": "PARTIALLY_CONTROLLABLE",
+        "severity": "MEDIUM",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "receipt at 112.90 against reference 106.05",
+      "evidence": [
+        "receipt",
+        "delivery move",
+        "cost allocation",
+        "cost reference"
+      ],
+      "recommended_action": "Review the supplier price with procurement",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-DEROG-001",
+      "family": "management_approved_exception",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/DEROG-001",
+        "product": "SEN-007"
+      },
+      "order_date": "2024-04-13",
+      "period": "2024-04",
+      "expected": {
+        "status": "COMPLIANT",
+        "classification": "LEGITIMATE_EXCEPTION",
+        "cause": "APPROVED_DEROGATION",
+        "adverse_exposure": null,
+        "potential_exposure": null,
+        "exposure_type": "discount",
+        "controllability": "NOT_APPLICABLE",
+        "severity": "NONE",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "discount covered by a dated derogation of a finance approver",
+      "evidence": [
+        "derogation register"
+      ],
+      "recommended_action": "None: not raised",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-DEROG-002",
+      "family": "management_approved_exception",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/DEROG-002",
+        "product": "SPR-008"
+      },
+      "order_date": "2024-02-20",
+      "period": "2024-02",
+      "expected": {
+        "status": "COMPLIANT",
+        "classification": "LEGITIMATE_EXCEPTION",
+        "cause": "APPROVED_DEROGATION",
+        "adverse_exposure": null,
+        "potential_exposure": null,
+        "exposure_type": "discount",
+        "controllability": "NOT_APPLICABLE",
+        "severity": "NONE",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "discount covered by a dated derogation of a finance approver",
+      "evidence": [
+        "derogation register"
+      ],
+      "recommended_action": "None: not raised",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-DEROG-003",
+      "family": "management_approved_exception",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/DEROG-003",
+        "product": "SPR-002"
+      },
+      "order_date": "2025-03-06",
+      "period": "2025-03",
+      "expected": {
+        "status": "COMPLIANT",
+        "classification": "LEGITIMATE_EXCEPTION",
+        "cause": "APPROVED_DEROGATION",
+        "adverse_exposure": null,
+        "potential_exposure": null,
+        "exposure_type": "discount",
+        "controllability": "NOT_APPLICABLE",
+        "severity": "NONE",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "discount covered by a dated derogation of a finance approver",
+      "evidence": [
+        "derogation register"
+      ],
+      "recommended_action": "None: not raised",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-DEROG-004",
+      "family": "management_approved_exception",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/DEROG-004",
+        "product": "FLW-001"
+      },
+      "order_date": "2024-06-06",
+      "period": "2024-06",
+      "expected": {
+        "status": "COMPLIANT",
+        "classification": "LEGITIMATE_EXCEPTION",
+        "cause": "APPROVED_DEROGATION",
+        "adverse_exposure": null,
+        "potential_exposure": null,
+        "exposure_type": "discount",
+        "controllability": "NOT_APPLICABLE",
+        "severity": "NONE",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "discount covered by a dated derogation of a finance approver",
+      "evidence": [
+        "derogation register"
+      ],
+      "recommended_action": "None: not raised",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-DEROG-005",
+      "family": "management_approved_exception",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/DEROG-005",
+        "product": "VLV-007"
+      },
+      "order_date": "2025-08-13",
+      "period": "2025-08",
+      "expected": {
+        "status": "COMPLIANT",
+        "classification": "LEGITIMATE_EXCEPTION",
+        "cause": "APPROVED_DEROGATION",
+        "adverse_exposure": null,
+        "potential_exposure": null,
+        "exposure_type": "discount",
+        "controllability": "NOT_APPLICABLE",
+        "severity": "NONE",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "discount covered by a dated derogation of a finance approver",
+      "evidence": [
+        "derogation register"
+      ],
+      "recommended_action": "None: not raised",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-DEROG-006",
+      "family": "management_approved_exception",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/DEROG-006",
+        "product": "SPR-001"
+      },
+      "order_date": "2024-05-14",
+      "period": "2024-05",
+      "expected": {
+        "status": "COMPLIANT",
+        "classification": "LEGITIMATE_EXCEPTION",
+        "cause": "APPROVED_DEROGATION",
+        "adverse_exposure": null,
+        "potential_exposure": null,
+        "exposure_type": "discount",
+        "controllability": "NOT_APPLICABLE",
+        "severity": "NONE",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "discount covered by a dated derogation of a finance approver",
+      "evidence": [
+        "derogation register"
+      ],
+      "recommended_action": "None: not raised",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-DISC-001",
+      "family": "unauthorised_discount",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/DISC-001",
+        "product": "VLV-005"
+      },
+      "order_date": "2026-08-13",
+      "period": "2026-08",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "DISCOUNT_ABOVE_CAP",
+        "adverse_exposure": "1228.00",
+        "potential_exposure": null,
+        "exposure_type": "discount",
+        "controllability": "CONTROLLABLE",
+        "severity": "HIGH",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "discount 15% above the 5% standard cap, no derogation",
+      "evidence": [
+        "order line",
+        "invoice line",
+        "policy POL-DISC-STANDARD"
+      ],
+      "recommended_action": "Obtain a derogation or issue a complementary invoice",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-DISC-002",
+      "family": "unauthorised_discount",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/DISC-002",
+        "product": "VLV-014"
+      },
+      "order_date": "2025-07-15",
+      "period": "2025-07",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "DISCOUNT_ABOVE_CAP",
+        "adverse_exposure": "615.68",
+        "potential_exposure": null,
+        "exposure_type": "discount",
+        "controllability": "CONTROLLABLE",
+        "severity": "MEDIUM",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "discount 18% above the 5% standard cap, no derogation",
+      "evidence": [
+        "order line",
+        "invoice line",
+        "policy POL-DISC-STANDARD"
+      ],
+      "recommended_action": "Obtain a derogation or issue a complementary invoice",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-DISC-003",
+      "family": "unauthorised_discount",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/DISC-003",
+        "product": "FLW-020"
+      },
+      "order_date": "2024-04-15",
+      "period": "2024-04",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "DISCOUNT_ABOVE_CAP",
+        "adverse_exposure": "3447.60",
+        "potential_exposure": null,
+        "exposure_type": "discount",
+        "controllability": "CONTROLLABLE",
+        "severity": "HIGH",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "discount 18% above the 5% standard cap, no derogation",
+      "evidence": [
+        "order line",
+        "invoice line",
+        "policy POL-DISC-STANDARD"
+      ],
+      "recommended_action": "Obtain a derogation or issue a complementary invoice",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-DISC-004",
+      "family": "unauthorised_discount",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/DISC-004",
+        "product": "FLW-005"
+      },
+      "order_date": "2025-03-04",
+      "period": "2025-03",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "DISCOUNT_ABOVE_CAP",
+        "adverse_exposure": "359.10",
+        "potential_exposure": null,
+        "exposure_type": "discount",
+        "controllability": "CONTROLLABLE",
+        "severity": "MEDIUM",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "discount 15% above the 5% standard cap, no derogation",
+      "evidence": [
+        "order line",
+        "invoice line",
+        "policy POL-DISC-STANDARD"
+      ],
+      "recommended_action": "Obtain a derogation or issue a complementary invoice",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-DISC-005",
+      "family": "unauthorised_discount",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/DISC-005",
+        "product": "CON-004"
+      },
+      "order_date": "2024-01-17",
+      "period": "2024-01",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "DISCOUNT_ABOVE_CAP",
+        "adverse_exposure": "858.00",
+        "potential_exposure": null,
+        "exposure_type": "discount",
+        "controllability": "CONTROLLABLE",
+        "severity": "HIGH",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "discount 18% above the 5% standard cap, no derogation",
+      "evidence": [
+        "order line",
+        "invoice line",
+        "policy POL-DISC-STANDARD"
+      ],
+      "recommended_action": "Obtain a derogation or issue a complementary invoice",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-DISC-006",
+      "family": "unauthorised_discount",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/DISC-006",
+        "product": "TLG-001"
+      },
+      "order_date": "2023-09-09",
+      "period": "2023-09",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "DISCOUNT_ABOVE_CAP",
+        "adverse_exposure": "2322.32",
+        "potential_exposure": null,
+        "exposure_type": "discount",
+        "controllability": "CONTROLLABLE",
+        "severity": "HIGH",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "discount 18% above the 5% standard cap, no derogation",
+      "evidence": [
+        "order line",
+        "invoice line",
+        "policy POL-DISC-STANDARD"
+      ],
+      "recommended_action": "Obtain a derogation or issue a complementary invoice",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-DISC-007",
+      "family": "unauthorised_discount",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/DISC-007",
+        "product": "VLV-005"
+      },
+      "order_date": "2024-12-14",
+      "period": "2024-12",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "DISCOUNT_ABOVE_CAP",
+        "adverse_exposure": "3192.80",
+        "potential_exposure": null,
+        "exposure_type": "discount",
+        "controllability": "CONTROLLABLE",
+        "severity": "HIGH",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "discount 15% above the 5% standard cap, no derogation",
+      "evidence": [
+        "order line",
+        "invoice line",
+        "policy POL-DISC-STANDARD"
+      ],
+      "recommended_action": "Obtain a derogation or issue a complementary invoice",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-DISC-008",
+      "family": "unauthorised_discount",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/DISC-008",
+        "product": "DRV-007"
+      },
+      "order_date": "2024-04-11",
+      "period": "2024-04",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "DISCOUNT_ABOVE_CAP",
+        "adverse_exposure": "3800.16",
+        "potential_exposure": null,
+        "exposure_type": "discount",
+        "controllability": "CONTROLLABLE",
+        "severity": "HIGH",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "discount 18% above the 5% standard cap, no derogation",
+      "evidence": [
+        "order line",
+        "invoice line",
+        "policy POL-DISC-STANDARD"
+      ],
+      "recommended_action": "Obtain a derogation or issue a complementary invoice",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-DISC-009",
+      "family": "unauthorised_discount",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/DISC-009",
+        "product": "SEN-004"
+      },
+      "order_date": "2025-05-12",
+      "period": "2025-05",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "DISCOUNT_ABOVE_CAP",
+        "adverse_exposure": "1033.20",
+        "potential_exposure": null,
+        "exposure_type": "discount",
+        "controllability": "CONTROLLABLE",
+        "severity": "HIGH",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "discount 12% above the 5% standard cap, no derogation",
+      "evidence": [
+        "order line",
+        "invoice line",
+        "policy POL-DISC-STANDARD"
+      ],
+      "recommended_action": "Obtain a derogation or issue a complementary invoice",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-DISC-010",
+      "family": "unauthorised_discount",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/DISC-010",
+        "product": "FLW-008"
+      },
+      "order_date": "2025-04-07",
+      "period": "2025-04",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "DISCOUNT_ABOVE_CAP",
+        "adverse_exposure": "2856.00",
+        "potential_exposure": null,
+        "exposure_type": "discount",
+        "controllability": "CONTROLLABLE",
+        "severity": "HIGH",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "discount 15% above the 5% standard cap, no derogation",
+      "evidence": [
+        "order line",
+        "invoice line",
+        "policy POL-DISC-STANDARD"
+      ],
+      "recommended_action": "Obtain a derogation or issue a complementary invoice",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-DISC-011",
+      "family": "unauthorised_discount",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/DISC-011",
+        "product": "VLV-004"
+      },
+      "order_date": "2024-10-17",
+      "period": "2024-10",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "DISCOUNT_ABOVE_CAP",
+        "adverse_exposure": "480.15",
+        "potential_exposure": null,
+        "exposure_type": "discount",
+        "controllability": "CONTROLLABLE",
+        "severity": "MEDIUM",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "discount 20% above the 5% standard cap, no derogation",
+      "evidence": [
+        "order line",
+        "invoice line",
+        "policy POL-DISC-STANDARD"
+      ],
+      "recommended_action": "Obtain a derogation or issue a complementary invoice",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-DISC-012",
+      "family": "unauthorised_discount",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/DISC-012",
+        "product": "FLW-008"
+      },
+      "order_date": "2025-07-03",
+      "period": "2025-07",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "DISCOUNT_ABOVE_CAP",
+        "adverse_exposure": "1528.80",
+        "potential_exposure": null,
+        "exposure_type": "discount",
+        "controllability": "CONTROLLABLE",
+        "severity": "HIGH",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "discount 12% above the 5% standard cap, no derogation",
+      "evidence": [
+        "order line",
+        "invoice line",
+        "policy POL-DISC-STANDARD"
+      ],
+      "recommended_action": "Obtain a derogation or issue a complementary invoice",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-FRT-001",
+      "family": "freight_not_recharged",
+      "rule": "FREIGHT_REBILL",
+      "subject": {
+        "type": "sale_order",
+        "order": "FD/SO/FRT-001",
+        "product": null
+      },
+      "order_date": "2026-08-06",
+      "period": "2026-08",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "FREIGHT_NOT_INVOICED",
+        "adverse_exposure": "180",
+        "potential_exposure": null,
+        "exposure_type": "freight",
+        "controllability": "CONTROLLABLE",
+        "severity": "LOW",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "goods delivered and invoiced, no freight line",
+      "evidence": [
+        "delivery",
+        "invoices",
+        "freight contract clause"
+      ],
+      "recommended_action": "Issue the contractual freight invoice",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-FRT-002",
+      "family": "freight_not_recharged",
+      "rule": "FREIGHT_REBILL",
+      "subject": {
+        "type": "sale_order",
+        "order": "FD/SO/FRT-002",
+        "product": null
+      },
+      "order_date": "2025-03-02",
+      "period": "2025-03",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "FREIGHT_NOT_INVOICED",
+        "adverse_exposure": "180",
+        "potential_exposure": null,
+        "exposure_type": "freight",
+        "controllability": "CONTROLLABLE",
+        "severity": "LOW",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "goods delivered and invoiced, no freight line",
+      "evidence": [
+        "delivery",
+        "invoices",
+        "freight contract clause"
+      ],
+      "recommended_action": "Issue the contractual freight invoice",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-FRT-003",
+      "family": "freight_not_recharged",
+      "rule": "FREIGHT_REBILL",
+      "subject": {
+        "type": "sale_order",
+        "order": "FD/SO/FRT-003",
+        "product": null
+      },
+      "order_date": "2024-09-06",
+      "period": "2024-09",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "FREIGHT_NOT_INVOICED",
+        "adverse_exposure": "180",
+        "potential_exposure": null,
+        "exposure_type": "freight",
+        "controllability": "CONTROLLABLE",
+        "severity": "LOW",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "goods delivered and invoiced, no freight line",
+      "evidence": [
+        "delivery",
+        "invoices",
+        "freight contract clause"
+      ],
+      "recommended_action": "Issue the contractual freight invoice",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-FRT-004",
+      "family": "freight_not_recharged",
+      "rule": "FREIGHT_REBILL",
+      "subject": {
+        "type": "sale_order",
+        "order": "FD/SO/FRT-004",
+        "product": null
+      },
+      "order_date": "2025-10-14",
+      "period": "2025-10",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "FREIGHT_NOT_INVOICED",
+        "adverse_exposure": "180",
+        "potential_exposure": null,
+        "exposure_type": "freight",
+        "controllability": "CONTROLLABLE",
+        "severity": "LOW",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "goods delivered and invoiced, no freight line",
+      "evidence": [
+        "delivery",
+        "invoices",
+        "freight contract clause"
+      ],
+      "recommended_action": "Issue the contractual freight invoice",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-FRT-005",
+      "family": "freight_not_recharged",
+      "rule": "FREIGHT_REBILL",
+      "subject": {
+        "type": "sale_order",
+        "order": "FD/SO/FRT-005",
+        "product": null
+      },
+      "order_date": "2024-03-08",
+      "period": "2024-03",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "FREIGHT_NOT_INVOICED",
+        "adverse_exposure": "180",
+        "potential_exposure": null,
+        "exposure_type": "freight",
+        "controllability": "CONTROLLABLE",
+        "severity": "LOW",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "goods delivered and invoiced, no freight line",
+      "evidence": [
+        "delivery",
+        "invoices",
+        "freight contract clause"
+      ],
+      "recommended_action": "Issue the contractual freight invoice",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-FRT-006",
+      "family": "freight_not_recharged",
+      "rule": "FREIGHT_REBILL",
+      "subject": {
+        "type": "sale_order",
+        "order": "FD/SO/FRT-006",
+        "product": null
+      },
+      "order_date": "2024-07-05",
+      "period": "2024-07",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "FREIGHT_NOT_INVOICED",
+        "adverse_exposure": "180",
+        "potential_exposure": null,
+        "exposure_type": "freight",
+        "controllability": "CONTROLLABLE",
+        "severity": "LOW",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "goods delivered and invoiced, no freight line",
+      "evidence": [
+        "delivery",
+        "invoices",
+        "freight contract clause"
+      ],
+      "recommended_action": "Issue the contractual freight invoice",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-FRT-007",
+      "family": "freight_not_recharged",
+      "rule": "FREIGHT_REBILL",
+      "subject": {
+        "type": "sale_order",
+        "order": "FD/SO/FRT-007",
+        "product": null
+      },
+      "order_date": "2026-05-12",
+      "period": "2026-05",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "FREIGHT_NOT_INVOICED",
+        "adverse_exposure": "180",
+        "potential_exposure": null,
+        "exposure_type": "freight",
+        "controllability": "CONTROLLABLE",
+        "severity": "LOW",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "goods delivered and invoiced, no freight line",
+      "evidence": [
+        "delivery",
+        "invoices",
+        "freight contract clause"
+      ],
+      "recommended_action": "Issue the contractual freight invoice",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-FRT-008",
+      "family": "freight_not_recharged",
+      "rule": "FREIGHT_REBILL",
+      "subject": {
+        "type": "sale_order",
+        "order": "FD/SO/FRT-008",
+        "product": null
+      },
+      "order_date": "2025-01-10",
+      "period": "2025-01",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "FREIGHT_NOT_INVOICED",
+        "adverse_exposure": "180",
+        "potential_exposure": null,
+        "exposure_type": "freight",
+        "controllability": "CONTROLLABLE",
+        "severity": "LOW",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "goods delivered and invoiced, no freight line",
+      "evidence": [
+        "delivery",
+        "invoices",
+        "freight contract clause"
+      ],
+      "recommended_action": "Issue the contractual freight invoice",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-FRTP-001",
+      "family": "partial_freight_recharge",
+      "rule": "FREIGHT_REBILL",
+      "subject": {
+        "type": "sale_order",
+        "order": "FD/SO/FRTP-001",
+        "product": null
+      },
+      "order_date": "2024-04-13",
+      "period": "2024-04",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "FREIGHT_PARTIALLY_INVOICED",
+        "adverse_exposure": "150.00",
+        "potential_exposure": null,
+        "exposure_type": "freight",
+        "controllability": "CONTROLLABLE",
+        "severity": "LOW",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "freight invoiced 100.00 of 250",
+      "evidence": [
+        "freight line",
+        "freight contract clause"
+      ],
+      "recommended_action": "Invoice the remaining freight",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-FRTP-002",
+      "family": "partial_freight_recharge",
+      "rule": "FREIGHT_REBILL",
+      "subject": {
+        "type": "sale_order",
+        "order": "FD/SO/FRTP-002",
+        "product": null
+      },
+      "order_date": "2026-04-13",
+      "period": "2026-04",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "FREIGHT_PARTIALLY_INVOICED",
+        "adverse_exposure": "108.00",
+        "potential_exposure": null,
+        "exposure_type": "freight",
+        "controllability": "CONTROLLABLE",
+        "severity": "LOW",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "freight invoiced 72.00 of 180",
+      "evidence": [
+        "freight line",
+        "freight contract clause"
+      ],
+      "recommended_action": "Invoice the remaining freight",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-FRTP-003",
+      "family": "partial_freight_recharge",
+      "rule": "FREIGHT_REBILL",
+      "subject": {
+        "type": "sale_order",
+        "order": "FD/SO/FRTP-003",
+        "product": null
+      },
+      "order_date": "2024-06-08",
+      "period": "2024-06",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "FREIGHT_PARTIALLY_INVOICED",
+        "adverse_exposure": "108.00",
+        "potential_exposure": null,
+        "exposure_type": "freight",
+        "controllability": "CONTROLLABLE",
+        "severity": "LOW",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "freight invoiced 72.00 of 180",
+      "evidence": [
+        "freight line",
+        "freight contract clause"
+      ],
+      "recommended_action": "Invoice the remaining freight",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-FRTP-004",
+      "family": "partial_freight_recharge",
+      "rule": "FREIGHT_REBILL",
+      "subject": {
+        "type": "sale_order",
+        "order": "FD/SO/FRTP-004",
+        "product": null
+      },
+      "order_date": "2026-04-07",
+      "period": "2026-04",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "FREIGHT_PARTIALLY_INVOICED",
+        "adverse_exposure": "90.00",
+        "potential_exposure": null,
+        "exposure_type": "freight",
+        "controllability": "CONTROLLABLE",
+        "severity": "LOW",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "freight invoiced 60.00 of 150",
+      "evidence": [
+        "freight line",
+        "freight contract clause"
+      ],
+      "recommended_action": "Invoice the remaining freight",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-FX-001",
+      "family": "currency_effect_explained",
+      "rule": "PRICE_BELOW_BASELINE",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/FX-001",
+        "product": "VLV-013"
+      },
+      "order_date": "2026-05-02",
+      "period": "2026-05",
+      "expected": {
+        "status": "COMPLIANT",
+        "classification": "COMPLIANT",
+        "cause": "AT_OR_ABOVE_BASELINE",
+        "adverse_exposure": null,
+        "potential_exposure": null,
+        "exposure_type": "price",
+        "controllability": "NOT_APPLICABLE",
+        "severity": "NONE",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "foreign-currency line compared at the order-date rate",
+      "evidence": [
+        "order line",
+        "currency rate"
+      ],
+      "recommended_action": "None: not raised",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-FX-002",
+      "family": "currency_effect_explained",
+      "rule": "PRICE_BELOW_BASELINE",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/FX-002",
+        "product": "SPR-001"
+      },
+      "order_date": "2025-02-08",
+      "period": "2025-02",
+      "expected": {
+        "status": "COMPLIANT",
+        "classification": "COMPLIANT",
+        "cause": "AT_OR_ABOVE_BASELINE",
+        "adverse_exposure": null,
+        "potential_exposure": null,
+        "exposure_type": "price",
+        "controllability": "NOT_APPLICABLE",
+        "severity": "NONE",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "foreign-currency line compared at the order-date rate",
+      "evidence": [
+        "order line",
+        "currency rate"
+      ],
+      "recommended_action": "None: not raised",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-FX-003",
+      "family": "currency_effect_explained",
+      "rule": "PRICE_BELOW_BASELINE",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/FX-003",
+        "product": "CON-005"
+      },
+      "order_date": "2024-09-16",
+      "period": "2024-09",
+      "expected": {
+        "status": "COMPLIANT",
+        "classification": "COMPLIANT",
+        "cause": "AT_OR_ABOVE_BASELINE",
+        "adverse_exposure": null,
+        "potential_exposure": null,
+        "exposure_type": "price",
+        "controllability": "NOT_APPLICABLE",
+        "severity": "NONE",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "foreign-currency line compared at the order-date rate",
+      "evidence": [
+        "order line",
+        "currency rate"
+      ],
+      "recommended_action": "None: not raised",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-GAP-001",
+      "family": "data_quality_prevents_recommendation",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/GAP-001",
+        "product": "TLG-002"
+      },
+      "order_date": "2026-04-06",
+      "period": "2026-04",
+      "expected": {
+        "status": "UNKNOWN",
+        "classification": "INSUFFICIENT_EVIDENCE",
+        "cause": "POLICY_EXPIRED",
+        "adverse_exposure": null,
+        "potential_exposure": "338.69",
+        "exposure_type": "discount",
+        "controllability": "CONTROLLABLE",
+        "severity": "MEDIUM",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "no distributor policy valid in the renewal gap",
+      "evidence": [
+        "policy register"
+      ],
+      "recommended_action": "Renew the policy, then reassess",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-GAP-002",
+      "family": "data_quality_prevents_recommendation",
+      "rule": "DISCOUNT_CAP",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/GAP-002",
+        "product": "ENC-004"
+      },
+      "order_date": "2026-04-11",
+      "period": "2026-04",
+      "expected": {
+        "status": "UNKNOWN",
+        "classification": "INSUFFICIENT_EVIDENCE",
+        "cause": "POLICY_EXPIRED",
+        "adverse_exposure": null,
+        "potential_exposure": "600.93",
+        "exposure_type": "discount",
+        "controllability": "CONTROLLABLE",
+        "severity": "MEDIUM",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "no distributor policy valid in the renewal gap",
+      "evidence": [
+        "policy register"
+      ],
+      "recommended_action": "Renew the policy, then reassess",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-MAP-001",
+      "family": "incorrect_product_mapping",
+      "rule": "PRODUCT_MAPPING",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/MAP-001",
+        "product": "MAP-01"
+      },
+      "order_date": "2024-07-15",
+      "period": "2024-07",
+      "expected": {
+        "status": "UNDETERMINED",
+        "classification": "DATA_QUALITY_ISSUE",
+        "cause": "UNRESOLVED_UNIT_OR_PRODUCT",
+        "adverse_exposure": null,
+        "potential_exposure": "1140.00",
+        "exposure_type": null,
+        "controllability": "NOT_APPLICABLE",
+        "severity": "HIGH",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "product without a resolvable unit of measure",
+      "evidence": [
+        "order line",
+        "product master"
+      ],
+      "recommended_action": "Correct the product master",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-MAP-002",
+      "family": "incorrect_product_mapping",
+      "rule": "PRODUCT_MAPPING",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/MAP-002",
+        "product": "MAP-01"
+      },
+      "order_date": "2025-08-12",
+      "period": "2025-08",
+      "expected": {
+        "status": "UNDETERMINED",
+        "classification": "DATA_QUALITY_ISSUE",
+        "cause": "UNRESOLVED_UNIT_OR_PRODUCT",
+        "adverse_exposure": null,
+        "potential_exposure": "1140.00",
+        "exposure_type": null,
+        "controllability": "NOT_APPLICABLE",
+        "severity": "HIGH",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "product without a resolvable unit of measure",
+      "evidence": [
+        "order line",
+        "product master"
+      ],
+      "recommended_action": "Correct the product master",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-MAP-003",
+      "family": "incorrect_product_mapping",
+      "rule": "PRODUCT_MAPPING",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/MAP-003",
+        "product": "MAP-01"
+      },
+      "order_date": "2024-07-06",
+      "period": "2024-07",
+      "expected": {
+        "status": "UNDETERMINED",
+        "classification": "DATA_QUALITY_ISSUE",
+        "cause": "UNRESOLVED_UNIT_OR_PRODUCT",
+        "adverse_exposure": null,
+        "potential_exposure": "475.00",
+        "exposure_type": null,
+        "controllability": "NOT_APPLICABLE",
+        "severity": "MEDIUM",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "product without a resolvable unit of measure",
+      "evidence": [
+        "order line",
+        "product master"
+      ],
+      "recommended_action": "Correct the product master",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-MISS-001",
+      "family": "missing_or_delayed_cost_posting",
+      "rule": "COST_REFERENCE_VARIANCE",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/MISS-001",
+        "product": "SCM-01"
+      },
+      "order_date": "2025-03-14",
+      "period": "2025-03",
+      "expected": {
+        "status": "UNDETERMINED",
+        "classification": "DATA_QUALITY_ISSUE",
+        "cause": "MISSING_COST",
+        "adverse_exposure": null,
+        "potential_exposure": null,
+        "exposure_type": "cost",
+        "controllability": "PARTIALLY_CONTROLLABLE",
+        "severity": "NONE",
+        "material": false,
+        "case_created": true
+      },
+      "root_cause": "delivered without any valued receipt",
+      "evidence": [
+        "delivery move",
+        "cost allocation UNDETERMINED"
+      ],
+      "recommended_action": "Post or attribute the receipt cost",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-MISS-002",
+      "family": "missing_or_delayed_cost_posting",
+      "rule": "COST_REFERENCE_VARIANCE",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/MISS-002",
+        "product": "SCM-02"
+      },
+      "order_date": "2025-10-20",
+      "period": "2025-10",
+      "expected": {
+        "status": "UNDETERMINED",
+        "classification": "DATA_QUALITY_ISSUE",
+        "cause": "MISSING_COST",
+        "adverse_exposure": null,
+        "potential_exposure": null,
+        "exposure_type": "cost",
+        "controllability": "PARTIALLY_CONTROLLABLE",
+        "severity": "NONE",
+        "material": false,
+        "case_created": true
+      },
+      "root_cause": "delivered without any valued receipt",
+      "evidence": [
+        "delivery move",
+        "cost allocation UNDETERMINED"
+      ],
+      "recommended_action": "Post or attribute the receipt cost",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-MISS-003",
+      "family": "missing_or_delayed_cost_posting",
+      "rule": "COST_REFERENCE_VARIANCE",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/MISS-003",
+        "product": "SCM-03"
+      },
+      "order_date": "2024-05-14",
+      "period": "2024-05",
+      "expected": {
+        "status": "UNDETERMINED",
+        "classification": "DATA_QUALITY_ISSUE",
+        "cause": "MISSING_COST",
+        "adverse_exposure": null,
+        "potential_exposure": null,
+        "exposure_type": "cost",
+        "controllability": "PARTIALLY_CONTROLLABLE",
+        "severity": "NONE",
+        "material": false,
+        "case_created": true
+      },
+      "root_cause": "delivered without any valued receipt",
+      "evidence": [
+        "delivery move",
+        "cost allocation UNDETERMINED"
+      ],
+      "recommended_action": "Post or attribute the receipt cost",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-NOORD-001",
+      "family": "invoice_without_order",
+      "rule": "INVOICE_WITHOUT_SALE_LINK",
+      "subject": {
+        "type": "invoice_line",
+        "invoice": "FD/INV/NOORD-001",
+        "product": "CON-008"
+      },
+      "order_date": "2026-02-14",
+      "period": "2026-02",
+      "expected": {
+        "status": "NO_SALE_LINK",
+        "classification": "DATA_QUALITY_ISSUE",
+        "cause": "INVOICE_WITHOUT_ORDER",
+        "adverse_exposure": "0.00",
+        "potential_exposure": "648.00",
+        "exposure_type": null,
+        "controllability": "NOT_APPLICABLE",
+        "severity": "MEDIUM",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "invoice entered without an order behind it",
+      "evidence": [
+        "invoice line without order link"
+      ],
+      "recommended_action": "Link the invoice to its order or document the exception",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-NOORD-002",
+      "family": "invoice_without_order",
+      "rule": "INVOICE_WITHOUT_SALE_LINK",
+      "subject": {
+        "type": "invoice_line",
+        "invoice": "FD/INV/NOORD-002",
+        "product": "CON-006"
+      },
+      "order_date": "2026-03-03",
+      "period": "2026-03",
+      "expected": {
+        "status": "NO_SALE_LINK",
+        "classification": "DATA_QUALITY_ISSUE",
+        "cause": "INVOICE_WITHOUT_ORDER",
+        "adverse_exposure": "0.00",
+        "potential_exposure": "220.00",
+        "exposure_type": null,
+        "controllability": "NOT_APPLICABLE",
+        "severity": "LOW",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "invoice entered without an order behind it",
+      "evidence": [
+        "invoice line without order link"
+      ],
+      "recommended_action": "Link the invoice to its order or document the exception",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-NOORD-003",
+      "family": "invoice_without_order",
+      "rule": "INVOICE_WITHOUT_SALE_LINK",
+      "subject": {
+        "type": "invoice_line",
+        "invoice": "FD/INV/NOORD-003",
+        "product": "TLG-006"
+      },
+      "order_date": "2025-08-02",
+      "period": "2025-08",
+      "expected": {
+        "status": "NO_SALE_LINK",
+        "classification": "DATA_QUALITY_ISSUE",
+        "cause": "INVOICE_WITHOUT_ORDER",
+        "adverse_exposure": "0.00",
+        "potential_exposure": "3906.00",
+        "exposure_type": null,
+        "controllability": "NOT_APPLICABLE",
+        "severity": "HIGH",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "invoice entered without an order behind it",
+      "evidence": [
+        "invoice line without order link"
+      ],
+      "recommended_action": "Link the invoice to its order or document the exception",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-NOORD-004",
+      "family": "invoice_without_order",
+      "rule": "INVOICE_WITHOUT_SALE_LINK",
+      "subject": {
+        "type": "invoice_line",
+        "invoice": "FD/INV/NOORD-004",
+        "product": "DRV-018"
+      },
+      "order_date": "2026-01-17",
+      "period": "2026-01",
+      "expected": {
+        "status": "NO_SALE_LINK",
+        "classification": "DATA_QUALITY_ISSUE",
+        "cause": "INVOICE_WITHOUT_ORDER",
+        "adverse_exposure": "0.00",
+        "potential_exposure": "6664.00",
+        "exposure_type": null,
+        "controllability": "NOT_APPLICABLE",
+        "severity": "HIGH",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "invoice entered without an order behind it",
+      "evidence": [
+        "invoice line without order link"
+      ],
+      "recommended_action": "Link the invoice to its order or document the exception",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-PLIST-001",
+      "family": "incorrect_pricelist_application",
+      "rule": "PRICE_BELOW_BASELINE",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/PLIST-001",
+        "product": "SPR-004"
+      },
+      "order_date": "2026-08-05",
+      "period": "2026-08",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "PRICELIST_MISMATCH",
+        "adverse_exposure": "362.88",
+        "potential_exposure": null,
+        "exposure_type": "price",
+        "controllability": "CONTROLLABLE",
+        "severity": "MEDIUM",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "order applied the distributor price list to a standard customer",
+      "evidence": [
+        "order price list",
+        "customer price list",
+        "list price"
+      ],
+      "recommended_action": "Re-price the order on the customer's price list",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-PLIST-002",
+      "family": "incorrect_pricelist_application",
+      "rule": "PRICE_BELOW_BASELINE",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/PLIST-002",
+        "product": "FLW-011"
+      },
+      "order_date": "2023-12-16",
+      "period": "2023-12",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "PRICELIST_MISMATCH",
+        "adverse_exposure": "385.20",
+        "potential_exposure": null,
+        "exposure_type": "price",
+        "controllability": "CONTROLLABLE",
+        "severity": "MEDIUM",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "order applied the distributor price list to a standard customer",
+      "evidence": [
+        "order price list",
+        "customer price list",
+        "list price"
+      ],
+      "recommended_action": "Re-price the order on the customer's price list",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-PLIST-003",
+      "family": "incorrect_pricelist_application",
+      "rule": "PRICE_BELOW_BASELINE",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/PLIST-003",
+        "product": "FLW-006"
+      },
+      "order_date": "2023-09-08",
+      "period": "2023-09",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "PRICELIST_MISMATCH",
+        "adverse_exposure": "416.52",
+        "potential_exposure": null,
+        "exposure_type": "price",
+        "controllability": "CONTROLLABLE",
+        "severity": "MEDIUM",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "order applied the distributor price list to a standard customer",
+      "evidence": [
+        "order price list",
+        "customer price list",
+        "list price"
+      ],
+      "recommended_action": "Re-price the order on the customer's price list",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-PLIST-004",
+      "family": "incorrect_pricelist_application",
+      "rule": "PRICE_BELOW_BASELINE",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/PLIST-004",
+        "product": "CTL-014"
+      },
+      "order_date": "2024-11-12",
+      "period": "2024-11",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "PRICELIST_MISMATCH",
+        "adverse_exposure": "3215.40",
+        "potential_exposure": null,
+        "exposure_type": "price",
+        "controllability": "CONTROLLABLE",
+        "severity": "HIGH",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "order applied the distributor price list to a standard customer",
+      "evidence": [
+        "order price list",
+        "customer price list",
+        "list price"
+      ],
+      "recommended_action": "Re-price the order on the customer's price list",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-PLIST-005",
+      "family": "incorrect_pricelist_application",
+      "rule": "PRICE_BELOW_BASELINE",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/PLIST-005",
+        "product": "ENC-011"
+      },
+      "order_date": "2025-01-02",
+      "period": "2025-01",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "PRICELIST_MISMATCH",
+        "adverse_exposure": "1001.52",
+        "potential_exposure": null,
+        "exposure_type": "price",
+        "controllability": "CONTROLLABLE",
+        "severity": "HIGH",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "order applied the distributor price list to a standard customer",
+      "evidence": [
+        "order price list",
+        "customer price list",
+        "list price"
+      ],
+      "recommended_action": "Re-price the order on the customer's price list",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-PRICE-001",
+      "family": "invoiced_below_contract_price",
+      "rule": "PRICE_BELOW_BASELINE",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/PRICE-001",
+        "product": "CON-006"
+      },
+      "order_date": "2026-08-11",
+      "period": "2026-08",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "PRICE_BELOW_CONTRACT",
+        "adverse_exposure": "33.60",
+        "potential_exposure": null,
+        "exposure_type": "price",
+        "controllability": "CONTROLLABLE",
+        "severity": "LOW",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "unit price 17.48 below contract price 18.60",
+      "evidence": [
+        "order line",
+        "contract price register"
+      ],
+      "recommended_action": "Invoice the difference or record the amendment",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-PRICE-002",
+      "family": "invoiced_below_contract_price",
+      "rule": "PRICE_BELOW_BASELINE",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/PRICE-002",
+        "product": "VLV-005"
+      },
+      "order_date": "2025-09-20",
+      "period": "2025-09",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "PRICE_BELOW_CONTRACT",
+        "adverse_exposure": "822.24",
+        "potential_exposure": null,
+        "exposure_type": "price",
+        "controllability": "CONTROLLABLE",
+        "severity": "HIGH",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "unit price 536.76 below contract price 571.02",
+      "evidence": [
+        "order line",
+        "contract price register"
+      ],
+      "recommended_action": "Invoice the difference or record the amendment",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-PRICE-003",
+      "family": "invoiced_below_contract_price",
+      "rule": "PRICE_BELOW_BASELINE",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/PRICE-003",
+        "product": "SPR-008"
+      },
+      "order_date": "2024-12-08",
+      "period": "2024-12",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "PRICE_BELOW_CONTRACT",
+        "adverse_exposure": "79.73",
+        "potential_exposure": null,
+        "exposure_type": "price",
+        "controllability": "CONTROLLABLE",
+        "severity": "LOW",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "unit price 73.43 below contract price 78.12",
+      "evidence": [
+        "order line",
+        "contract price register"
+      ],
+      "recommended_action": "Invoice the difference or record the amendment",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-PRICE-004",
+      "family": "invoiced_below_contract_price",
+      "rule": "PRICE_BELOW_BASELINE",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/PRICE-004",
+        "product": "VLV-012"
+      },
+      "order_date": "2025-07-08",
+      "period": "2025-07",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "PRICE_BELOW_CONTRACT",
+        "adverse_exposure": "255.12",
+        "potential_exposure": null,
+        "exposure_type": "price",
+        "controllability": "CONTROLLABLE",
+        "severity": "MEDIUM",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "unit price 333.07 below contract price 354.33",
+      "evidence": [
+        "order line",
+        "contract price register"
+      ],
+      "recommended_action": "Invoice the difference or record the amendment",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-PRICE-005",
+      "family": "invoiced_below_contract_price",
+      "rule": "PRICE_BELOW_BASELINE",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/PRICE-005",
+        "product": "SEN-004"
+      },
+      "order_date": "2025-09-19",
+      "period": "2025-09",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "PRICE_BELOW_CONTRACT",
+        "adverse_exposure": "441.98",
+        "potential_exposure": null,
+        "exposure_type": "price",
+        "controllability": "CONTROLLABLE",
+        "severity": "MEDIUM",
+        "material": true,
+        "case_created": true
+      },
+      "root_cause": "unit price 314.71 below contract price 334.80",
+      "evidence": [
+        "order line",
+        "contract price register"
+      ],
+      "recommended_action": "Invoice the difference or record the amendment",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-PRICE-006",
+      "family": "invoiced_below_contract_price",
+      "rule": "PRICE_BELOW_BASELINE",
+      "subject": {
+        "type": "sale_order_line",
+        "order": "FD/SO/PRICE-006",
+        "product": "CON-005"
+      },
+      "order_date": "2025-03-03",
+      "period": "2025-03",
+      "expected": {
+        "status": "VIOLATION",
+        "classification": "CONFIRMED_LEAKAGE",
+        "cause": "PRICE_BELOW_CONTRACT",
+        "adverse_exposure": "189.37",
+        "potential_exposure": null,
+        "exposure_type": "price",
+        "controllability": "CONTROLLABLE",
+        "severity": "LOW",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "unit price 102.28 below contract price 108.81",
+      "evidence": [
+        "order line",
+        "contract price register"
+      ],
+      "recommended_action": "Invoice the difference or record the amendment",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-WAIV-001",
+      "family": "legitimate_low_margin_transaction",
+      "rule": "FREIGHT_REBILL",
+      "subject": {
+        "type": "sale_order",
+        "order": "FD/SO/WAIV-001",
+        "product": null
+      },
+      "order_date": "2025-04-13",
+      "period": "2025-04",
+      "expected": {
+        "status": "COMPLIANT",
+        "classification": "LEGITIMATE_EXCEPTION",
+        "cause": "CONTRACT_WAIVER",
+        "adverse_exposure": null,
+        "potential_exposure": null,
+        "exposure_type": "freight",
+        "controllability": "NOT_APPLICABLE",
+        "severity": "NONE",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "freight waived by contract",
+      "evidence": [
+        "freight contract clause"
+      ],
+      "recommended_action": "None: not raised",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-WAIV-002",
+      "family": "legitimate_low_margin_transaction",
+      "rule": "FREIGHT_REBILL",
+      "subject": {
+        "type": "sale_order",
+        "order": "FD/SO/WAIV-002",
+        "product": null
+      },
+      "order_date": "2024-11-15",
+      "period": "2024-11",
+      "expected": {
+        "status": "COMPLIANT",
+        "classification": "LEGITIMATE_EXCEPTION",
+        "cause": "CONTRACT_WAIVER",
+        "adverse_exposure": null,
+        "potential_exposure": null,
+        "exposure_type": "freight",
+        "controllability": "NOT_APPLICABLE",
+        "severity": "NONE",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "freight waived by contract",
+      "evidence": [
+        "freight contract clause"
+      ],
+      "recommended_action": "None: not raised",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-WAIV-003",
+      "family": "legitimate_low_margin_transaction",
+      "rule": "FREIGHT_REBILL",
+      "subject": {
+        "type": "sale_order",
+        "order": "FD/SO/WAIV-003",
+        "product": null
+      },
+      "order_date": "2024-10-10",
+      "period": "2024-10",
+      "expected": {
+        "status": "COMPLIANT",
+        "classification": "LEGITIMATE_EXCEPTION",
+        "cause": "CONTRACT_WAIVER",
+        "adverse_exposure": null,
+        "potential_exposure": null,
+        "exposure_type": "freight",
+        "controllability": "NOT_APPLICABLE",
+        "severity": "NONE",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "freight waived by contract",
+      "evidence": [
+        "freight contract clause"
+      ],
+      "recommended_action": "None: not raised",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-WAIV-004",
+      "family": "legitimate_low_margin_transaction",
+      "rule": "FREIGHT_REBILL",
+      "subject": {
+        "type": "sale_order",
+        "order": "FD/SO/WAIV-004",
+        "product": null
+      },
+      "order_date": "2025-02-11",
+      "period": "2025-02",
+      "expected": {
+        "status": "COMPLIANT",
+        "classification": "LEGITIMATE_EXCEPTION",
+        "cause": "CONTRACT_WAIVER",
+        "adverse_exposure": null,
+        "potential_exposure": null,
+        "exposure_type": "freight",
+        "controllability": "NOT_APPLICABLE",
+        "severity": "NONE",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "freight waived by contract",
+      "evidence": [
+        "freight contract clause"
+      ],
+      "recommended_action": "None: not raised",
+      "status": "INJECTED"
+    },
+    {
+      "scenario_id": "FULL-WAIV-005",
+      "family": "legitimate_low_margin_transaction",
+      "rule": "FREIGHT_REBILL",
+      "subject": {
+        "type": "sale_order",
+        "order": "FD/SO/WAIV-005",
+        "product": null
+      },
+      "order_date": "2025-05-03",
+      "period": "2025-05",
+      "expected": {
+        "status": "COMPLIANT",
+        "classification": "LEGITIMATE_EXCEPTION",
+        "cause": "CONTRACT_WAIVER",
+        "adverse_exposure": null,
+        "potential_exposure": null,
+        "exposure_type": "freight",
+        "controllability": "NOT_APPLICABLE",
+        "severity": "NONE",
+        "material": false,
+        "case_created": false
+      },
+      "root_cause": "freight waived by contract",
+      "evidence": [
+        "freight contract clause"
+      ],
+      "recommended_action": "None: not raised",
+      "status": "INJECTED"
+    }
+  ],
+  "expected_totals": {
+    "injected_scenarios": 80,
+    "cases_from_scenarios": 41,
+    "confirmed_leakage_exceptions": 43,
+    "leakage_by_type": {
+      "cost": "9263.92",
+      "discount": "21721.81",
+      "freight": "1896.00",
+      "price": "7203.56"
+    },
+    "exceptions_outside_scenarios": 0
+  },
+  "period_signal": {
+    "description": "year-three mix shift and volume push on low-margin families: goods gross margin percentage of the last twelve months below the previous twelve by at least one point",
+    "min_drop_points": "1.0"
+  }
+}

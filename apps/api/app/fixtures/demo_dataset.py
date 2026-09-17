@@ -1,7 +1,7 @@
 """Deterministic BENACTA DEMO dataset shaped like Odoo 19 API records.
 
-One fictional company over 90 days: 21 customers, 5 suppliers, 12 catalogue
-products, 5 scenario products, 120 sale orders. Background orders are
+One fictional company over 90 days: 24 customers, 5 suppliers, 12 catalogue
+products, 5 scenario products, 123 sale orders. Background orders are
 compliant by construction. Scenario orders carry the three golden cases and
 the negative controls. Expected outcomes are NOT produced here: they live in
 the hand-written oracle `data/golden/oracle_v1.yml`, which never imports this
@@ -98,7 +98,14 @@ SCENARIO_CUSTOMERS = {
     "N03": ("Sarlat Cement", "standard", "rebill"),
     "N09": ("Tessier Distribution", "distributor", None),
     "N10": ("Ubaye Trade Partners", "distributor", None),
+    "G4": ("Rennes Hydraulics", "standard", None),
+    "G5": ("Saumur Cranes", "standard", "rebill"),
+    "N13": ("Vannes Trading", "standard", None),
 }
+# Approved contract price of one customer for one product (PRICE-001).
+CONTRACT_PRICES = {("G4", "P07"): "500"}
+# Distributor price list: a fixed price below list on one product; PLIST-001 applies it to a customer who is not on it.
+DISTRIBUTOR_PRICELIST_ITEMS = {"P02": "300"}
 FREIGHT_AMOUNT = Decimal("250")
 
 
@@ -159,6 +166,8 @@ class _Order:
     invoice_after: int | None = 1
     refund: tuple[int, Decimal] | None = None  # (days after invoice, refunded quantity on the first line)
     freight_line: bool = False
+    freight_price: Decimal | None = None  # freight line amount when it differs from the contract (FREIGHT-002)
+    pricelist: str | None = None  # price list applied on the order when it is not the public one (PLIST-001)
 
 
 @dataclass
@@ -264,16 +273,40 @@ class _DemoGenerator:
             write_date=start,
         )
 
+        # One public price list; customer-specific lists are attached to partners by scenarios.
+        self.public_pricelist = b.add(
+            "product.pricelist",
+            "pricelist_public",
+            name="BENACTA_DEMO Public",
+            currency_id=m2o(EUR),
+            company_id=m2o(COMPANY),
+            active=True,
+            item_ids=[],
+            write_date=start,
+        )
+        self.distributor_pricelist = b.add(
+            "product.pricelist",
+            "pricelist_distributor",
+            name="BENACTA_DEMO Distributor",
+            currency_id=m2o(EUR),
+            company_id=m2o(COMPANY),
+            active=True,
+            item_ids=[],
+            write_date=start,
+        )
+        self.pricelists = {"public": self.public_pricelist, "distributor": self.distributor_pricelist}
         for key, name in SUPPLIERS.items():
             self.partner_ids[key] = b.add(
                 "res.partner",
                 f"partner_{key}",
                 name=name,
+                ref=key,
                 company_id=m2o(COMPANY),
                 is_company=True,
                 customer_rank=0,
                 supplier_rank=1,
                 commercial_partner_id=False,
+                property_product_pricelist=False,
                 email=f"{key.lower()}@benacta-demo.invalid",
                 write_date=start,
             )
@@ -282,11 +315,13 @@ class _DemoGenerator:
                 "res.partner",
                 f"partner_{key}",
                 name=name,
+                ref=key,
                 company_id=m2o(COMPANY),
                 is_company=True,
                 customer_rank=1,
                 supplier_rank=0,
                 commercial_partner_id=False,
+                property_product_pricelist=[self.public_pricelist, "BENACTA_DEMO Public"],
                 email=f"{key.lower()}@benacta-demo.invalid",
                 write_date=start,
             )
@@ -321,6 +356,25 @@ class _DemoGenerator:
             self.list_price[code] = Decimal(price)
             self.ref_cost[code] = Decimal(ref_cost)
             self.receipt_cost[code] = Decimal(receipt_cost) if receipt_cost else None
+        for code, fixed in DISTRIBUTOR_PRICELIST_ITEMS.items():
+            template_id = b.records["product.product"][self.product_ids[code] - 1]["product_tmpl_id"][0]
+            b.add(
+                "product.pricelist.item",
+                f"item_distributor_{code}",
+                pricelist_id=[self.distributor_pricelist, "BENACTA_DEMO Distributor"],
+                applied_on="1_product",
+                product_tmpl_id=[template_id, self.product_names[code]],
+                product_id=False,
+                categ_id=False,
+                min_quantity=0.0,
+                compute_price="fixed",
+                fixed_price=float(fixed),
+                percent_price=0.0,
+                currency_id=m2o(EUR),
+                date_start=False,
+                date_end=False,
+                write_date=start,
+            )
         code, name, price = FREIGHT_PRODUCT
         template = b.add(
             "product.template",
@@ -410,6 +464,10 @@ class _DemoGenerator:
             _Order("BD/SO/NEG-09", "N09", 65, [_Line("P02", Decimal(6), P["P02"], Decimal(12))]),
             _Order("BD/SO/NEG-10", "N10", 66, [_Line("P07", Decimal(2), P["P07"], Decimal(8))]),
             _Order("BD/SO/NEG-12", "C12", 70, [_Line("SC5", Decimal(50), Decimal(100), Decimal(15))]),
+            _Order("BD/SO/PRICE-001", "G4", 47, [_Line("P07", Decimal(20), Decimal(470), Decimal(0))]),
+            _Order("BD/SO/PLIST-001", "N13", 53, [_Line("P02", Decimal(10), Decimal(300), Decimal(0))], pricelist="distributor"),
+            _Order("BD/SO/FREIGHT-002", "G5", 58, [_Line("P09", Decimal(5), P["P09"], Decimal(0))], freight_line=True,
+                   freight_price=Decimal(100)),
         ]
 
     # ------------------------------------------------------------------ purchasing
@@ -514,7 +572,7 @@ class _DemoGenerator:
     def sale(self, order: _Order) -> None:
         b = self.b
         order_day = b.day(order.day)
-        customer_name = ({**BACKGROUND_CUSTOMERS, **SCENARIO_CUSTOMERS})[order.customer][0]
+        customer_name = self.customer_name(order.customer)
         partner = [self.partner_ids[order.customer], customer_name]
         so_id = b.add(
             "sale.order",
@@ -523,7 +581,7 @@ class _DemoGenerator:
             partner_id=partner,
             company_id=m2o(COMPANY),
             currency_id=m2o(order.currency),
-            pricelist_id=False,
+            pricelist_id=self._order_pricelist(order),
             date_order=dt(order_day),
             state=order.state,
             order_line=[],
@@ -534,7 +592,7 @@ class _DemoGenerator:
         so = b.records["sale.order"][-1]
         lines = list(order.lines)
         if order.freight_line:
-            lines.append(_Line("FRT", Decimal(1), FREIGHT_AMOUNT, Decimal(0)))
+            lines.append(_Line("FRT", Decimal(1), order.freight_price or FREIGHT_AMOUNT, Decimal(0)))
 
         delivered_day = b.day(order.day + order.deliver_after) if order.deliver_after is not None else None
         invoice_day = (
@@ -620,6 +678,15 @@ class _DemoGenerator:
                 so["invoice_ids"].append(refund)
                 self._sol(first[0])["qty_invoiced"] = float(first[2] - refunded)
                 so["write_date"] = dt(invoice_day + timedelta(days=days_after), 11)
+
+    def customer_name(self, key: str) -> str:
+        return ({**BACKGROUND_CUSTOMERS, **SCENARIO_CUSTOMERS})[key][0]
+
+    def _order_pricelist(self, order: _Order) -> Any:
+        if order.currency != EUR:
+            return False
+        key = order.pricelist or "public"
+        return [self.pricelists[key], "BENACTA_DEMO " + key.capitalize()]
 
     def _sol(self, sol_id: int) -> dict[str, Any]:
         return next(r for r in self.b.records["sale.order.line"] if r["id"] == sol_id)
@@ -926,6 +993,19 @@ class _DemoGenerator:
                     "valid_to": None,
                 }
                 for customer, terms in sorted(freight.items())
+            ],
+            "contract_prices": [
+                {
+                    "contract_id": f"CTR-PRICE-{customer}",
+                    "customer": customer,
+                    "product": product,
+                    "unit_price": price,
+                    "currency": "EUR",
+                    "min_quantity": "0",
+                    "valid_from": str(day(-200)),
+                    "valid_to": None,
+                }
+                for (customer, product), price in sorted(CONTRACT_PRICES.items())
             ],
             "cost_references": [
                 {

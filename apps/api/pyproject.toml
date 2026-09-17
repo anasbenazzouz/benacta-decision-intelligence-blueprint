@@ -17,6 +17,10 @@ dependencies = [
     "uvicorn[standard]>=0.53.0",
 ]
 
+[project.optional-dependencies]
+# The Margin Control cockpit (Streamlit) is optional: the API and the command line never need it.
+cockpit = ["streamlit>=1.40"]
+
 [project.scripts]
 benacta = "app.cli:main"
 
@@ -32,12 +36,14 @@ dev = [
     "pytest>=9.1.1",
     "respx>=0.23.1",
     "ruff>=0.16.7",
+    "streamlit>=1.40",
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 markers = [
     "odoo_live: reads the configured Odoo instance; skipped unless BENACTA_LIVE_ODOO=1",
+    "full_profile: runs the whole pipeline on the three-year demonstration profile; skipped unless BENACTA_FULL_PROFILE=1",
 ]
 
 [tool.ruff]
