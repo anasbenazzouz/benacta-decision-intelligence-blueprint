@@ -3,7 +3,8 @@
 Grains:
 - fact_sales_order_line: one ordered line (section and note lines excluded)
 - fact_invoice_line: one posted customer invoice or credit note product line, signed
-- fact_posted_cogs_line: one posted COGS item on a direct cost account
+- fact_posted_cogs_line: one posted COGS item on an expense account (the expense side of Odoo's cost pair;
+  Odoo 19 with the French chart posts it on a plain expense account, older charts on a direct cost account)
 - fact_stock_move: one stock move with its Odoo valuation
 - fact_cost_allocation: one slice of a delivery's quantity attributed to a receipt
 - bridge_sale_invoice_line: one link between an order line and an invoice line
@@ -29,6 +30,7 @@ import sqlalchemy as sa
 from sqlalchemy.engine import Connection, Engine
 
 from app.audit.log import append_event
+from app.marts.reconcile import COGS_ACCOUNT_TYPES
 
 MARTS_TABLES = (
     "fact_margin_period",
@@ -332,8 +334,9 @@ class _Builder:
             accounting_date = to_date(line["date"])
             company_id = m2o(line["company_id"])
             if line["display_type"] == "cogs":
+                # The expense side of the pair; the asset side (stock valuation) is not a cost of goods sold.
                 account = accounts.get(m2o(line["account_id"]), {})
-                if account.get("account_type") == "expense_direct_cost":
+                if account.get("account_type") in COGS_ACCOUNT_TYPES:
                     self.rows["fact_posted_cogs_line"].append(
                         {
                             "snapshot_id": self.s,

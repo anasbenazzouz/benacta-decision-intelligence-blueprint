@@ -157,7 +157,7 @@ def read_facts(reader: OdooReader, settings: Settings) -> InstanceFacts:
                 f.stock_accounts["property_stock_journal"] = journal["id"]
     for model in ("sale.order.line", "purchase.order.line"):
         described = _fields(reader, model, ["type"])
-        f.line_uom_field[model] = "product_uom_id" if "product_uom_id" in described or not described else "product_uom"
+        f.line_uom_field[model] = "product_uom" if "product_uom" in described and "product_uom_id" not in described else "product_uom_id"
     f.template_fields = set(_fields(reader, "product.template", ["type"]))
     return f
 
@@ -472,14 +472,14 @@ class TradingSeeder(OdooSeeder):
         for line in self.ds.records["purchase.order.line"]:
             lines_of[line["order_id"][0]].append(line)
         receipts = {p["origin"]: p for p in self.ds.records["stock.picking"] if p["picking_type_code"] == "incoming"}
-        uom_field = self.f.line_uom_field.get("purchase.order.line", "product_uom_id")
 
         def order_vals(order: dict[str, Any]) -> dict[str, Any]:
             planned = receipts[order["name"]]["date_done"]
+            # Purchase lines are all in the product's unit: Odoo fills the unit itself.
             return {"name": order["name"], "partner_ref": order["name"], "partner_id": self.ref("res.partner", order["partner_id"]),
                     "company_id": self.company, "currency_id": self.ref("res.currency", order["currency_id"]), "date_order": order["date_order"],
                     "order_line": [[0, 0, {"product_id": self.ref("product.product", line["product_id"]), "name": line["product_id"][1],
-                                           "product_qty": line["product_qty"], uom_field: self.f.units, "price_unit": line["price_unit"],
+                                           "product_qty": line["product_qty"], "price_unit": line["price_unit"],
                                            "date_planned": planned, "tax_ids": [[6, 0, []]]}] for line in lines_of[order["id"]]]}
 
         self.ensure("purchase.order", orders, order_vals, adopt=("partner_ref", lambda row: row["name"]), batch=20)
@@ -520,10 +520,12 @@ class TradingSeeder(OdooSeeder):
             else:
                 pricelist = self.ref("product.pricelist", order["pricelist_id"] or [public["id"], public["name"]])
             lines = [self.fixture["sale.order.line"][i] for i in order["order_line"]]
+            # The unit is passed only when it differs from the product's unit (the dozens scenario); Odoo fills it otherwise.
             return {"name": order["name"], "client_order_ref": order["name"], "partner_id": self.ref("res.partner", order["partner_id"]),
                     "company_id": self.company, "pricelist_id": pricelist, "date_order": order["date_order"],
                     "order_line": [[0, 0, {"product_id": self.ref("product.product", line["product_id"]), "name": line["product_id"][1],
-                                           "product_uom_qty": line["product_uom_qty"], uom_field: self.ref("uom.uom", line["product_uom_id"]),
+                                           "product_uom_qty": line["product_uom_qty"],
+                                           **({uom_field: self.ref("uom.uom", line["product_uom_id"])} if line["product_uom_id"][1] != "Units" else {}),
                                            "price_unit": line["price_unit"], "discount": line["discount"], "tax_ids": self.tax}] for line in lines]}
 
         self.ensure("sale.order", orders, order_vals, adopt=("client_order_ref", lambda row: row["name"]), batch=25)
@@ -630,9 +632,10 @@ class TradingSeeder(OdooSeeder):
             self.w.call("account.move", "action_post", ids=[move_id])
             self.register_one("account.move", move, move_id)
             step.created += 1
-            [posted] = self.r.search_read("account.move", [["id", "=", move_id]], ["amount_untaxed", "state"])
-            if posted["state"] != "posted" or abs(posted["amount_untaxed"] - abs(move["amount_untaxed_signed"])) > 0.005:
-                self.report.mismatches.append(f"{move['name']}: Odoo {posted['state']} {posted['amount_untaxed']} vs dataset {abs(move['amount_untaxed_signed'])}")
+            [posted] = self.r.search_read("account.move", [["id", "=", move_id]], ["amount_untaxed_signed", "state"])
+            # Compared in company currency: the dataset carries the signed company-currency amount, foreign invoices included.
+            if posted["state"] != "posted" or abs(abs(posted["amount_untaxed_signed"]) - abs(move["amount_untaxed_signed"])) > 0.005:
+                self.report.mismatches.append(f"{move['name']}: Odoo {posted['state']} {posted['amount_untaxed_signed']} vs dataset {move['amount_untaxed_signed']}")
 
     def run(self) -> None:
         self.reference()

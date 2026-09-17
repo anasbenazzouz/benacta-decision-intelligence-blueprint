@@ -10,7 +10,7 @@ tolerance, timestamps and transformation version (`benacta reconciliation-report
 | Check | Source total | Analytical total | Independence | Statuses |
 |---|---|---|---|---|
 | `REVENUE_POSTED` | server aggregate of posted customer invoice and credit note product lines (`account.move.line.balance`, negated), per company and month | `sum(marts.fact_invoice_line.revenue_company_ccy)` | `SERVER_AGGREGATE` on Odoo (`formatted_read_group`), `FIXTURE_CONTROL_TOTAL` on fixtures | `RECONCILED`, `UNRECONCILED`, `UNAVAILABLE` |
-| `COGS_POSTED` | server aggregate of posted COGS items on `expense_direct_cost` accounts | `sum(marts.fact_posted_cogs_line.balance)` | as above; `NONE` when goods were invoiced without any posted COGS | `RECONCILED`, `UNRECONCILED`, `UNAVAILABLE` |
+| `COGS_POSTED` | server aggregate of posted COGS items on expense accounts (`expense_direct_cost`, or `expense` where the chart has no direct cost type, as Odoo 19 with the French chart) | `sum(marts.fact_posted_cogs_line.balance)` | as above; `NONE` when goods were invoiced without any posted COGS | `RECONCILED`, `UNRECONCILED`, `UNAVAILABLE` |
 | `INVOICE_HEADER_LINES` | `amount_untaxed_signed` of every posted revenue invoice header in the snapshot | sum of that invoice's product lines in the marts | `SOURCE_HEADER` (the source's own header, consistent with its lines by construction) | `RECONCILED`, `UNRECONCILED` with the mismatched invoices listed, `UNAVAILABLE` |
 
 Tolerance: 0.01 in company currency on every check. Revenue and cost are compared at the same grain (company,

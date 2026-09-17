@@ -8,7 +8,7 @@ production readiness.
 | Control | Where | Test |
 |---|---|---|
 | Odoo reads only through an allowlisted reader; any other method is refused before the network | `app/connectors/odoo.py` (`OdooReader`) | `test_odoo_connector.py` |
-| Odoo writes only through `OdooWriter`, built from a passing guard, method allowlist, no `unlink`, no raw write on journal items, mail and tracking disabled, no retry | `app/connectors/odoo.py` | `test_writer_*` |
+| Odoo writes only through `OdooWriter`, built from a passing guard, method allowlist plus five document workflows admitted on their own model only, no `unlink`, no raw write on journal items, mail and tracking disabled, no retry | `app/connectors/odoo.py` | `test_writer_*` |
 | Write guard: sandbox mode, writes enabled, allowlisted target, sandbox company named and verified live, backup attested within the allowed age | `app/connectors/guards.py` | `test_guards.py` |
 | Migrations only against a database named as the analytics database, never carrying Odoo tables | `app/db/engine.py` | `test_foundation_db.py` |
 | Secrets never rendered by configuration description; audit payloads refuse secret-like keys | `app/config.py`, `app/audit/log.py` | `test_config.py`, foundation tests |

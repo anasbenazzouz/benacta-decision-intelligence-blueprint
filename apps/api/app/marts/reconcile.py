@@ -7,9 +7,9 @@ and are labelled FIXTURE_CONTROL_TOTAL, never presented as independent evidence.
 
 Checks:
 - REVENUE_POSTED: signed revenue of posted customer invoice and credit note product lines
-- COGS_POSTED: posted COGS items on direct cost accounts. When goods were invoiced in a
-  month without any posted COGS, the check is UNAVAILABLE and gross margin can only be a
-  management proxy.
+- COGS_POSTED: posted COGS items on expense accounts (the expense side of the cost pair, direct
+  cost or plain expense depending on the chart). When goods were invoiced in a month without any
+  posted COGS, the check is UNAVAILABLE and gross margin can only be a management proxy.
 - INVOICE_HEADER_LINES: the untaxed amount of every posted invoice header against the sum of
   its product lines in the marts (SOURCE_HEADER: the source's own header, consistent with its
   lines by construction, so a difference is an extraction or transformation defect).
@@ -41,10 +41,13 @@ REVENUE_DOMAIN = [
     ["parent_state", "=", "posted"],
     ["move_id.move_type", "in", ["out_invoice", "out_refund"]],
 ]
+# Account types of the expense side of a posted cost-of-goods-sold pair: direct cost accounts, or plain expense accounts
+# where the chart carries no direct cost type (Odoo 19 with the French chart posts on 607 "Goods", type expense).
+COGS_ACCOUNT_TYPES = frozenset({"expense_direct_cost", "expense"})
 COGS_DOMAIN = [
     ["display_type", "=", "cogs"],
     ["parent_state", "=", "posted"],
-    ["account_id.account_type", "=", "expense_direct_cost"],
+    ["account_id.account_type", "in", sorted(COGS_ACCOUNT_TYPES)],
 ]
 
 

@@ -83,7 +83,10 @@ class OdooSeeder:
         return xmlid_name(model, self.ds.keys[model][fixture_id])
 
     def ref(self, model: str, value: Any) -> int | bool:
-        fixture_id = m2o_id(value) if not isinstance(value, int) else value
+        """Odoo id of a fixture many2one (`[id, name]`), a fixture id, or False when the fixture holds no value."""
+        if value is None or isinstance(value, bool):
+            return False
+        fixture_id = value if isinstance(value, int) else m2o_id(value)
         if fixture_id is None:
             return False
         return self.ids[model][fixture_id]

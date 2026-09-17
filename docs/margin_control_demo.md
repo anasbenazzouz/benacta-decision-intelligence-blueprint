@@ -161,14 +161,16 @@ cockpit, and the three-year demonstration company.
 
 ## 3. What this demonstration does not claim
 
-- Fixture mode proves the engine, not the Odoo integration. The connected Odoo has been read (revenue reconciled
-  against server aggregates), never seeded with these orders; order-level exceptions are `NOT_VERIFIED` against
-  Odoo until the sandbox seed runs. The seed executor exists (`benacta seed-odoo`, dry run without `--confirm`)
-  and waits for the owner's write switch, see `docs/progress.md`, section "Odoo write path".
+- Fixture mode proves the engine, not the Odoo integration. On 2026-09-17 the same orders were written into the
+  owner's trial instance with `benacta seed-odoo --confirm` and the pipeline read them back: the eight expected
+  leakages came out with their amounts, revenue and cost of goods sold reconciled against server aggregates on the
+  three seeded months (`VERIFIED_ODOO_SANDBOX`, see `docs/progress.md`, section "Odoo write path"). That instance
+  also carries documents of its own, which the engine evaluates as well.
 - Thresholds are demonstration settings, not financial standards.
 - Recovery is measured only from posted documents dated after a decision; on the demonstration data it stays
   `NOT_MEASURED` until such a document exists.
-- The controlled action has never run against the connected Odoo: `NOT_VERIFIED` until the owner enables writes
-  and attests a backup.
+- The controlled action ran once for real on 2026-09-17: one review activity on the order `BD/SO/DISC-001` of the
+  owner's trial instance, from an approved decision, with its audit trail (`VERIFIED_ODOO_SANDBOX`). Any other
+  instance starts again at `NOT_VERIFIED` until its owner enables writes and attests a backup.
 - No language model has been called for real: the model path is exercised through a fake transport and validated
   drafts; the demonstration runs the deterministic investigation.

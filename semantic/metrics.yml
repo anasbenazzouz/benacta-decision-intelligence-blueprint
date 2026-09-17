@@ -503,7 +503,7 @@ metrics:
     owner: Chief financial officer
     steward: Accounting manager
     grain: company, accounting month
-    formula: sum(balance of posted journal items with display_type cogs on expense_direct_cost accounts)
+    formula: sum(balance of posted journal items with display_type cogs on expense accounts, direct cost or plain expense)
     calculation: app.margin.engine:run_engine
     unit: EUR excluding taxes
     period: accounting month

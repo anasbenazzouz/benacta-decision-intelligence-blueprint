@@ -5,7 +5,34 @@ Status vocabulary: `IMPLEMENTED` (code exists) · `TESTED_LOCAL` (automated test
 real read-only run against the connected Odoo) · `NOT_VERIFIED` · `BLOCKED`.
 A fixture test never proves an Odoo integration. Plan: `docs/implementation_plan.md`.
 
-## Odoo write path: trading-company seed executor (2026-09-16, IMPLEMENTED, NOT_VERIFIED)
+## Odoo write path: first real run on the connected instance (2026-09-17, VERIFIED_ODOO_SANDBOX)
+
+The owner authorised the run in chat on 2026-09-17 (proof of concept on the owner's own trial instance, no backup,
+waiver recorded in the attestation variable). Everything below was executed against `benacta.odoo.com/benacta`.
+
+| Step | Result | Status |
+|---|---|---|
+| `benacta seed-odoo --confirm` (three passes, each resuming on the external identifiers) | 2 categories, 3 price lists, 18 products, 1 price-list item, 29 partners, 2 rates, 5 purchase orders confirmed and received, 123 sale orders (118 confirmed, 4 draft, 1 cancelled), 121 transfers validated with the dataset dates (one partial with a backorder), 117 journal entries posted from the orders, one credit note through the reversal wizard, one invoice without order; anglo-saxon accounting switched on and the unit "Dozens" created; policy register written | VERIFIED_ODOO_SANDBOX |
+| `benacta ingest`, `marts`, `reconcile`, `load-policies`, `exceptions` | 154 orders, 169 journal entries and 319 stock moves read (the 123 seeded orders plus the 31 the instance already had); `REVENUE_POSTED` and `INVOICE_HEADER_LINES` `RECONCILED` on 21 months against `SERVER_AGGREGATE`; `COGS_POSTED` `RECONCILED` on the three seeded months once the marts accepted Odoo 19's cost account (see below), `UNAVAILABLE` on the 18 months that only carry the instance's own documents | VERIFIED_ODOO_READ |
+| Rule results on the seeded documents | the 8 expected confirmed leakages with the expected amounts (1 000, 800, 600, 500, 400, 400, 250, 150 EUR), the derogation legitimate, the policy gap and the policy conflict as insufficient evidence, the waiver, the not-yet-due freight, the missing cost, the invoice without order; nothing else on the seeded documents | VERIFIED_ODOO_SANDBOX |
+| Rule results on the instance's own 31 orders | 38 lines sold below list price (816 817 EUR, all in 2026-08) and 65 invoice lines without order link: correct findings on that data, which dominate the August overview | as designed |
+| `benacta margin-overview --period 2026-07` | basis `RECONCILED_COGS`, revenue 222 713.91, COGS 168 217.00, detected leakage 3 050.00, the five causes and the five orders of the dataset | VERIFIED_ODOO_SANDBOX |
+| `benacta margin-decide MC-000053 --decision APPROVE`, `benacta margin-act MC-000053 --confirm` | review activity created in Odoo (`mail.activity` 1 on the order `BD/SO/DISC-001`, external id `benacta_demo.margin_action__MC-000053__REVIEW_ACTIVITY`), case `ACTIONED`, audit chain with the three events | VERIFIED_ODOO_SANDBOX |
+| Ingestion replay | no new record version for the seeded documents | VERIFIED_ODOO_READ |
+
+Findings of the first run:
+
+- Odoo 19 posts the cost of goods sold pair on the invoice with the French chart's account 607 "Goods", type
+  `expense`, not `expense_direct_cost`. The marts and the reconciliation now take the expense side of the pair on
+  either type (`COGS_ACCOUNT_TYPES`), so `COGS_POSTED` reconciles on the seeded months.
+- Odoo 19 keeps no valuation layers: values live on the stock moves, which the marts already read. Deliveries
+  post nothing at validation; the cost hits the ledger with the invoice.
+- The instance's own documents (one 129 388 EUR invoice in June, one 64 694 EUR credit note in July, 31 orders in
+  August) blend with the seeded months, so the June and July margins on the instance are not the dataset's. The
+  seeded documents alone give about 41.5 % goods margin each month.
+- The foreign-currency invoice amount must be compared in company currency; the executor's mismatch check does.
+
+## Odoo write path: trading-company seed executor (2026-09-16, IMPLEMENTED, then run on 2026-09-17)
 
 The owner asked on 2026-09-16 for the connected instance (`benacta.odoo.com/benacta`, Odoo saas~19.4, company
 `Benacta`, the only one) to carry the demonstration data as if it had been entered there. The instance already has
@@ -21,22 +48,12 @@ alongside the seed.
 | Policy register of the seeded company written for `benacta load-policies` in connected mode | IMPLEMENTED | `data/policies/margin_policy_register.yml` (ignored by git) |
 | Default suite | 254 passed, 16 skipped | `uv run pytest -q` |
 
-What the first confirmed run still needs, all owner decisions taken outside this session:
-
-1. `.env`: `ODOO_WRITES_ENABLED=true`, `ODOO_BACKUP_ATTESTED_AT` (ISO date within 7 days) and `ODOO_BACKUP_REFERENCE`
-   (the downloaded backup, or an explicit waiver text for a throw-away instance). The session's permission layer
-   refused these edits on 2026-09-16, so they stay with the owner.
-2. Two shared settings the executor changes on the instance and reports: anglo-saxon accounting on the company
-   (cost of goods sold posted with the invoice, which `COGS_POSTED` needs) and the unit of measure "Dozens".
-3. The guarded writer's method allowlist must admit five document workflows on their own model only:
-   `stock.picking.button_validate`, `stock.backorder.confirmation.process`, `sale.advance.payment.inv.create_invoices`,
-   `account.move.reversal.reverse_moves`, `sale.order.action_cancel` (`MODEL_METHODS` in `app/connectors/odoo.py`,
-   with a unit test that every other model still refuses them). Without it the executor stops at the first
-   receipt with `WriteNotAllowed`, which is the intended behaviour of the guard.
-
-Then, in order: `benacta seed-odoo --confirm`, `benacta ingest`, `benacta marts`, `benacta reconcile`,
-`benacta load-policies`, `benacta exceptions`, `benacta margin-overview`, one `margin-decide` and one
-`margin-act --confirm`, and the status words move to `VERIFIED_ODOO_SANDBOX` where the run proves them.
+Owner decisions taken on 2026-09-17, in chat: `ODOO_WRITES_ENABLED=true` with the backup waiver recorded in
+`ODOO_BACKUP_ATTESTED_AT` and `ODOO_BACKUP_REFERENCE`; the two shared settings the executor changes (anglo-saxon
+accounting on the company, the unit "Dozens"); and the guarded writer admitting five document workflows on their
+own model only (`MODEL_METHODS` in `app/connectors/odoo.py`: `stock.picking.button_validate`,
+`stock.backorder.confirmation.process`, `sale.advance.payment.inv.create_invoices`,
+`account.move.reversal.reverse_moves`, `sale.order.action_cancel`), refused on every other model by a unit test.
 
 ## Milestone 3c: three-year demonstration company and its ground truth (delivered on fixtures)
 
