@@ -136,23 +136,24 @@ def read_facts(reader: OdooReader, settings: Settings) -> InstanceFacts:
     if f.warehouse is None:
         f.missing.append("warehouse of the company")
     f.category_fields = {k: v for k, v in _fields(reader, "product.category", ["type", "selection"]).items() if k.startswith("property_")}
-    if "property_stock_valuation_account_id" in f.category_fields:
-        template = first("product.category", [["property_stock_valuation_account_id", "!=", False]],
-                         ["property_stock_account_input_categ_id", "property_stock_account_output_categ_id",
-                          "property_stock_valuation_account_id", "property_stock_journal"])
+    # Odoo 19 keeps the valuation account and journal on the category; older versions also carried input and output accounts.
+    account_fields = [name for name in ("property_stock_valuation_account_id", "property_stock_account_input_categ_id",
+                                        "property_stock_account_output_categ_id", "property_stock_journal") if name in f.category_fields]
+    if "property_stock_valuation_account_id" in account_fields:
+        template = first("product.category", [["property_stock_valuation_account_id", "!=", False]], account_fields)
         if template:
-            f.stock_accounts = {k: m2o_id(v) for k, v in template.items() if k.startswith("property_") and m2o_id(v)}
+            f.stock_accounts = {k: m2o_id(v) for k, v in template.items() if k in account_fields and m2o_id(v)}
         else:
-            for name, prefixes in (("property_stock_valuation_account_id", ("37", "35", "3")),
-                                   ("property_stock_account_input_categ_id", ("6037", "603")),
-                                   ("property_stock_account_output_categ_id", ("6037", "603"))):
-                for prefix in prefixes:
+            prefixes = {"property_stock_valuation_account_id": ("37", "35", "3"), "property_stock_account_input_categ_id": ("6037", "603"),
+                        "property_stock_account_output_categ_id": ("6037", "603")}
+            for name in account_fields:
+                for prefix in prefixes.get(name, ()):
                     account = first("account.account", [["code", "=like", f"{prefix}%"]], ["id"])
                     if account:
                         f.stock_accounts[name] = account["id"]
                         break
             journal = first("account.journal", [["type", "=", "general"], ["company_id", "=", f.company]], ["id"])
-            if journal:
+            if journal and "property_stock_journal" in account_fields:
                 f.stock_accounts["property_stock_journal"] = journal["id"]
     for model in ("sale.order.line", "purchase.order.line"):
         described = _fields(reader, model, ["type"])

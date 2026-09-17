@@ -138,13 +138,27 @@ def test_writer_cannot_be_built_from_a_blocked_guard():
 
 
 @pytest.mark.parametrize(("model", "method"), [("sale.order", "unlink"), ("account.move", "button_draft"),
-                                               ("account.move.line", "write"), ("res.users", "action_reset_password")])
+                                               ("account.move.line", "write"), ("res.users", "action_reset_password"),
+                                               ("sale.order", "button_validate"), ("account.move", "reverse_moves"),
+                                               ("purchase.order", "action_cancel")])
 def test_writer_refuses_methods_outside_its_allowlist(model, method):
     def handler(request: httpx.Request) -> httpx.Response:  # pragma: no cover - must never be called
         raise AssertionError("a refused write reached the network")
 
     with pytest.raises(odoo_module.WriteNotAllowed):
         odoo_module.OdooWriter(_client(handler), _Guard(True)).call(model, method, ids=[1])
+
+
+@pytest.mark.parametrize(("model", "method"), sorted((m, method) for m, methods in odoo_module.MODEL_METHODS.items() for method in methods))
+def test_writer_allows_document_workflows_on_their_own_model_only(model, method):
+    seen = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request.url.path)
+        return httpx.Response(200, json=True)
+
+    assert odoo_module.OdooWriter(_client(handler), _Guard(True)).call(model, method, ids=[1]) is True
+    assert seen == [f"/json/2/{model}/{method}"]
 
 
 def test_writer_disables_mail_and_tracking_and_never_retries():

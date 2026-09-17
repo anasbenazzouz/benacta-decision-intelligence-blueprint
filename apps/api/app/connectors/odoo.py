@@ -136,6 +136,14 @@ WRITE_METHODS = frozenset({
     "create", "write", "action_confirm", "button_confirm", "action_post", "action_create_payments",
     "button_immediate_install",
 })
+# Document workflows allowed on one model only (owner decision of 2026-09-17): the seed drives Odoo's own methods.
+MODEL_METHODS: dict[str, frozenset[str]] = {
+    "stock.picking": frozenset({"button_validate"}),
+    "stock.backorder.confirmation": frozenset({"process"}),
+    "sale.advance.payment.inv": frozenset({"create_invoices"}),
+    "account.move.reversal": frozenset({"reverse_moves"}),
+    "sale.order": frozenset({"action_cancel"}),
+}
 # `write` on these models is refused: posted accounting and confirmed documents change through business methods only.
 NO_RAW_WRITE = frozenset({"account.move.line", "account.partial.reconcile"})
 # Odoo must not send mail, subscribe followers or log chatter for automated writes.
@@ -158,8 +166,8 @@ class OdooWriter:
         self.guard = guard
 
     def call(self, model: str, method: str, *, context: dict[str, Any] | None = None, **kwargs: Any) -> Any:
-        if method not in WRITE_METHODS and method not in READ_METHODS:
-            raise WriteNotAllowed(f"method '{method}' is not in the write allowlist")
+        if method not in WRITE_METHODS and method not in READ_METHODS and method not in MODEL_METHODS.get(model, ()):
+            raise WriteNotAllowed(f"method '{method}' is not in the write allowlist for {model}")
         if method == "write" and model in NO_RAW_WRITE:
             raise WriteNotAllowed(f"raw write on {model} is refused")
         return self._client.call(model, method, context={**MAIL_SAFE_CONTEXT, **(context or {})}, **kwargs)
